@@ -12,6 +12,16 @@ import io.cloudsoft.winrm4j.winrm.WinRmTool.Builder
 
 class WinRMConnectionFactory {
     
+    static Builder getWinRMConnection(WinRMConnectionConfiguration conf) {
+        if (conf instanceof WinRMGlobalConnectionConfiguration) {
+            return getGlobalWinRMConnection(conf)
+        }
+        if(conf instanceof WinRMUserConnectionConfiguration) {
+            return getUserConnection(conf)
+        }
+        return null
+    }
+    
     @Restricted(NoExternalUse)
     private static  Builder getConnection(final StandardCredentials credentials, final String servername, final Integer serverport, 
                                           final String authenticationScheme, final Boolean useHttps) {

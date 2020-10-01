@@ -25,12 +25,12 @@ class WindowsHost implements Describable<WindowsHost> {
     Integer connectionTimeout
     Integer agentConnectionTimeout
     Integer maxTries
-    String labelString
+    String label
     Boolean useHttps
 
     @DataBoundConstructor
     WindowsHost(String host, String credentialsId, Integer port, String authenticationScheme, Integer maxUsers,
-    Boolean disable,Integer connectionTimeout, Integer agentConnectionTimeout, Integer maxTries, String labelString, Boolean useHttps) {
+    Boolean disable,Integer connectionTimeout, Integer agentConnectionTimeout, Integer maxTries, String label, Boolean useHttps) {
         this.host = host
         this.credentialsId = credentialsId
         this.port = port
@@ -40,7 +40,7 @@ class WindowsHost implements Describable<WindowsHost> {
         this.connectionTimeout = connectionTimeout
         this.agentConnectionTimeout = agentConnectionTimeout
         this.maxTries = maxTries
-        this.labelString = labelString
+        this.label = label
         this.useHttps = useHttps
     }
 
@@ -154,14 +154,14 @@ class WindowsHost implements Describable<WindowsHost> {
 
 
 
-    String getLabelString() {
-        return labelString
+    String getLabel() {
+        return label
     }
 
 
     @DataBoundSetter
-    void setLabelString(String labelString) {
-        this.labelString = labelString
+    void setLabel(String label) {
+        this.label = label
     }
 
 

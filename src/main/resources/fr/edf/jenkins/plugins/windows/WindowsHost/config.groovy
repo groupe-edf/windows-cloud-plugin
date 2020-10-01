@@ -1,7 +1,6 @@
 import org.apache.http.client.config.AuthSchemes
 
 def f = namespace(lib.FormTagLib)
-def c = namespace(lib.CredentialsTagLib)
 
 f.entry(title: 'Host', field:'host') {
     f.textbox(clazz: 'required', checkMethod: 'post')
@@ -13,7 +12,7 @@ f.entry(title: 'Disable', field:'disable') {
 
 f.advanced(title:'Windows Host Details') {
     
-        f.entry(title:'Label', field:'labelString') {
+        f.entry(title:'Label', field:'label') {
             f.textbox()
         }
     

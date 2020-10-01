@@ -1,6 +1,7 @@
+import fr.edf.jenkins.plugins.windows.Messages
 def f = namespace(lib.FormTagLib)
 
-f.entry(title: 'Name', field:'name') {
+f.entry(title: Messages.Cloud_Name(), field:'name') {
     f.textbox(default:'windows')
 }
 

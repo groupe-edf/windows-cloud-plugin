@@ -5,8 +5,8 @@ f.entry(title: Messages.Cloud_Name(), field:'name') {
     f.textbox(default:'windows')
 }
 
-f.advanced(title:'Cloud Details') {
-    f.entry(title:'Windows Host') {
+f.advanced(title: Messages.Cloud_Details()) {
+    f.entry(title:Messages.Host_DefaultName()) {
         f.repeatableHeteroProperty(
         field:'windowsHosts',
         hasHeader: 'true',

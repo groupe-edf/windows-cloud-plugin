@@ -1,16 +1,30 @@
 package fr.edf.jenkins.plugins.windows
 
+
+import org.antlr.v4.runtime.misc.NotNull
 import org.apache.http.client.config.AuthSchemes
+import org.kohsuke.stapler.AncestorInPath
 import org.kohsuke.stapler.DataBoundConstructor
 import org.kohsuke.stapler.DataBoundSetter
 import org.kohsuke.stapler.QueryParameter
 import org.kohsuke.stapler.verb.POST
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers
+import com.cloudbees.plugins.credentials.CredentialsProvider
+import com.cloudbees.plugins.credentials.common.StandardCredentials
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel
+
+import fr.edf.jenkins.plugins.windows.util.FormUtils
+
+import static com.cloudbees.plugins.credentials.domains.URIRequirementBuilder.fromUri
 
 import hudson.Extension
 import hudson.model.Describable
 import hudson.model.Descriptor
+import hudson.model.Item
+import hudson.model.ItemGroup
+import hudson.security.ACL
+import hudson.util.FormValidation
 import hudson.util.ListBoxModel
 import jenkins.model.Jenkins
 
@@ -104,15 +118,15 @@ class WindowsHost implements Describable<WindowsHost> {
         this.maxUsers = maxUsers
     }
 
-    
 
-     Boolean getDisable() {
+
+    Boolean getDisable() {
         return disable
     }
 
 
     @DataBoundSetter
-     void setDisable(Boolean disable) {
+    void setDisable(Boolean disable) {
         this.disable = disable
     }
 
@@ -140,15 +154,15 @@ class WindowsHost implements Describable<WindowsHost> {
         this.agentConnectionTimeout = agentConnectionTimeout
     }
 
-    
-    
-     Integer getMaxTries() {
+
+
+    Integer getMaxTries() {
         return maxTries
     }
 
 
     @DataBoundSetter
-     void setMaxTries(Integer maxTries) {
+    void setMaxTries(Integer maxTries) {
         this.maxTries = maxTries
     }
 
@@ -190,15 +204,64 @@ class WindowsHost implements Describable<WindowsHost> {
          */
         @Override
         String getDisplayName() {
-            return "Windows Host"
+            return Messages.Host_DefaultName()
         }
+        
+        /**
+         * 
+         * @param authenticationScheme
+         * @return Type of authentication scheme
+         */
         @POST
         ListBoxModel doFillAuthenticationSchemeItems(@QueryParameter String authenticationScheme) {
             ListBoxModel result = new ListBoxModel()
-            [AuthSchemes.NTLM, AuthSchemes.BASIC, AuthSchemes.KERBEROS].each { 
+            [AuthSchemes.NTLM, AuthSchemes.BASIC, AuthSchemes.KERBEROS].each {
                 result.add(it,it)
             }
             return result
         }
+
+
+          /**
+           *           
+           * @param host
+           * @param credentialsId
+           * @param item
+           * @return ListBoxModel of Credentials
+           */
+        @POST
+        ListBoxModel doFillCredentialsIdItems(@QueryParameter String host, @QueryParameter String credentialsId,
+                @AncestorInPath Item item) {
+            StandardListBoxModel result = new StandardListBoxModel()
+            boolean notAdmin = item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)
+            boolean noCredentials = item != null && !item.hasPermission(Item.EXTENDED_READ) &&
+                    !item.hasPermission(CredentialsProvider.USE_ITEM)
+
+            if(notAdmin || noCredentials) {
+                return result.includeCurrentValue(credentialsId)
+            }
+            return result
+                    .includeEmptyValue()
+                    .includeMatchingAs(ACL.SYSTEM,
+                    item ?: Jenkins.get(),
+                    StandardCredentials.class,
+                    fromUri(FormUtils.getUri(host).toString()).build(),
+                    CredentialsMatchers.always())
+                    .includeCurrentValue(credentialsId)
+        }
     }
+
+
+//    FormValidation doCheckCredentialsId(@AncestorInPath Item item, @QueryParameter String value) {
+//        
+//        boolean notAdmin = item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)
+//        boolean noCredentials = item != null && !item.hasPermission(Item.EXTENDED_READ) &&
+//                !item.hasPermission(CredentialsProvider.USE_ITEM)
+//                
+//                if(notAdmin || noCredentials) {
+//                    return FormValidation.ok()
+//                }
+//                
+//                if(StringUtils)
+//    }
 }

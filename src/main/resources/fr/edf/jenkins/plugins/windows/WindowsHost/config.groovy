@@ -2,9 +2,8 @@ import org.apache.http.client.config.AuthSchemes
 
 import fr.edf.jenkins.plugins.windows.Messages
 
-
-
 def f = namespace(lib.FormTagLib)
+def c = namespace(lib.CredentialsTagLib)
 
 f.entry(title: Messages.Host_Host(), field:'host') {
     f.textbox(clazz: 'required', checkMethod: 'post')
@@ -35,6 +34,11 @@ f.advanced(title:Messages.Host_Details()) {
     
         f.entry(title: Messages.Host_MaxUsers(), field: 'maxUsers') {
             f.number(clazz: 'required', min: 1)
+        }
+        
+        
+        f.entry(title:Messages.Host_Credentials(), field:'credentialsId'){
+            c.select(expressionAllowed:'true', includeUser:'true', context:'app')
         }
     
     

@@ -1,7 +1,8 @@
 package fr.edf.jenkins.plugins.windows
 
 
-import org.antlr.v4.runtime.misc.NotNull
+import static com.cloudbees.plugins.credentials.domains.URIRequirementBuilder.fromUri
+
 import org.apache.http.client.config.AuthSchemes
 import org.kohsuke.stapler.AncestorInPath
 import org.kohsuke.stapler.DataBoundConstructor
@@ -15,16 +16,11 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel
 
 import fr.edf.jenkins.plugins.windows.util.FormUtils
-
-import static com.cloudbees.plugins.credentials.domains.URIRequirementBuilder.fromUri
-
 import hudson.Extension
 import hudson.model.Describable
 import hudson.model.Descriptor
 import hudson.model.Item
-import hudson.model.ItemGroup
 import hudson.security.ACL
-import hudson.util.FormValidation
 import hudson.util.ListBoxModel
 import jenkins.model.Jenkins
 
@@ -208,9 +204,9 @@ class WindowsHost implements Describable<WindowsHost> {
         }
         
         /**
-         * 
+         * Set the authentication scheme, the default one used is NTLM
          * @param authenticationScheme
-         * @return Type of authentication scheme
+         * @return authentication scheme
          */
         @POST
         ListBoxModel doFillAuthenticationSchemeItems(@QueryParameter String authenticationScheme) {
@@ -223,7 +219,7 @@ class WindowsHost implements Describable<WindowsHost> {
 
 
           /**
-           *           
+           * Enter username and password to connect to Windows via WinRm         
            * @param host
            * @param credentialsId
            * @param item

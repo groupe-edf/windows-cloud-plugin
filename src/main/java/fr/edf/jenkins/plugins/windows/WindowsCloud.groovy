@@ -5,7 +5,6 @@ import org.kohsuke.stapler.DataBoundConstructor
 import hudson.Extension
 import hudson.model.Descriptor
 import hudson.model.Label
-import hudson.slaves.AbstractCloudImpl
 import hudson.slaves.Cloud
 import hudson.slaves.NodeProvisioner.PlannedNode
 

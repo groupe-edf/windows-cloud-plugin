@@ -1,18 +1,6 @@
 package fr.edf.jenkins.plugins.windows.util
 
 import org.antlr.v4.runtime.misc.NotNull
-import org.kohsuke.stapler.AncestorInPath
-import org.kohsuke.stapler.QueryParameter
-
-import com.cloudbees.plugins.credentials.CredentialsMatchers
-import com.cloudbees.plugins.credentials.CredentialsProvider
-import com.cloudbees.plugins.credentials.common.StandardCredentials
-import com.cloudbees.plugins.credentials.common.StandardListBoxModel
-
-import hudson.model.Item
-import hudson.security.ACL
-import hudson.util.ListBoxModel
-import jenkins.model.Jenkins
 
 class FormUtils {
 

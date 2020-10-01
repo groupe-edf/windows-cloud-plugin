@@ -1,18 +1,11 @@
 package fr.edf.jenkins.plugins.windows.winrm.connection
 
 import org.apache.http.client.config.AuthSchemes
-import org.kohsuke.accmod.Restricted
-import org.kohsuke.accmod.restrictions.NoExternalUse
 
-import com.cloudbees.plugins.credentials.CredentialsScope
 import com.cloudbees.plugins.credentials.common.StandardCredentials
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
-import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials
-import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
 
-import io.cloudsoft.winrm4j.client.WinRmClientContext
 import io.cloudsoft.winrm4j.winrm.WinRmTool
-import io.cloudsoft.winrm4j.winrm.WinRmTool.Builder
 import jenkins.model.Jenkins
 
 class WinRMConnectionFactory {

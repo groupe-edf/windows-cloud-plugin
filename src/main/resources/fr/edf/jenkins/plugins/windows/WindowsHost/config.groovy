@@ -36,18 +36,21 @@ f.advanced(title:Messages.Host_Details()) {
             f.number(clazz: 'required', min: 1)
         }
         
+        f.entry(title: Messages.Host_useHttps(), field: 'useHttps') {
+            f.checkbox(checked: false)
+        }
         
         f.entry(title:Messages.Host_Credentials(), field:'credentialsId'){
-            c.select(expressionAllowed:'true', includeUser:'true', context:'app')
+            c.select(context: app, , includeUser: false, expressionAllowed: false)
         }
     
     
         f.block() {
             f.validateButton(
-                    title: Messages.Host_TestConnection(),
+                    title: 'Test Connection',
                     progress: 'Testing...',
                     method: 'verifyConnection',
-                    with: 'host,port'
+                    with: 'host,port,credentialsId,authenticationScheme,useHttps'
                     )
         }
     

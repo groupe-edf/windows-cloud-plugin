@@ -1,8 +1,11 @@
 package fr.edf.jenkins.plugins.windows
 
 
+import static com.cloudbees.plugins.credentials.CredentialsMatchers.anyOf
+import static com.cloudbees.plugins.credentials.CredentialsMatchers.instanceOf
 import static com.cloudbees.plugins.credentials.domains.URIRequirementBuilder.fromUri
 
+import org.apache.commons.lang.StringUtils
 import org.apache.http.client.config.AuthSchemes
 import org.kohsuke.stapler.AncestorInPath
 import org.kohsuke.stapler.DataBoundConstructor
@@ -14,13 +17,17 @@ import com.cloudbees.plugins.credentials.CredentialsMatchers
 import com.cloudbees.plugins.credentials.CredentialsProvider
 import com.cloudbees.plugins.credentials.common.StandardCredentials
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
 
 import fr.edf.jenkins.plugins.windows.util.FormUtils
+import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
+import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
 import hudson.Extension
 import hudson.model.Describable
 import hudson.model.Descriptor
 import hudson.model.Item
 import hudson.security.ACL
+import hudson.util.FormValidation
 import hudson.util.ListBoxModel
 import jenkins.model.Jenkins
 
@@ -202,7 +209,7 @@ class WindowsHost implements Describable<WindowsHost> {
         String getDisplayName() {
             return Messages.Host_DefaultName()
         }
-        
+
         /**
          * List the available authentication schemes for WinRm. However NTLM is the default one
          * @param authenticationScheme
@@ -218,13 +225,13 @@ class WindowsHost implements Describable<WindowsHost> {
         }
 
 
-          /**
-           * List the available credentials        
-           * @param host
-           * @param credentialsId
-           * @param item
-           * @return CredentialsId
-           */
+        /**
+         * List the available credentials        
+         * @param host
+         * @param credentialsId
+         * @param item
+         * @return CredentialsId
+         */
         @POST
         ListBoxModel doFillCredentialsIdItems(@QueryParameter String host, @QueryParameter String credentialsId,
                 @AncestorInPath Item item) {
@@ -242,22 +249,60 @@ class WindowsHost implements Describable<WindowsHost> {
                     item ?: Jenkins.get(),
                     StandardCredentials.class,
                     fromUri(FormUtils.getUri(host).toString()).build(),
-                    CredentialsMatchers.always())
+                    anyOf(instanceOf(StandardUsernamePasswordCredentials)))
                     .includeCurrentValue(credentialsId)
         }
+
+
+
+
+        /**
+         * Check if CredentialsId exist
+         * @param item
+         * @param value
+         * @return boolean to verify the credentialsId
+         */
+//        @POST
+//        FormValidation doCheckCredentialsId(@AncestorInPath Item item, @QueryParameter String value) {
+//
+//            boolean notAdmin = item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)
+//            boolean noCredentials = item != null && !item.hasPermission(Item.EXTENDED_READ) &&
+//                    !item.hasPermission(CredentialsProvider.USE_ITEM)
+//            boolean noString = value.startsWith("\${") && value.endsWith("}")
+//
+//            if(notAdmin || noCredentials) {
+//                return FormValidation.ok()
+//            }
+//
+//            if(StringUtils.isBlank(value)) {
+//                return FormValidation.ok()
+//            }
+//
+//            if (noString) {
+//                return FormValidation.warning("Cannot validate expression based credentials")
+//            }
+//
+//            if (CredentialsProvider.listCredentials(StandardCredentials.class, item, authenticationScheme, host,
+//            CredentialsMatchers.withId(value)).isEmpty() {
+//                return FormValidation.error("Cannot find the selected credentials")
+//            }
+//        }
+
+
+        @POST
+        FormValidation doVerifyConnection(@QueryParameter String host, @QueryParameter Integer port,
+                @QueryParameter String credentialsId, @QueryParameter String authenticationScheme,
+                @QueryParameter Boolean useHttps, @AncestorInPath Item item) {
+
+            try {
+
+                Jenkins.get().checkPermission(Jenkins.ADMINISTER)
+                String result = WinRMCommand.checkConnection(new WinRMGlobalConnectionConfiguration(credentialsId: credentialsId,
+                context: item, host: host, port: port, authenticationScheme: AuthSchemes.NTLM, useHttps: false))
+                return FormValidation.ok("Connection success : " + (result).toString())
+            } catch(Exception e) {
+                return FormValidation.error("Connection failed : " + (e.getMessage()).toString())
+            }
+        }
     }
-
-
-//    FormValidation doCheckCredentialsId(@AncestorInPath Item item, @QueryParameter String value) {
-//        
-//        boolean notAdmin = item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)
-//        boolean noCredentials = item != null && !item.hasPermission(Item.EXTENDED_READ) &&
-//                !item.hasPermission(CredentialsProvider.USE_ITEM)
-//                
-//                if(notAdmin || noCredentials) {
-//                    return FormValidation.ok()
-//                }
-//                
-//                if(StringUtils)
-//    }
 }

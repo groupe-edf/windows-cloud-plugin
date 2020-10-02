@@ -204,7 +204,7 @@ class WindowsHost implements Describable<WindowsHost> {
         }
         
         /**
-         * Set the authentication scheme, the default one used is NTLM
+         * List the available authentication schemes for WinRm. However NTLM is the default one
          * @param authenticationScheme
          * @return authentication scheme
          */
@@ -219,11 +219,11 @@ class WindowsHost implements Describable<WindowsHost> {
 
 
           /**
-           * Enter username and password to connect to Windows via WinRm         
+           * List the available credentials        
            * @param host
            * @param credentialsId
            * @param item
-           * @return ListBoxModel of Credentials
+           * @return CredentialsId
            */
         @POST
         ListBoxModel doFillCredentialsIdItems(@QueryParameter String host, @QueryParameter String credentialsId,

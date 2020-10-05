@@ -24,7 +24,7 @@ f.advanced(title:Messages.Host_Details()) {
         }
     
         f.entry(title: Messages.Host_Port(), field: 'port') {
-            f.number(clazz: 'required', default: 5895, min: 1)
+            f.number(clazz: 'required', default: 5985, min: 1)
         }
         
         f.entry(title: Messages.Host_AuthenticationScheme(), field: 'authenticationScheme'){

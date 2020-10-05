@@ -1,12 +1,17 @@
 package fr.edf.jenkins.plugins.windows.winrm.connection
 
 import org.apache.http.client.config.AuthSchemes
+import org.kohsuke.accmod.Restricted
+import org.kohsuke.accmod.restrictions.NoExternalUse
 
 import com.cloudbees.plugins.credentials.common.StandardCredentials
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
 
+import fr.edf.jenkins.plugins.windows.util.CredentialsUtils
+import fr.edf.jenkins.plugins.windows.util.FormUtils
 import io.cloudsoft.winrm4j.winrm.WinRmTool
 import jenkins.model.Jenkins
+
 
 class WinRMConnectionFactory {
 
@@ -20,9 +25,9 @@ class WinRMConnectionFactory {
         if(config instanceof WinRMGlobalConnectionConfiguration) {
             return getGlobalWinRMConnection(config)
         }
-        //        if(config instanceof WinRMUserConnectionConfiguration) {
-        //            return getUserWinRMConnection(config)
-        //        }
+//                if(config instanceof WinRMUserConnectionConfiguration) {
+//                    return getUserWinRMConnection(config)
+//                }
         return null
     }
 
@@ -32,6 +37,8 @@ class WinRMConnectionFactory {
      * @return
      * @throws WinRMConnectionException
      */
+    
+    @Restricted(NoExternalUse)
     private static WinRmTool getGlobalWinRMConnection(WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration()) throws WinRMConnectionException {
         String host = config.host
         Integer port = config.port ?: Integer.valueOf(5985)
@@ -42,7 +49,7 @@ class WinRMConnectionFactory {
         if(!credentialsId) {
             throw new WinRMConnectionException("No credentials found for the host " + host)
         }
-        def credentials
+        def credentials = CredentialsUtils.findCredentials(host, credentialsId, context)
         return getConnection(host, credentials, port, authenticationScheme, useHttps)
     }
 
@@ -56,15 +63,18 @@ class WinRMConnectionFactory {
      * @return
      * @throws WinRMConnectionException
      */
-    private static WinRmTool getConnection(final String host, final StandardCredentials credentials, final Integer port, final Boolean useHttps) throws WinRMConnectionException {
+    
+    @Restricted(NoExternalUse)
+    private static WinRmTool getConnection(final String host, final StandardCredentials credentials, final Integer port,
+    final String authenticationScheme, final Boolean useHttps) throws WinRMConnectionException {
         WinRmTool tool = null
         if (credentials instanceof StandardUsernamePasswordCredentials) {
             StandardUsernamePasswordCredentials usernamePasswordCredentials = credentials
             tool = WinRmTool.Builder.builder(host, usernamePasswordCredentials.getUsername(), usernamePasswordCredentials.getPassword().getPlainText())
-                    .authenticationScheme(AuthSchemes.NTLM)
-                    .port(5985)
-                    .useHttps(false)
-                    .build()
+            .authenticationScheme(AuthSchemes.NTLM)
+            .port(5985)
+            .useHttps(false)
+            .build()
         } else {
             throw new WinRMConnectionException("Only Username and Password Credentials are allowed")
         }

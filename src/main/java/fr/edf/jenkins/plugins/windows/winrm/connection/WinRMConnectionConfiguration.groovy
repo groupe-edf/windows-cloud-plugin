@@ -1,6 +1,7 @@
 package fr.edf.jenkins.plugins.windows.winrm.connection
 
 import hudson.model.ModelObject
+import hudson.util.Secret
 
 abstract class WinRMConnectionConfiguration {
     String host
@@ -16,5 +17,5 @@ class WinRMGlobalConnectionConfiguration extends WinRMConnectionConfiguration{
 
 class WinRMUserConnectionConfiguration extends WinRMConnectionConfiguration{
     String username
-    String password
+    Secret password
 }

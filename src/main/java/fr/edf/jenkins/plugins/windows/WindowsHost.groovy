@@ -183,7 +183,7 @@ class WindowsHost implements Describable<WindowsHost> {
 
 
 
-    Boolean getUseHttps() {
+    Boolean isUseHttps() {
         return useHttps
     }
 

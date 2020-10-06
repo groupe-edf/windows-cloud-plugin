@@ -9,6 +9,7 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
 
 import fr.edf.jenkins.plugins.windows.util.CredentialsUtils
 import fr.edf.jenkins.plugins.windows.util.FormUtils
+import io.cloudsoft.winrm4j.client.WinRmClientContext
 import io.cloudsoft.winrm4j.winrm.WinRmTool
 import jenkins.model.Jenkins
 
@@ -21,13 +22,13 @@ class WinRMConnectionFactory {
      * @return WinRmTool
      * @throws WinRMConnectionException
      */
-    static WinRmTool getWinRMConnection(WinRMConnectionConfiguration config) throws WinRMConnectionException{
+    static WinRmTool getWinRMConnection(WinRMConnectionConfiguration config, WinRmClientContext winRMContext) throws WinRMConnectionException{
         if(config instanceof WinRMGlobalConnectionConfiguration) {
-            return getGlobalWinRMConnection(config)
+            return getGlobalWinRMConnection(config, winRMContext)
         }
-//                if(config instanceof WinRMUserConnectionConfiguration) {
-//                    return getUserWinRMConnection(config)
-//                }
+        //                if(config instanceof WinRMUserConnectionConfiguration) {
+        //                    return getUserWinRMConnection(config)
+        //                }
         return null
     }
 
@@ -37,9 +38,9 @@ class WinRMConnectionFactory {
      * @return
      * @throws WinRMConnectionException
      */
-    
+
     @Restricted(NoExternalUse)
-    private static WinRmTool getGlobalWinRMConnection(WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration()) throws WinRMConnectionException {
+    private static WinRmTool getGlobalWinRMConnection(WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(), WinRmClientContext winRMContext) throws WinRMConnectionException {
         String host = config.host
         Integer port = config.port ?: Integer.valueOf(5985)
         String authenticationScheme = config.authenticationScheme ?: AuthSchemes.NTLM
@@ -50,7 +51,7 @@ class WinRMConnectionFactory {
             throw new WinRMConnectionException("No credentials found for the host " + host)
         }
         def credentials = CredentialsUtils.findCredentials(host, credentialsId, context)
-        return getConnection(host, credentials, port, authenticationScheme, useHttps)
+        return getConnection(host, credentials, port, authenticationScheme, useHttps, winRMContext)
     }
 
 
@@ -63,21 +64,24 @@ class WinRMConnectionFactory {
      * @return
      * @throws WinRMConnectionException
      */
-    
+
     @Restricted(NoExternalUse)
     private static WinRmTool getConnection(final String host, final StandardCredentials credentials, final Integer port,
-    final String authenticationScheme, final Boolean useHttps) throws WinRMConnectionException {
-        WinRmTool tool = null
+            final String authenticationScheme, final Boolean useHttps, WinRmClientContext winRMContext) throws WinRMConnectionException {
         if (credentials instanceof StandardUsernamePasswordCredentials) {
             StandardUsernamePasswordCredentials usernamePasswordCredentials = credentials
-            tool = WinRmTool.Builder.builder(host, usernamePasswordCredentials.getUsername(), usernamePasswordCredentials.getPassword().getPlainText())
-            .authenticationScheme(AuthSchemes.NTLM)
-            .port(5985)
-            .useHttps(false)
-            .build()
+            WinRmTool winRmTool = WinRmTool.Builder.builder(host, usernamePasswordCredentials.getUsername(), usernamePasswordCredentials.getPassword().getPlainText())
+                    .authenticationScheme(AuthSchemes.NTLM)
+                    .port(port.intValue())
+                    .useHttps(useHttps.booleanValue())
+                    .disableCertificateChecks(true)
+                    .context(winRMContext)
+                    .build();
+             winRmTool.setConnectionTimeout(10000)
+             winRmTool.setReceiveTimeout(10000)
+             return winRmTool
         } else {
             throw new WinRMConnectionException("Only Username and Password Credentials are allowed")
         }
-        return tool
     }
 }

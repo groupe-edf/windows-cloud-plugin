@@ -11,14 +11,11 @@ class FormUtils {
      */
 
     static URI getUri(@NotNull String host) {
-        if (!(host.startsWith("http://") || host.startsWith("https://"))) {
+        if (!(host.startsWith("http://"))) {
             host = "http://" + host
         }
         if (!host.endsWith("/")) {
             host += "/"
-        }
-        if(host.startsWith("http:")) {
-            host = "http://" + host
         }
         try {
             return new URI(host)

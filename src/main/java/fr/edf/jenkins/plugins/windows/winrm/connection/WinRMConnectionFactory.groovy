@@ -26,9 +26,7 @@ class WinRMConnectionFactory {
         if(config instanceof WinRMGlobalConnectionConfiguration) {
             return getGlobalWinRMConnection(config, winRMContext)
         }
-        //                if(config instanceof WinRMUserConnectionConfiguration) {
-        //                    return getUserWinRMConnection(config)
-        //                }
+
         return null
     }
 
@@ -70,16 +68,17 @@ class WinRMConnectionFactory {
             final String authenticationScheme, final Boolean useHttps, WinRmClientContext winRMContext) throws WinRMConnectionException {
         if (credentials instanceof StandardUsernamePasswordCredentials) {
             StandardUsernamePasswordCredentials usernamePasswordCredentials = credentials
-            WinRmTool winRmTool = WinRmTool.Builder.builder(host, usernamePasswordCredentials.getUsername(), usernamePasswordCredentials.getPassword().getPlainText())
+            WinRmTool winRmTool = WinRmTool.Builder.builder(host, usernamePasswordCredentials.getUsername(),
+                    usernamePasswordCredentials.getPassword().getPlainText())
                     .authenticationScheme(AuthSchemes.NTLM)
                     .port(port.intValue())
                     .useHttps(useHttps.booleanValue())
                     .disableCertificateChecks(true)
                     .context(winRMContext)
                     .build();
-             winRmTool.setConnectionTimeout(10000)
-             winRmTool.setReceiveTimeout(10000)
-             return winRmTool
+            winRmTool.setConnectionTimeout(10000)
+            winRmTool.setReceiveTimeout(10000)
+            return winRmTool
         } else {
             throw new WinRMConnectionException("Only Username and Password Credentials are allowed")
         }

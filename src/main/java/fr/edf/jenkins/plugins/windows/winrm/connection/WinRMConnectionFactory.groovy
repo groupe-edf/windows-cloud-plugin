@@ -41,6 +41,7 @@ class WinRMConnectionFactory {
     private static WinRmTool getGlobalWinRMConnection(WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(), WinRmClientContext winRMContext) throws WinRMConnectionException {
         String host = config.host
         Integer port = config.port ?: Integer.valueOf(5985)
+        Integer connectionTimeout = config.connectionTimeout ?: Integer.valueOf(1000)
         String authenticationScheme = config.authenticationScheme ?: AuthSchemes.NTLM
         Boolean useHttps = config.useHttps ?: Boolean.FALSE
         def context = config.context ?: Jenkins.get()

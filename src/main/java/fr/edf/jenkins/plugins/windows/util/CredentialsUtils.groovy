@@ -27,29 +27,22 @@ class CredentialsUtils {
 
     static StandardCredentials findCredentials(final String host, final String credentialsId, ModelObject context) {
         Preconditions.checkNotNull(host, "host not set")
-        String uri = FormUtils.getUri(host)
+        URI uri = FormUtils.getUri(host)
         Preconditions.checkNotNull(credentialsId, "CredentialsId not set")
         Preconditions.checkNotNull(uri, "uri not set")
         Preconditions.checkNotNull(context, "context not set")
         Preconditions.checkArgument(!credentialsId.isEmpty())
-        Preconditions.checkArgument(!uri.isEmpty())
-
-
-        //        List<StandardCredentials> lookupCredentials = CredentialsProvider.lookupCredentials(StandardCredentials.class,
-        //                Jenkins.get(),
-        //                ACL.SYSTEM,
-        //                URIRequirementBuilder.fromUri(uri.toString()).build()
-        //                )
-        //
-        //        def credentials = CredentialsMatchers.firstOrNull(lookupCredentials, CredentialsMatchers.withId(credentialsId))
-        //        return credentials
-
+        
         def credentials = CredentialsMatchers.firstOrNull(CredentialsProvider.lookupCredentials(StandardCredentials.class,
                 context,
                 ACL.SYSTEM,
                 URIRequirementBuilder.fromUri(uri.toString()).build()),
                 CredentialsMatchers.withId(credentialsId))
-        
+
+        Preconditions.checkArgument(credentialsId != null
+                )
         return credentials
+
+
     }
 }

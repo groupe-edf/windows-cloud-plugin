@@ -6,6 +6,7 @@ import hudson.util.Secret
 abstract class WinRMConnectionConfiguration {
     String host
     Integer port
+    Integer connectionTimeout
     String authenticationScheme
     Boolean useHttps
 }

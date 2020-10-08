@@ -16,7 +16,7 @@ class Constants {
 
     static final String DELETE_USER = "Remove-LocalUser -Name %s -Verbose"
     
-    static final String WORDIR_PATTERN = "C:\\Users\\%s\\"
+    static final String WORKDIR_PATTERN = "C:\\Users\\%s\\"
 
     static final String CREATE_DIR = "New-Item -Path %s -ItemType 'directory' -Force"
     

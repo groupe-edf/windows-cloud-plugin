@@ -37,7 +37,7 @@ f.advanced(title:Messages.Host_Details()) {
         }
         
         f.entry(title: Messages.Host_useHttps(), field: 'useHttps') {
-            f.checkbox(checked: false)
+            f.checkbox(default: false)
         }
         
         f.entry(title:Messages.Host_Credentials(), field:'credentialsId'){

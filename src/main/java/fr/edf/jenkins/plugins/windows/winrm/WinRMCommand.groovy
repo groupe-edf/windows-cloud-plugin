@@ -9,8 +9,8 @@ import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.util.Constants
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionConfiguration
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
-import jenkins.model.Jenkins
 import hudson.util.Secret
+import jenkins.model.Jenkins
 
 class WinRMCommand {
 
@@ -42,7 +42,7 @@ class WinRMCommand {
             throw new WinRMCommandException(e.getMessage(), e)
         }
     }
-    
+
     @Restricted(NoExternalUse)
     static WindowsUser generateUser() {
         String username = String.format(Constants.USERNAME_PATTERN, RandomStringUtils.random(15, true, true).toLowerCase())

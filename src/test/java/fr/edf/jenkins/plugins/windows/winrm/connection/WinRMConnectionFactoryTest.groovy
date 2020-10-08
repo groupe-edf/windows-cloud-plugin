@@ -12,7 +12,7 @@ class WinRMConnectionFactoryTest extends Specification{
     JenkinsRule rule =  new JenkinsRule()
 
     def "getWinRMConnection with no parameters returns null"(){
-        
+
         when:
         WinRmTool tool = WinRMConnectionFactory.getWinRMConnection(null,null)
 

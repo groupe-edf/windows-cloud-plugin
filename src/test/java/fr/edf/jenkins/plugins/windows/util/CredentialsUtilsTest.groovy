@@ -6,7 +6,6 @@ import org.jvnet.hudson.test.JenkinsRule
 import com.cloudbees.plugins.credentials.CredentialsProvider
 import com.cloudbees.plugins.credentials.CredentialsScope
 import com.cloudbees.plugins.credentials.common.StandardCredentials
-import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
 import com.cloudbees.plugins.credentials.domains.Domain
 import com.cloudbees.plugins.credentials.domains.HostnameSpecification
@@ -49,6 +48,7 @@ class CredentialsUtilsTest extends Specification{
         assert cred.id == "testing one"
     }
 
+// TODO : findCredentials throws an exception when id does not exist
 //    def "findCredentials throws an exception when id does not exist"(){
 //
 //        given:

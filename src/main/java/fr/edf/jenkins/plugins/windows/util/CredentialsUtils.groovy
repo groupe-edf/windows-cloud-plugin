@@ -32,17 +32,14 @@ class CredentialsUtils {
         Preconditions.checkNotNull(uri, "uri not set")
         Preconditions.checkNotNull(context, "context not set")
         Preconditions.checkArgument(!credentialsId.isEmpty())
-        
+
         def credentials = CredentialsMatchers.firstOrNull(CredentialsProvider.lookupCredentials(StandardCredentials.class,
                 context,
                 ACL.SYSTEM,
                 URIRequirementBuilder.fromUri(uri.toString()).build()),
                 CredentialsMatchers.withId(credentialsId))
 
-        Preconditions.checkArgument(credentialsId != null
-                )
+        Preconditions.checkArgument(credentialsId != null)
         return credentials
-
-
     }
 }

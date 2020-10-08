@@ -53,7 +53,6 @@ class WinRMConnectionFactory {
         return getConnection(host, credentials, port, authenticationScheme, useHttps, winRMContext)
     }
 
-
     /**
      * 
      * @param host : hostname of the windows machine

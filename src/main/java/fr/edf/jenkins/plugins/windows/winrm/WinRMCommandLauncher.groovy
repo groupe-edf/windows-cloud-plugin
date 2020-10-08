@@ -12,8 +12,6 @@ import io.cloudsoft.winrm4j.winrm.WinRmTool
 import io.cloudsoft.winrm4j.winrm.WinRmToolResponse
 
 class WinRMCommandLauncher {
-    // TODO : dev WinRMCommandLauncher
-
 
     @Restricted(NoExternalUse)
     protected static String executeCommand(@NotNull WinRMConnectionConfiguration connectionConfiguration, @NotNull String command) throws Exception{

@@ -25,6 +25,14 @@ class WinRMCommand {
         return res.trim() == username
     }
 
+    @Restricted(NoExternalUse)
+    static WindowsUser generateUser() {
+        String username = String.format(Constants.USERNAME_PATTERN, RandomStringUtils.random(15, true, true).toLowerCase())
+        String password = RandomStringUtils.random(15, true, true)
+        String workdir = String.format(Constants.WORKDIR_PATTERN, username)
+        return new WindowsUser(username: username, password: Secret.fromString(password), workdir: workdir)
+    }
+
 
     @Restricted(NoExternalUse)
     static WindowsUser createUser(WindowsHost host, WindowsUser user) throws WinRMCommandException{
@@ -33,21 +41,35 @@ class WinRMCommand {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
             context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
             authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
+            WinRMCommandLauncher.executeCommand(config, String.format(Constants.CREATE_USER, user.username, user.password, user.username))
 
             if(doesUserExist(config, user.username)) {
                 throw new Exception(String.format("The user %s already exists", user.username))
             }
-            return WinRMCommandLauncher.executeCommand(config, String.format(Constants.CREATE_USER, user.username, user.password))
+            WinRMCommandLauncher.executeCommand(config, String.format(Constants.CREATE_DIR, user.workdir))
+            WinRMCommandLauncher.executeCommand(config, String.format(Constants.DISABLE_INHERITED_WORKDIR, user.workdir, user.username))
+            WinRMCommandLauncher.executeCommand(config, String.format(Constants.GRANT_ACCESS_WORKDIR, user.workdir, user.username))
+            return user
         } catch(Exception e) {
-            throw new WinRMCommandException(e.getMessage(), e)
+            String message = String.format(WinRMCommandException.CREATE_WINDOWS_USER_ERROR, host.host)
+            throw new WinRMCommandException(message, e)
         }
     }
 
-    @Restricted(NoExternalUse)
-    static WindowsUser generateUser() {
-        String username = String.format(Constants.USERNAME_PATTERN, RandomStringUtils.random(15, true, true).toLowerCase())
-        String password = RandomStringUtils.random(15, true, true)
-        String workdir = String.format(Constants.WORKDIR_PATTERN, username)
-        return new WindowsUser(username: username, password: Secret.fromString(password), workdir: workdir)
+    static void deleteUser(WindowsHost host, String username) throws WinRMCommandException{
+        try {
+            WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
+            context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
+            authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
+
+            if(!doesUserExist(config, username)) {
+                throw new Exception(String.format("The user %s does not exist", username))
+            }
+            
+            WinRMCommandLauncher.executeCommand(config, String.format(Constants.DELETE_USER, username))
+        }catch(Exception e) {
+            String message = String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host)
+            throw new WinRMCommandException(message, e)
+        }
     }
 }

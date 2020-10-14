@@ -1,6 +1,7 @@
 package fr.edf.jenkins.plugins.windows.winrm
 
 import org.apache.commons.lang.RandomStringUtils
+import org.apache.commons.lang.StringUtils
 import org.kohsuke.accmod.Restricted
 import org.kohsuke.accmod.restrictions.NoExternalUse
 
@@ -69,6 +70,21 @@ class WinRMCommand {
             WinRMCommandLauncher.executeCommand(config, String.format(Constants.DELETE_USER, username))
         }catch(Exception e) {
             String message = String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host)
+            throw new WinRMCommandException(message, e)
+        }
+    }
+    
+    static List<String> listUsers(WindowsHost host) throws WinRMCommandException{
+        try {
+            WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
+                context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
+                authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
+            
+            String result = WinRMCommandLauncher.executeCommand(config, String.format(Constants.LIST_USERS, Constants.USERNAME_PATTERN))
+            if(StringUtils.isEmpty(result)) return new ArrayList()
+                return result as List
+        }catch(Exception e) {
+            String message = String.format(WinRMCommandException.LIST_USERS_ERROR_MESSAGE, e.getMessage(), host.host)
             throw new WinRMCommandException(message, e)
         }
     }

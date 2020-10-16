@@ -2,7 +2,6 @@ package fr.edf.jenkins.plugins.windows
 
 
 import org.junit.Rule
-import org.junit.jupiter.api.Test
 import org.jvnet.hudson.test.JenkinsRule
 
 import fr.edf.jenkins.plugins.windows.pojos.WindowsPojoBuilder

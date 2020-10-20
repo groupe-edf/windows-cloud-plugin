@@ -1,7 +1,7 @@
 package fr.edf.jenkins.plugins.windows
 
 import org.kohsuke.stapler.DataBoundConstructor
-import com.sun.xml.ws.spi.ProviderImpl
+
 import hudson.Extension
 import hudson.model.Descriptor
 import hudson.model.Label

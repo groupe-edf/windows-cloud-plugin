@@ -8,7 +8,6 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
 
 import fr.edf.jenkins.plugins.windows.util.CredentialsUtils
-import fr.edf.jenkins.plugins.windows.util.FormUtils
 import io.cloudsoft.winrm4j.client.WinRmClientContext
 import io.cloudsoft.winrm4j.winrm.WinRmTool
 import jenkins.model.Jenkins

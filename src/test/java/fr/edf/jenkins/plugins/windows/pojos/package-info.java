@@ -1,1 +1,0 @@
-package fr.edf.jenkins.plugins.windows.pojos;

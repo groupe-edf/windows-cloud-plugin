@@ -57,32 +57,32 @@ class WinRMCommand {
         }
     }
 
-    static void deleteUser(WindowsHost host, String username) throws WinRMCommandException{
+    static void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception{
         try {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
             context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
             authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
-
-            if(!doesUserExist(config, username)) {
-                throw new Exception(String.format("The user %s does not exist", username))
-            }
             
             WinRMCommandLauncher.executeCommand(config, String.format(Constants.DELETE_USER, username))
+
+            if(doesUserExist(config, username)) {
+                throw new Exception(String.format("The user %s was not deleted", username))
+            }
         }catch(Exception e) {
             String message = String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host)
             throw new WinRMCommandException(message, e)
         }
     }
-    
+
     static List<String> listUsers(WindowsHost host) throws WinRMCommandException{
         try {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
-                context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
-                authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
-            
+            context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
+            authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
+
             String result = WinRMCommandLauncher.executeCommand(config, String.format(Constants.LIST_USERS, Constants.USERNAME_PATTERN))
             if(StringUtils.isEmpty(result)) return new ArrayList()
-                return result as List
+            return result as List
         }catch(Exception e) {
             String message = String.format(WinRMCommandException.LIST_USERS_ERROR_MESSAGE, e.getMessage(), host.host)
             throw new WinRMCommandException(message, e)

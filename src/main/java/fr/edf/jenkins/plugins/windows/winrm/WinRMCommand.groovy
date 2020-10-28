@@ -42,17 +42,18 @@ class WinRMCommand {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
             context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
             authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
+            
             WinRMCommandLauncher.executeCommand(config, String.format(Constants.CREATE_USER, user.username, user.password.getPlainText(), user.username))
-
             if(!doesUserExist(config, user.username)) {
                 throw new Exception(String.format("The user %s already exists", user.username))
             }
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.CREATE_DIR, user.username))
             WinRMCommandLauncher.executeCommand(config, String.format(Constants.DISABLE_INHERITED_WORKDIR, user.username, user.username))
+            WinRMCommandLauncher.executeCommand(config, String.format(Constants.CREATE_DIR, user.username))
             WinRMCommandLauncher.executeCommand(config, String.format(Constants.GRANT_ACCESS_WORKDIR, user.username, user.username))
+            
             return user
         } catch(Exception e) {
-            String message = String.format(WinRMCommandException.CREATE_WINDOWS_USER_ERROR, host.host)
+            final String message = String.format(WinRMCommandException.CREATE_WINDOWS_USER_ERROR, host.host)
             throw new WinRMCommandException(message, e)
         }
     }

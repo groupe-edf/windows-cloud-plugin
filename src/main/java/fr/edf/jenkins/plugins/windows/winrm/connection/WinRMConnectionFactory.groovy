@@ -4,8 +4,11 @@ import org.apache.http.client.config.AuthSchemes
 import org.kohsuke.accmod.Restricted
 import org.kohsuke.accmod.restrictions.NoExternalUse
 
+import com.cloudbees.plugins.credentials.CredentialsScope
 import com.cloudbees.plugins.credentials.common.StandardCredentials
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
+import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
 
 import fr.edf.jenkins.plugins.windows.util.CredentialsUtils
 import io.cloudsoft.winrm4j.client.WinRmClientContext
@@ -25,14 +28,16 @@ class WinRMConnectionFactory {
         if(config instanceof WinRMGlobalConnectionConfiguration) {
             return getGlobalWinRMConnection(config, winRMContext)
         }
-
+        if(config instanceof WinRMUserConnectionConfiguration) {
+            return getUserWinRMConnection(config, winRMContext)
+        }
         return null
     }
 
     /**
      * 
      * @param config
-     * @return
+     * @return getConnection
      * @throws WinRMConnectionException
      */
 
@@ -50,6 +55,27 @@ class WinRMConnectionFactory {
         }
         def credentials = CredentialsUtils.findCredentials(host, credentialsId, context)
         return getConnection(host, credentials, port, authenticationScheme, useHttps, winRMContext)
+    }
+    
+    /**
+     * 
+     * @param config
+     * @param winRMContext
+     * @return getConnection
+     */
+    private static WinRmTool getUserWinRMConnection(WinRMUserConnectionConfiguration config = new WinRMUserConnectionConfiguration(), WinRmClientContext winRMContext) {
+        String host = config.host
+        Integer port = config.port ?: Integer.valueOf(5985)
+        Integer connectionTimeout = config.connectionTimeout ?: Integer.valueOf(1000)
+        String authenticationScheme = config.authenticationScheme ?: AuthSchemes.NTLM
+        Boolean useHttps = config.useHttps ?: Boolean.FALSE
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.SYSTEM, 
+            "cred", 
+            null, 
+            config.username, 
+            config.password.getPlainText()
+            )
+            return getConnection(host, credentials, port, authenticationScheme, useHttps, winRMContext)
     }
 
     /**

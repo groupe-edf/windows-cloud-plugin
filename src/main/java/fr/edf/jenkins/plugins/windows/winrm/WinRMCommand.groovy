@@ -10,6 +10,7 @@ import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.util.Constants
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionConfiguration
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
+import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMUserConnectionConfiguration
 import hudson.util.Secret
 import jenkins.model.Jenkins
 
@@ -86,6 +87,28 @@ class WinRMCommand {
             return result as List
         }catch(Exception e) {
             String message = String.format(WinRMCommandException.LIST_USERS_ERROR_MESSAGE, e.getMessage(), host.host)
+            throw new WinRMCommandException(message, e)
+        }
+    }
+    
+    static boolean jnlpConnect(WindowsHost host, WindowsUser user, String jenkinsUrl, String slaveSecret) throws WinRMCommandException, Exception{
+        jenkinsUrl = StringUtils.isNotEmpty(jenkinsUrl) ?: Jenkins.get().getRootUrl()
+        if(!jenkinsUrl.endsWith("/")) {
+            jenkinsUrl += "/"
+        }
+        
+        String remotingUrl = jenkinsUrl + Constants.REMOTING_JAR_PATH
+        
+        try {
+            WinRMUserConnectionConfiguration config = new WinRMUserConnectionConfiguration(username: user.username, password: user.password.getPlainText(),
+                host: host.host, port: host.port, connectionTimeout: host.connectionTimeout, authenticationScheme: host.authenticationScheme,
+                useHttps: host.useHttps)
+            WinRMCommandLauncher.executeCommand(config, String.format(Constants.GET_REMOTING_JAR, remotingUrl))
+            WinRMCommandLauncher.executeCommand(config, String.format(Constants.LAUNCH_JNLP, jenkinsUrl, user.username, slaveSecret))
+            return true
+        }catch(Exception e) {
+            final String message = String.format(WinRMCommandException.JNLP_CONNETION_ERROR, host.host, user.username)
+            e.getMessage()
             throw new WinRMCommandException(message, e)
         }
     }

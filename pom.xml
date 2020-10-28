@@ -21,11 +21,10 @@
     <java.level>8</java.level>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <!-- <cxf.version>3.4.0</cxf.version> -->
   </properties>
 
   <name>Windows plugin</name>
-  <description>This plugin create Windows agents where builds can be performed</description>
+  <description>This plugin create Windows agents on which builds can be performed</description>
   <organization>
     <name>EDF</name>
   </organization>
@@ -70,22 +69,6 @@
   </dependencyManagement>
 
   <dependencies>
-
-    <!-- <dependency> -->
-    <!-- <groupId>com.aestasit.infrastructure.winrm</groupId> -->
-    <!-- <artifactId>groovy-winrm-client</artifactId> -->
-    <!-- <version>0.6</version> -->
-    <!-- </dependency> -->
-    <!-- <dependency> -->
-    <!-- <groupId>org.apache.httpcomponents</groupId> -->
-    <!-- <artifactId>httpcore</artifactId> -->
-    <!-- <version>4.4.13</version> -->
-    <!-- </dependency> -->
-    <!-- <dependency> -->
-    <!-- <groupId>org.apache.httpcomponents</groupId> -->
-    <!-- <artifactId>httpclient</artifactId> -->
-    <!-- <version>4.5.13</version> -->
-    <!-- </dependency> -->
     <dependency>
       <groupId>io.cloudsoft.windows</groupId>
       <artifactId>winrm4j</artifactId>

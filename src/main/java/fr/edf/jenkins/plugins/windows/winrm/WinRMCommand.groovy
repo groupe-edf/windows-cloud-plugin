@@ -100,7 +100,7 @@ class WinRMCommand {
         String remotingUrl = jenkinsUrl + Constants.REMOTING_JAR_PATH
         
         try {
-            WinRMUserConnectionConfiguration config = new WinRMUserConnectionConfiguration(username: user.username, password: user.password.getPlainText(),
+            WinRMUserConnectionConfiguration config = new WinRMUserConnectionConfiguration(username: user.username, password: user.password,
                 host: host.host, port: host.port, connectionTimeout: host.connectionTimeout, authenticationScheme: host.authenticationScheme,
                 useHttps: host.useHttps)
             WinRMCommandLauncher.executeCommand(config, String.format(Constants.GET_REMOTING_JAR, remotingUrl))

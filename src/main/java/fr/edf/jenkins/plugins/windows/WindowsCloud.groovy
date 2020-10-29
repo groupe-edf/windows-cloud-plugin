@@ -7,7 +7,11 @@ import hudson.model.Descriptor
 import hudson.model.Label
 import hudson.slaves.Cloud
 import hudson.slaves.NodeProvisioner.PlannedNode
-
+/**
+ * Configuration of a Windows Cloud
+ * @author CHRIS BAHONDA
+ *
+ */
 class WindowsCloud extends /*AbstractCloudImpl*/ Cloud {
 
     List<WindowsHost> windowsHosts
@@ -46,7 +50,7 @@ class WindowsCloud extends /*AbstractCloudImpl*/ Cloud {
          */
         @Override
         String getDisplayName() {
-            return "Windows Cloud"
+            return Messages._Cloud_DefaultName()
         }
     }
 }

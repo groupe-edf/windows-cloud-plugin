@@ -28,7 +28,11 @@ import hudson.security.ACL
 import hudson.util.FormValidation
 import hudson.util.ListBoxModel
 import jenkins.model.Jenkins
-
+/**
+ * WinRm conncetion configuration for a Windows host
+ * @author CHRIS BAHONDA
+ *
+ */
 class WindowsHost implements Describable<WindowsHost> {
 
     String host
@@ -163,6 +167,11 @@ class WindowsHost implements Describable<WindowsHost> {
         return Jenkins.get().getDescriptorOrDie(this.getClass())
     }
 
+    /**
+     * Jenkins UI of Windows host
+     * @author CHRIS BAHONDA
+     *
+     */
     @Extension
     static class DescriptorImpl extends Descriptor<WindowsHost> {
         /**
@@ -215,6 +224,16 @@ class WindowsHost implements Describable<WindowsHost> {
                     .includeCurrentValue(credentialsId)
         }
 
+        /**
+         * Checks connection on Windows machine
+         * @param host
+         * @param port
+         * @param credentialsId
+         * @param authenticationScheme
+         * @param useHttps
+         * @param item
+         * @return connection success otherwise connection failed
+         */
         @POST
         FormValidation doVerifyConnection(@QueryParameter String host, @QueryParameter Integer port,
                 @QueryParameter String credentialsId, @QueryParameter String authenticationScheme,

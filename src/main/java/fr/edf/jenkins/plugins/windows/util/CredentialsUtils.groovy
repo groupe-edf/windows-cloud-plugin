@@ -11,8 +11,8 @@ import hudson.security.ACL
 
 
 /**
- * 
- * @author Chris Bahonda
+ * Credentials
+ * @author CHRIS BAHONDA
  *
  */
 class CredentialsUtils {

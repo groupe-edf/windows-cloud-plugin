@@ -1,5 +1,9 @@
 package fr.edf.jenkins.plugins.windows.util;
-
+/**
+ * List of constants that represent PowerShell commands
+ * @author CHRIS BAHONDA
+ *
+ */
 class Constants {
 
     static final String EMPTY_LIST_BOX_NAME = "-------"

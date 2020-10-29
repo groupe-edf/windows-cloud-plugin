@@ -1,7 +1,11 @@
 package fr.edf.jenkins.plugins.windows
 
 import hudson.util.Secret
-
+/**
+ * The windows user with a name, password and working directory
+ * @author CHRIS BAHONDA
+ *
+ */
 class WindowsUser{
 
     String username

@@ -15,7 +15,11 @@ import io.cloudsoft.winrm4j.client.WinRmClientContext
 import io.cloudsoft.winrm4j.winrm.WinRmTool
 import jenkins.model.Jenkins
 
-
+/**
+ * WinRm Connection factory
+ * @author CHRIS BAHONDA
+ *
+ */
 class WinRMConnectionFactory {
 
     /**

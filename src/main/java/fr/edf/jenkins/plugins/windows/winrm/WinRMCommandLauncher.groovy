@@ -10,9 +10,19 @@ import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionFactory
 import io.cloudsoft.winrm4j.client.WinRmClientContext
 import io.cloudsoft.winrm4j.winrm.WinRmTool
 import io.cloudsoft.winrm4j.winrm.WinRmToolResponse
-
+/**
+ * Contains method needed to launch commands
+ * @author CHRIS BAHONDA
+ *
+ */
 class WinRMCommandLauncher {
-
+    /**
+     * Execute the command using the given connection configuration
+     * @param connectionConfiguration
+     * @param command i.e. the command that need to be launched
+     * @return the command output
+     * @throws Exception
+     */
     @Restricted(NoExternalUse)
     protected static String executeCommand(@NotNull WinRMConnectionConfiguration connectionConfiguration, @NotNull String command) throws Exception{
 

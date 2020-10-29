@@ -13,20 +13,39 @@ import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConf
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMUserConnectionConfiguration
 import hudson.util.Secret
 import jenkins.model.Jenkins
-
+/**
+ * List of all methods to execute winrm commands
+ * @author CHRIS BAHONDA
+ *
+ */
 class WinRMCommand {
 
-
+    /**
+     * Checks whether the user is connected or not
+     * @param config
+     * @return which user is connected
+     */
     @Restricted(NoExternalUse)
     static String checkConnection(WinRMGlobalConnectionConfiguration config) {
         return WinRMCommandLauncher.executeCommand(config, Constants.WHOAMI)
     }
 
+    /**
+     * Checks if user exists
+     * @param config
+     * @param username
+     * @return true if the user exists otherwise false
+     * @throws Exception
+     */
     private static boolean doesUserExist(WinRMConnectionConfiguration config, String username) throws Exception{
         String res = WinRMCommandLauncher.executeCommand(config, String.format(Constants.CHECK_USER_EXIST, username))
         return res.trim() == username
     }
-
+    
+    /**
+     * Randomly generate Windows user
+     * @return a new Windows user
+     */
     @Restricted(NoExternalUse)
     static WindowsUser generateUser() {
         String username = String.format(Constants.USERNAME_PATTERN, RandomStringUtils.random(15, true, true).toLowerCase())
@@ -35,7 +54,14 @@ class WinRMCommand {
         return new WindowsUser(username: username, password: Secret.fromString(password), workdir: workdir)
     }
 
-
+    /**
+     * Create a user 
+     * @param host
+     * @param user
+     * @return
+     * @throws WinRMCommandException
+     * @throws Exception
+     */
     @Restricted(NoExternalUse)
     static WindowsUser createUser(WindowsHost host, WindowsUser user) throws WinRMCommandException, Exception{
 
@@ -59,6 +85,13 @@ class WinRMCommand {
         }
     }
 
+    /**
+     * Delete the given user
+     * @param host
+     * @param username
+     * @throws WinRMCommandException
+     * @throws Exception
+     */
     static void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception{
         try {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
@@ -76,6 +109,12 @@ class WinRMCommand {
         }
     }
 
+    /**
+     * List all users for the given host
+     * @param host
+     * @return a list of users
+     * @throws WinRMCommandException
+     */
     static List<String> listUsers(WindowsHost host) throws WinRMCommandException{
         try {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
@@ -91,6 +130,16 @@ class WinRMCommand {
         }
     }
     
+    /**
+     * Allows Windows users to connect via jnlp
+     * @param host
+     * @param user
+     * @param jenkinsUrl
+     * @param slaveSecret
+     * @return true if connection succeeds
+     * @throws WinRMCommandException
+     * @throws Exception
+     */
     static boolean jnlpConnect(WindowsHost host, WindowsUser user, String jenkinsUrl, String slaveSecret) throws WinRMCommandException, Exception{
         jenkinsUrl = StringUtils.isNotEmpty(jenkinsUrl) ?: Jenkins.get().getRootUrl()
         if(!jenkinsUrl.endsWith("/")) {

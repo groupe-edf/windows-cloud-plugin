@@ -23,7 +23,7 @@ import jenkins.model.Jenkins
 class WinRMConnectionFactory {
 
     /**
-     * Dispatch request on the good method of connection
+     * Dispatch request about the connection method
      * @param config
      * @return WinRmTool
      * @throws WinRMConnectionException
@@ -39,7 +39,7 @@ class WinRMConnectionFactory {
     }
 
     /**
-     * 
+     * Generate a global connection for the winrm client
      * @param config
      * @return getConnection
      * @throws WinRMConnectionException
@@ -62,7 +62,7 @@ class WinRMConnectionFactory {
     }
     
     /**
-     * 
+     * Generate a connection for the user using their credentials
      * @param config
      * @param winRMContext
      * @return getConnection
@@ -83,12 +83,12 @@ class WinRMConnectionFactory {
     }
 
     /**
-     * 
+     * Creates a WinRm client
      * @param host : hostname of the windows machine
      * @param credentials
      * @param port
      * @param useHttps
-     * @return
+     * @return a WinRmTool @see <a href="https://github.com/cloudsoft/winrm4j">https://github.com/cloudsoft/winrm4j</a>
      * @throws WinRMConnectionException
      */
 

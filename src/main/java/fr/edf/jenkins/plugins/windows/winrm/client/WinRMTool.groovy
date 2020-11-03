@@ -56,7 +56,7 @@ import org.apache.http.protocol.HttpContext
 
 import fr.edf.jenkins.plugins.windows.winrm.client.auth.ntlm.SpNegoNTLMSchemeFactory
 import fr.edf.jenkins.plugins.windows.winrm.client.auth.spnego.WsmanSPNegoSchemeFactory
-import fr.edf.jenkins.plugins.windows.winrm.client.command.CommandOutput
+import fr.edf.jenkins.plugins.windows.winrm.client.output.CommandOutput
 import fr.edf.jenkins.plugins.windows.winrm.client.request.CleanupCommandRequest
 import fr.edf.jenkins.plugins.windows.winrm.client.request.DeleteShellRequest
 import fr.edf.jenkins.plugins.windows.winrm.client.request.ExecuteCommandRequest
@@ -70,7 +70,9 @@ import groovy.util.slurpersupport.GPathResult
  * @author Mathieu Delrocq
  *
  */
-fr.edf.jenkins.plugins.windows.winrm.clientl Logger LOGGER = Logger.getLogger(WinRMTool.name)
+class WinRMTool {
+
+    static final Logger LOGGER = Logger.getLogger(WinRMTool.name)
     public static final String PROTOCOL_HTTP = "http"
     public static final String PROTOCOL_HTTPS = "https"
     private static final String SOAP_REQUEST_CONTENT_TYPE = "application/soap+xml; charset=UTF-8"

@@ -94,8 +94,12 @@ class WinRMTool {
     boolean disableCertificateChecks
     /** "http" or "https", usage of static constants recommended. */
     boolean useHttps
-    /** timout of the command */
-    Integer timeout = 60
+    /** timeout of the command */
+    Integer commandTimeout = 60
+    /** timeout of the connection */
+    Integer connectionTimeout = 20
+    /** timeout to receive response */
+    Integer readTimeout = 60
 
     URL url
     String lastShellId
@@ -121,7 +125,7 @@ class WinRMTool {
         this.authSheme = authSheme
         this.useHttps = useHttps
         this.disableCertificateChecks = disableCertificateChecks
-        this.timeout = commandTimeout
+        this.commandTimeout = commandTimeout
     }
 
     /**
@@ -132,7 +136,7 @@ class WinRMTool {
      */
     String openShell() throws WinRMException {
         HttpClient httpClient = getHttpClient()
-        HttpPost httpPost = buildHttpPostRequest(new OpenShellRequest(url, timeout))
+        HttpPost httpPost = buildHttpPostRequest(new OpenShellRequest(url, commandTimeout))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context)
         StatusLine status = response.getStatusLine()
@@ -185,7 +189,7 @@ class WinRMTool {
             throw new WinRMException("Call openShell() before execute command")
         }
         HttpClient httpClient = getHttpClient()
-        HttpPost httpPost = buildHttpPostRequest(new ExecuteCommandRequest(url, shellId, commandLine, args, timeout))
+        HttpPost httpPost = buildHttpPostRequest(new ExecuteCommandRequest(url, shellId, commandLine, args, commandTimeout))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context)
         StatusLine status = response.getStatusLine()
@@ -229,7 +233,7 @@ class WinRMTool {
             throw new WinRMException("No command was executed")
         }
         HttpClient httpClient = getHttpClient()
-        HttpPost httpPost = buildHttpPostRequest(new GetCommandOutputRequest(url, shellId, commandId, timeout))
+        HttpPost httpPost = buildHttpPostRequest(new GetCommandOutputRequest(url, shellId, commandId, commandTimeout))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context)
         StatusLine status = response.getStatusLine()
@@ -261,7 +265,7 @@ class WinRMTool {
         if (results?.'*:Body'?.'*:ReceiveResponse'?.'*:CommandState'?.find {
             it.@CommandId == commandId && it.@State == 'http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Done'
         }) {
-            Integer exitStatus = results?.'*:Body'?.'*:ReceiveResponse'?.'*:CommandState'?.'*:ExitCode'?.text()?.toInteger()
+            Long exitStatus = results?.'*:Body'?.'*:ReceiveResponse'?.'*:CommandState'?.'*:ExitCode'?.text()?.toLong()
             LOGGER.log(Level.FINEST, "exitStatus : " + exitStatus)
             LOGGER.log(Level.FINEST, "commandOutput : " + output)
             LOGGER.log(Level.FINEST, "errOutput : " + error)
@@ -284,7 +288,7 @@ class WinRMTool {
             throw new WinRMException("No command was executed")
         }
         HttpClient httpClient = getHttpClient()
-        HttpPost httpPost = buildHttpPostRequest(new CleanupCommandRequest(url, shellId, commandId, timeout))
+        HttpPost httpPost = buildHttpPostRequest(new CleanupCommandRequest(url, shellId, commandId, commandTimeout))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context)
         StatusLine status = response.getStatusLine()
@@ -311,7 +315,7 @@ class WinRMTool {
             throw new WinRMException("There is no shell Id")
         }
         HttpClient httpClient = getHttpClient()
-        HttpPost httpPost = buildHttpPostRequest(new DeleteShellRequest(url, shellId, timeout))
+        HttpPost httpPost = buildHttpPostRequest(new DeleteShellRequest(url, shellId, commandTimeout))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context)
         StatusLine status = response.getStatusLine()
@@ -340,7 +344,7 @@ class WinRMTool {
         try {
             response = httpClient.execute(httpPost, context)
         } catch(Exception e) {
-            throw new WinRMException("Cannot perform request due to unexpected exception", e)
+            throw new WinRMException("Cannot perform request due to unexpected exception : " + e.getLocalizedMessage(), e)
         }
         return response
     }
@@ -384,10 +388,12 @@ class WinRMTool {
             entity.setContentType(contentTypeHeader)
             httpPost.setEntity(entity)
             // Request config
-            RequestConfig.Builder configBuilder = new RequestConfig.Builder()
+            RequestConfig.Builder configBuilder = RequestConfig.custom()
+            .setConnectionRequestTimeout(connectionTimeout.intValue()*1000)
+            .setSocketTimeout(readTimeout.intValue()*1000)
             httpPost.setConfig(configBuilder.build())
         }catch (Exception e) {
-            throw new WinRMException("Cannot build HttpPost request due to unexpected exception", e)
+            throw new WinRMException("Cannot build HttpPost request due to unexpected exception : " + e.getLocalizedMessage(), e)
         }
         return httpPost
     }
@@ -412,7 +418,7 @@ class WinRMTool {
             sslContext = SSLContext.getInstance(TLS)
             sslContext.init(null, [nullTrustManager as X509TrustManager] as TrustManager[], new SecureRandom())
         }catch(Exception e) {
-            throw new WinRMException("Cannot init SSLContext due to unexpected exception", e)
+            throw new WinRMException("Cannot init SSLContext due to unexpected exception : " + e.getLocalizedMessage(), e)
         }
         return sslContext
     }

@@ -31,18 +31,18 @@ class CommandOutput {
 
     public static final String COMMAND_STILL_RUNNING = "The command is still running"
 
-    int exitStatus
+    long exitStatus
     String output
     String errorOutput
     Throwable exception
 
-    CommandOutput(int exitStatus, String output, String errorOutput) {
+    CommandOutput(long exitStatus, String output, String errorOutput) {
         this.exitStatus = exitStatus
         this.output = output
         this.errorOutput = errorOutput
     }
 
-    CommandOutput(int exitStatus, String output, String errorOutput, Throwable exception) {
+    CommandOutput(long exitStatus, String output, String errorOutput, Throwable exception) {
         this.exitStatus = exitStatus
         this.output = output
         this.errorOutput = errorOutput
@@ -60,6 +60,6 @@ class CommandOutput {
     }
 
     boolean isCommandRunning() {
-        -1 == exitStatus && COMMAND_STILL_RUNNING == errorOutput
+        -1 == exitStatus
     }
 }

@@ -138,7 +138,7 @@ class WinRMTool {
         HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new OpenShellRequest(url, commandTimeout))
         HttpContext context = buildHttpContext()
-        HttpResponse response = performRequest(httpPost, context)
+        HttpResponse response = performRequest(httpPost, context, "OpenShellRequest")
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
         if(!sucessStatus.contains(responseCode)) {
@@ -191,7 +191,7 @@ class WinRMTool {
         HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new ExecuteCommandRequest(url, shellId, commandLine, args, commandTimeout))
         HttpContext context = buildHttpContext()
-        HttpResponse response = performRequest(httpPost, context)
+        HttpResponse response = performRequest(httpPost, context, "ExecuteCommand " + commandLine)
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
         if(!sucessStatus.contains(responseCode)) {
@@ -235,7 +235,7 @@ class WinRMTool {
         HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new GetCommandOutputRequest(url, shellId, commandId, commandTimeout))
         HttpContext context = buildHttpContext()
-        HttpResponse response = performRequest(httpPost, context)
+        HttpResponse response = performRequest(httpPost, context, "GetCommandOutput with id " + commandId)
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
         if(!sucessStatus.contains(responseCode)) {
@@ -271,7 +271,7 @@ class WinRMTool {
             LOGGER.log(Level.FINEST, "errOutput : " + error)
             return new CommandOutput(exitStatus, output, error)
         } else {
-            return new CommandOutput(-1, output, CommandOutput.COMMAND_STILL_RUNNING)
+            return new CommandOutput(-1, output, error)
         }
     }
 
@@ -290,7 +290,7 @@ class WinRMTool {
         HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new CleanupCommandRequest(url, shellId, commandId, commandTimeout))
         HttpContext context = buildHttpContext()
-        HttpResponse response = performRequest(httpPost, context)
+        HttpResponse response = performRequest(httpPost, context, "CleanupCommand with id " + commandId)
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
         if(!sucessStatus.contains(responseCode)) {
@@ -317,7 +317,7 @@ class WinRMTool {
         HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new DeleteShellRequest(url, shellId, commandTimeout))
         HttpContext context = buildHttpContext()
-        HttpResponse response = performRequest(httpPost, context)
+        HttpResponse response = performRequest(httpPost, context, "DeleteShellRequest with id " + shellId)
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
         if(!sucessStatus.contains(responseCode)) {
@@ -336,15 +336,16 @@ class WinRMTool {
      * 
      * @param httpPost
      * @param context
+     * @param requestDescription : in case of Exception
      * @return {@link HttpResponse}
      * @throws WinRMException
      */
-    private HttpResponse performRequest(HttpPost httpPost, HttpContext context) throws WinRMException {
+    private HttpResponse performRequest(HttpPost httpPost, HttpContext context, String requestDescription) throws WinRMException {
         HttpResponse response = null
         try {
             response = httpClient.execute(httpPost, context)
         } catch(Exception e) {
-            throw new WinRMException("Cannot perform request due to unexpected exception : " + e.getLocalizedMessage(), e)
+            throw new WinRMException("Cannot perform request " + requestDescription + " due to unexpected exception : " + e.getLocalizedMessage(), e)
         }
         return response
     }

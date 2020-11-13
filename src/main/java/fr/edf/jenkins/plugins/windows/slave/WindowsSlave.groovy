@@ -63,7 +63,6 @@ class WindowsSlave extends AbstractCloudSlave{
      */
     @Override
     boolean isAcceptingTasks() {
-        // TODO Auto-generated method stub
         return acceptingTasks == null || acceptingTasks.get()
     }
 
@@ -72,7 +71,6 @@ class WindowsSlave extends AbstractCloudSlave{
      */
     @Override
     String getDisplayName() {
-        // TODO Auto-generated method stub
         if(cloudId!=null) {
             return getNodeName() + " on " + cloudId
         }
@@ -84,7 +82,6 @@ class WindowsSlave extends AbstractCloudSlave{
      */
     @Override
     WindowsComputer createComputer() {
-        // TODO Auto-generated method stub
         return WindowsComputerFactory.createInstance(this)
     }
 
@@ -94,7 +91,6 @@ class WindowsSlave extends AbstractCloudSlave{
     @Override
     @Restricted(NoExternalUse)
     void _terminate(TaskListener listener) throws IOException, InterruptedException {
-        // TODO Auto-generated method stub
         try {
             final Computer computer = toComputer()
             if (computer != null) {

@@ -5,6 +5,7 @@ import static com.cloudbees.plugins.credentials.CredentialsMatchers.anyOf
 import static com.cloudbees.plugins.credentials.CredentialsMatchers.instanceOf
 import static com.cloudbees.plugins.credentials.domains.URIRequirementBuilder.fromUri
 
+import org.apache.commons.lang.StringUtils
 import org.apache.http.client.config.AuthSchemes
 import org.kohsuke.stapler.AncestorInPath
 import org.kohsuke.stapler.DataBoundConstructor
@@ -24,6 +25,8 @@ import hudson.Extension
 import hudson.model.Describable
 import hudson.model.Descriptor
 import hudson.model.Item
+import hudson.model.Label
+import hudson.model.labels.LabelAtom
 import hudson.security.ACL
 import hudson.util.FormValidation
 import hudson.util.ListBoxModel
@@ -46,10 +49,12 @@ class WindowsHost implements Describable<WindowsHost> {
     Integer maxTries
     String label
     Boolean useHttps = Boolean.FALSE
+    List<WindowsEnvVar> envVars = new ArrayList()
+    transient Set<LabelAtom> labelSet
 
     @DataBoundConstructor
     WindowsHost(String host, String credentialsId, Integer port, String authenticationScheme, Integer maxUsers,
-    Boolean disable,Integer connectionTimeout, Integer agentConnectionTimeout, Integer maxTries, String label, Boolean useHttps) {
+    Boolean disable,Integer connectionTimeout, Integer agentConnectionTimeout, Integer maxTries, String label, Boolean useHttps, List<WindowsEnvVar> envVars) {
         this.host = host
         this.credentialsId = credentialsId
         this.port = port
@@ -61,6 +66,8 @@ class WindowsHost implements Describable<WindowsHost> {
         this.maxTries = maxTries
         this.label = label
         this.useHttps = useHttps
+        this.envVars = envVars
+        labelSet = Label.parse(StringUtils.defaultIfEmpty(label, ""))
     }
 
     String getHost() {
@@ -161,10 +168,20 @@ class WindowsHost implements Describable<WindowsHost> {
     void setUseHttps(Boolean useHttps) {
         this.useHttps = useHttps
     }
+    
+    @DataBoundSetter
+    void setEnvVars(List<WindowsEnvVar> envVars) {
+        this.envVars = envVars
+    }
 
     @Override
     Descriptor<WindowsHost> getDescriptor() {
         return Jenkins.get().getDescriptorOrDie(this.getClass())
+    }
+    
+    
+    Set<LabelAtom> getLabelSet() {
+        return Label.parse(StringUtils.defaultIfEmpty(this.label, ""))
     }
 
     /**

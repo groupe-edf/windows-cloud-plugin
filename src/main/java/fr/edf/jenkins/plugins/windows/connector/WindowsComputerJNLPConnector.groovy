@@ -20,7 +20,7 @@ import hudson.slaves.SlaveComputer
 
 class WindowsComputerJNLPConnector extends WindowsComputerConnector{
 
-    private String JenkinsUrl
+    private String jenkinsUrl
 
     @DataBoundConstructor
     WindowsComputerJNLPConnector(String jenkinsUrl) {

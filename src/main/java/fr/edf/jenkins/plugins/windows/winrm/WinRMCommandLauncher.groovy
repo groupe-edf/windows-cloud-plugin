@@ -29,20 +29,26 @@ class WinRMCommandLauncher {
 
         WinRMTool winrmTool = null
         CommandOutput output = null
+        String commandId = null
         String shellId = null
         try {
             winrmTool = WinRMConnectionFactory.getWinRMConnection(connectionConfiguration)
             shellId = winrmTool.openShell()
-            output = winrmTool.executePSCommand(command)
+            commandId = winrmTool.executePSCommand(command)
+            output = winrmTool.getCommandOutput(shellId, commandId)
             if(output.exitStatus==0) {
                 winrmTool.deleteShellRequest(shellId)
                 return output.output
             } else {
+                winrmTool.cleanupCommand(shellId, commandId)
                 winrmTool.deleteShellRequest(shellId)
                 throw new Exception(output.errorOutput)
             }
         }catch(WinRMException we) {
             if(shellId != null) {
+                if(commandId != null) {
+                    winrmTool.cleanupCommand(shellId, commandId)
+                }
                 winrmTool.deleteShellRequest(shellId)
             }
             throw new WinRMCommandException("An unexpected error occured due to exception " + we.getLocalizedMessage(), we)

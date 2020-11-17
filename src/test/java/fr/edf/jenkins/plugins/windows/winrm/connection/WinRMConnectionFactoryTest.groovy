@@ -8,9 +8,8 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
 
 import fr.edf.jenkins.plugins.windows.util.CredentialsUtils
+import fr.edf.jenkins.plugins.windows.winrm.client.WinRMTool
 import hudson.util.Secret
-import io.cloudsoft.winrm4j.client.WinRmClientContext
-import io.cloudsoft.winrm4j.winrm.WinRmTool
 import jenkins.model.Jenkins
 import spock.lang.Specification
 
@@ -25,7 +24,7 @@ class WinRMConnectionFactoryTest extends Specification{
         WinRMGlobalConnectionConfiguration conf = null
                
         when:
-        WinRmTool tool = WinRMConnectionFactory.getWinRMConnection(null,null)
+        WinRMTool tool = WinRMConnectionFactory.getWinRMConnection(null)
 
         then:
         notThrown Exception
@@ -42,19 +41,17 @@ class WinRMConnectionFactoryTest extends Specification{
             "username", 
             "password")
         
-        WinRmTool tool = Mock()
+        WinRMTool tool = Mock()
         GroovySpy(WinRMConnectionFactory, global:true){
-            WinRMConnectionFactory.getConnection(host, cred, _, _, _, _) >> tool
+            WinRMConnectionFactory.getConnection(host, cred, _, _, _) >> tool
         }
         GroovyStub(CredentialsUtils, global:true){
             CredentialsUtils.findCredentials(host, _, _) >> cred
         }
-        WinRmClientContext winRMContext = WinRmClientContext.newInstance()
         
         when:
-        WinRmTool res = WinRMConnectionFactory.getWinRMConnection(new WinRMGlobalConnectionConfiguration(credentialsId: host,
-            context: Jenkins.get(), host: host, port: null, connectionTimeout: null, authenticationScheme: null, useHttps: null), 
-            winRMContext)
+        WinRMTool res = WinRMConnectionFactory.getWinRMConnection(new WinRMGlobalConnectionConfiguration(credentialsId: host,
+            context: Jenkins.get(), host: host, port: null, connectionTimeout: null, authenticationScheme: null, useHttps: null))
         
         then:
         notThrown Exception
@@ -65,17 +62,15 @@ class WinRMConnectionFactoryTest extends Specification{
         
         given:
         String host ="host"
-        WinRmTool tool = Mock()
+        WinRMTool tool = Mock()
         GroovySpy(WinRMConnectionFactory, global:true){
-            WinRMConnectionFactory.getConnection(host, _, _, _, _, _) >> tool
+            WinRMConnectionFactory.getConnection(host, _, _, _, _) >> tool
         }
-        WinRmClientContext winRMContext = WinRmClientContext.newInstance()
         
         when:
-        WinRmTool res = WinRMConnectionFactory.getWinRMConnection(new WinRMUserConnectionConfiguration(username: "username",
+        WinRMTool res = WinRMConnectionFactory.getWinRMConnection(new WinRMUserConnectionConfiguration(username: "username",
             password: Secret.fromString("passwoed"),
-            host: host, port: null, connectionTimeout: null, authenticationScheme: null, useHttps: null), 
-            winRMContext)
+            host: host, port: null, connectionTimeout: null, authenticationScheme: null, useHttps: null))
         
         then:
         notThrown Exception

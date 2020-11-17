@@ -260,7 +260,7 @@ class WindowsHost implements Describable<WindowsHost> {
 
                 Jenkins.get().checkPermission(Jenkins.ADMINISTER)
                 String result = WinRMCommand.checkConnection(new WinRMGlobalConnectionConfiguration(credentialsId: credentialsId,
-                context: item, host: host, port: port, authenticationScheme: AuthSchemes.NTLM, useHttps: false))
+                context: item, host: host, port: port, authenticationScheme: AuthSchemes.NTLM, useHttps: useHttps))
                 return FormValidation.ok("Connection success : " + (result).toString())
             } catch(Exception e) {
                 return FormValidation.error("Connection failed : " + (e.getMessage()).toString())

@@ -11,8 +11,7 @@ import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
 
 import fr.edf.jenkins.plugins.windows.util.CredentialsUtils
-import io.cloudsoft.winrm4j.client.WinRmClientContext
-import io.cloudsoft.winrm4j.winrm.WinRmTool
+import fr.edf.jenkins.plugins.windows.winrm.client.WinRMTool
 import jenkins.model.Jenkins
 
 /**
@@ -28,12 +27,12 @@ class WinRMConnectionFactory {
      * @return WinRmTool
      * @throws WinRMConnectionException
      */
-    static WinRmTool getWinRMConnection(WinRMConnectionConfiguration config, WinRmClientContext winRMContext) throws WinRMConnectionException{
+    static WinRMTool getWinRMConnection(WinRMConnectionConfiguration config) throws WinRMConnectionException{
         if(config instanceof WinRMGlobalConnectionConfiguration) {
-            return getGlobalWinRMConnection(config, winRMContext)
+            return getGlobalWinRMConnection(config)
         }
         if(config instanceof WinRMUserConnectionConfiguration) {
-            return getUserWinRMConnection(config, winRMContext)
+            return getUserWinRMConnection(config)
         }
         return null
     }
@@ -46,7 +45,7 @@ class WinRMConnectionFactory {
      */
 
     @Restricted(NoExternalUse)
-    private static WinRmTool getGlobalWinRMConnection(WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(), WinRmClientContext winRMContext) throws WinRMConnectionException {
+    private static WinRMTool getGlobalWinRMConnection(WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration()) throws WinRMConnectionException {
         String host = config.host
         Integer port = config.port ?: Integer.valueOf(5985)
         Integer connectionTimeout = config.connectionTimeout ?: Integer.valueOf(1000)
@@ -58,28 +57,28 @@ class WinRMConnectionFactory {
             throw new WinRMConnectionException("No credentials found for the host " + host)
         }
         def credentials = CredentialsUtils.findCredentials(host, credentialsId, context)
-        return getConnection(host, credentials, port, authenticationScheme, useHttps, winRMContext)
+        return getConnection(host, credentials, port, authenticationScheme, useHttps)
     }
-    
+
     /**
      * Generate a connection for the user using their credentials
      * @param config
      * @param winRMContext
      * @return getConnection
      */
-    private static WinRmTool getUserWinRMConnection(WinRMUserConnectionConfiguration config = new WinRMUserConnectionConfiguration(), WinRmClientContext winRMContext) {
+    private static WinRMTool getUserWinRMConnection(WinRMUserConnectionConfiguration config = new WinRMUserConnectionConfiguration()) {
         String host = config.host
         Integer port = config.port ?: Integer.valueOf(5985)
         Integer connectionTimeout = config.connectionTimeout ?: Integer.valueOf(1000)
         String authenticationScheme = config.authenticationScheme ?: AuthSchemes.NTLM
         Boolean useHttps = config.useHttps ?: Boolean.FALSE
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.SYSTEM, 
-            "cred", 
-            null, 
-            config.username, 
-            config.password.getPlainText()
-            )
-            return getConnection(host, credentials, port, authenticationScheme, useHttps, winRMContext)
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.SYSTEM,
+                "cred",
+                null,
+                config.username,
+                config.password.getPlainText()
+                )
+        return getConnection(host, credentials, port, authenticationScheme, useHttps)
     }
 
     /**
@@ -93,20 +92,19 @@ class WinRMConnectionFactory {
      */
 
     @Restricted(NoExternalUse)
-    private static WinRmTool getConnection(final String host, final StandardCredentials credentials, final Integer port,
-            final String authenticationScheme, final Boolean useHttps, WinRmClientContext winRMContext) throws WinRMConnectionException {
+    private static WinRMTool getConnection(final String host, final StandardCredentials credentials, final Integer port,
+            final String authenticationScheme, final Boolean useHttps) throws WinRMConnectionException {
         if (credentials instanceof StandardUsernamePasswordCredentials) {
             StandardUsernamePasswordCredentials usernamePasswordCredentials = credentials
-            WinRmTool winRmTool = WinRmTool.Builder.builder(host, usernamePasswordCredentials.getUsername(),
-                    usernamePasswordCredentials.getPassword().getPlainText())
-                    .authenticationScheme(AuthSchemes.NTLM)
-                    .port(port.intValue())
-                    .useHttps(useHttps.booleanValue())
-                    .disableCertificateChecks(true)
-                    .context(winRMContext)
-                    .build();
-            winRmTool.setConnectionTimeout(10000)
-            winRmTool.setReceiveTimeout(10000)
+            WinRMTool winRmTool = new WinRMTool(
+                    host,
+                    port.intValue(),
+                    usernamePasswordCredentials.getUsername(),
+                    usernamePasswordCredentials.getPassword().getPlainText(),
+                    AuthSchemes.NTLM,
+                    useHttps.booleanValue(),
+                    true,
+                    10000)
             return winRmTool
         } else {
             throw new WinRMConnectionException("Only Username and Password Credentials are allowed")

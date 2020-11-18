@@ -15,10 +15,14 @@ class Constants {
     static final String REMOTING_JAR_PATH = "jnlpJars\\remoting.jar"
 
     static final String WHOAMI  = "whoami"
+    
+    static final String REMOTE_MANAGEMENT_USERS_GROUP = "Remote Management Users"
 
-    static final String CREATE_USER = "New-LocalUser %s -Password \$(%s | ConvertTo-SecureString -AsPlainText -Force) -FullName %s -Description \"User automatically created by jenkins\""
+    static final String CREATE_USER = "New-LocalUser \"%s\" -Password \$(\"%s\" | ConvertTo-SecureString -AsPlainText -Force) -FullName \"%s\" -Description \"User automatically created by jenkins\""
 
-    static final String DELETE_USER = "Remove-LocalUser -Name %s -Verbose"
+    static final String ADD_USER_TO_GROUP = "Add-LocalGroupMember -Group \"%s\" -Member \"%s\""
+    
+    static final String DELETE_USER = "Remove-LocalUser -Name \"%s\" -Verbose"
 
     static final String WORKDIR_PATTERN = "C:\\Users\\%s\\"
 
@@ -34,7 +38,7 @@ class Constants {
                                                 + "\$aclRule = New-Object System.Security.AccessControl.FileSystemAccessRule \$aclDef;" \
                                                 + "\$acl.SetAccessRule(\$aclRule);"
 
-    static final String REMOVE_WORKDIR = "Remove-Item 'c:\\Users\\%s' -Force -Recurse"
+    static final String REMOVE_WORKDIR = "Remove-Item 'C:\\Users\\%s' -Force -Recurse"
 
     static final String GET_REMOTING_JAR = "Invoke-RestMethod -Uri %s -OutFile remoting.jar"
 

@@ -77,7 +77,7 @@ class WinRMCommand {
             WinRMCommandLauncher.executeCommand(config, String.format(Constants.DISABLE_INHERITED_WORKDIR, user.username, user.username))
             WinRMCommandLauncher.executeCommand(config, String.format(Constants.CREATE_DIR, user.username))
             WinRMCommandLauncher.executeCommand(config, String.format(Constants.GRANT_ACCESS_WORKDIR, user.username, user.username))
-            
+            WinRMCommandLauncher.executeCommand(config, String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username))
             return user
         } catch(Exception e) {
             final String message = String.format(WinRMCommandException.CREATE_WINDOWS_USER_ERROR, host.host)

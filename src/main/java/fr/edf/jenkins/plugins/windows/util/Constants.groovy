@@ -1,7 +1,7 @@
 package fr.edf.jenkins.plugins.windows.util;
 /**
  * List of constants that represent PowerShell commands
- * @author CHRIS BAHONDA
+ * @author Abdelkrim ELOTMANI
  *
  */
 class Constants {
@@ -10,18 +10,22 @@ class Constants {
 
     static final String EMPTY_LIST_BOX_VALUE = "--------"
 
+    /** windows-%s */
     static final String USERNAME_PATTERN = "windows-%s"
 
     static final String REMOTING_JAR_PATH = "jnlpJars\\remoting.jar"
 
     static final String WHOAMI  = "whoami"
-    
+
     static final String REMOTE_MANAGEMENT_USERS_GROUP = "Remote Management Users"
 
     static final String CREATE_USER = "New-LocalUser \"%s\" -Password \$(\"%s\" | ConvertTo-SecureString -AsPlainText -Force) -FullName \"%s\" -Description \"User automatically created by jenkins\""
 
+    /** Add-LocalGroupMember -Group \"%s\" -Member \"%s\ */
     static final String ADD_USER_TO_GROUP = "Add-LocalGroupMember -Group \"%s\" -Member \"%s\""
-    
+
+    static final String STOP_USER_PROCESS = "Get-Process -IncludeUserName | Where-Object {\$_.UserName -eq \"\$env:COMPUTERNAME\\%s\"} | Stop-Process -Force"
+
     static final String DELETE_USER = "Remove-LocalUser -Name \"%s\" -Verbose"
 
     static final String WORKDIR_PATTERN = "C:\\Users\\%s\\"
@@ -36,7 +40,9 @@ class Constants {
                                                 + "\$acl.Access | Where-Object {\$_.IdentityReference -notlike \"*Administrators*\" -and \$_.IdentityReference -notlike \"*SYSTEM*\"} | ForEach-Object -Process {\$acl.RemoveAccessRule(\$_)};" \
                                                 + "\$aclDef = \"\$env:COMPUTERNAME\\%s\", \"FullControl\", \"ContainerInherit,ObjectInherit\", \"None\", \"Allow\";" \
                                                 + "\$aclRule = New-Object System.Security.AccessControl.FileSystemAccessRule \$aclDef;" \
-                                                + "\$acl.SetAccessRule(\$aclRule);"
+                                                + "\$acl.SetAccessRule(\$aclRule);" \
+                                                + "\$acl.SetOwner([System.Security.Principal.NTAccount]\"NT AUTHORITY\\SYSTEM\");" \
+                                                + "\$acl | Set-Acl \"C:\\users\\%s\""
 
     static final String REMOVE_WORKDIR = "Remove-Item 'C:\\Users\\%s' -Force -Recurse"
 

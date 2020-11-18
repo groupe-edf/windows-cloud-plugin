@@ -32,7 +32,10 @@ class Constants {
                                                 + "\$acl.Access | Where-Object {\$_.IdentityReference -notlike \"*Administrators*\" -and \$_.IdentityReference -notlike \"*SYSTEM*\"} | ForEach-Object -Process {\$acl.RemoveAccessRule(\$_)};" \
                                                 + "\$aclDef = \"\$env:COMPUTERNAME\\%s\", \"FullControl\", \"ContainerInherit,ObjectInherit\", \"None\", \"Allow\";" \
                                                 + "\$aclRule = New-Object System.Security.AccessControl.FileSystemAccessRule \$aclDef;" \
-                                                + "\$acl.SetAccessRule(\$aclRule);"
+                                                + "\$acl.SetAccessRule(\$aclRule);" \
+                                                + "\$acl.SetOwner([System.Security.Principal.NTAccount]\"NT AUTHORITY\\SYSTEM\");" \
+                                                + "\$acl | Set-Acl \"C:\\users\\%s\""
+                                                
 
     static final String REMOVE_WORKDIR = "Remove-Item 'c:\\Users\\%s' -Force -Recurse"
 

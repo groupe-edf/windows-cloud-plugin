@@ -74,9 +74,9 @@ class WinRMCommand {
             if(!doesUserExist(config, user.username)) {
                 throw new Exception(String.format("The user %s already exists", user.username))
             }
+            WinRMCommandLauncher.executeCommand(config, String.format(Constants.CREATE_DIR, String.format(Constants.WORKDIR_PATTERN, user.username)))
             WinRMCommandLauncher.executeCommand(config, String.format(Constants.DISABLE_INHERITED_WORKDIR, user.username, user.username))
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.CREATE_DIR, user.username))
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.GRANT_ACCESS_WORKDIR, user.username, user.username))
+            WinRMCommandLauncher.executeCommand(config, String.format(Constants.GRANT_ACCESS_WORKDIR, user.username, user.username, user.username))
             
             return user
         } catch(Exception e) {

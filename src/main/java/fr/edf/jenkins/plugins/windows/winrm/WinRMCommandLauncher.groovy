@@ -17,6 +17,7 @@ import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionFactory
  *
  */
 class WinRMCommandLauncher {
+    
     /**
      * Execute the command using the given connection configuration
      * @param connectionConfiguration
@@ -54,4 +55,5 @@ class WinRMCommandLauncher {
             throw new WinRMCommandException("An unexpected error occured due to exception " + we.getLocalizedMessage(), we)
         }
     }
+    
 }

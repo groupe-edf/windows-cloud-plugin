@@ -25,7 +25,7 @@ class WinRMCommandLauncher {
      * @throws Exception
      */
     @Restricted(NoExternalUse)
-    protected static String executeCommand(@NotNull WinRMConnectionConfiguration connectionConfiguration, @NotNull String command) throws Exception{
+    protected static String executeCommand(@NotNull WinRMConnectionConfiguration connectionConfiguration, @NotNull String command, @NotNull boolean keepAlive, @NotNull boolean ignoreError) throws Exception{
 
         WinRMTool winrmTool = null
         CommandOutput output = null
@@ -36,15 +36,16 @@ class WinRMCommandLauncher {
             shellId = winrmTool.openShell()
             commandId = winrmTool.executePSCommand(command)
             output = winrmTool.getCommandOutput(shellId, commandId)
-            if(output.exitStatus==0) {
-                winrmTool.deleteShellRequest(shellId)
-                return output.output
-            } else {
+            if(!ignoreError && output.exitStatus!=0) {
                 winrmTool.cleanupCommand(shellId, commandId)
                 winrmTool.deleteShellRequest(shellId)
                 throw new Exception(output.errorOutput)
             }
-        }catch(WinRMException we) {
+            if(!keepAlive) {
+                winrmTool.deleteShellRequest(shellId)
+            }
+            return output.output
+        } catch(WinRMException we) {
             if(shellId != null) {
                 if(commandId != null) {
                     winrmTool.cleanupCommand(shellId, commandId)

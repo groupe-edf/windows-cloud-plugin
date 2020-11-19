@@ -122,7 +122,7 @@ class WinRMCommand {
             context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
             authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
 
-            String result = WinRMCommandLauncher.executeCommand(config, String.format(Constants.LIST_USERS, Constants.USERNAME_PATTERN), false, false)
+            String result = WinRMCommandLauncher.executeCommand(config, String.format(Constants.LIST_USERS, Constants.USERNAME_PATTERN.substring(0, Constants.USERNAME_PATTERN.lastIndexOf("%"))), false, false)
             if(StringUtils.isEmpty(result)) return new ArrayList()
             return result as List
         }catch(Exception e) {

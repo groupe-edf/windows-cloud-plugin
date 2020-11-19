@@ -52,7 +52,7 @@ class Constants {
 
     static final String LAUNCH_JNLP = "java -jar remoting.jar -jnlpUrl %scomputer/%s/slave-agent.jnlp -secret %s"
 
-    static final String LIST_USERS = "(Get-LocalUser).name"
+    static final String LIST_USERS = "(Get-LocalUser | Where-Object {\$_.Name -match \"windows-*\"}).name"
 
     static final String REGEX_NEW_LINE = "\\r?\\n|\\r"
 }

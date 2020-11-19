@@ -27,7 +27,7 @@ class WinRMCommand {
      */
     @Restricted(NoExternalUse)
     static String checkConnection(WinRMGlobalConnectionConfiguration config) {
-        return WinRMCommandLauncher.executeCommand(config, Constants.WHOAMI)
+        return WinRMCommandLauncher.executeCommand(config, Constants.WHOAMI, false, false)
     }
 
     /**

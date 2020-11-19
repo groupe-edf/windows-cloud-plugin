@@ -48,8 +48,9 @@ class WinRMCommand {
      */
     @Restricted(NoExternalUse)
     static WindowsUser generateUser() {
-        String username = String.format(Constants.USERNAME_PATTERN, RandomStringUtils.random(15, true, true).toLowerCase())
+        String username = String.format(Constants.USERNAME_PATTERN, RandomStringUtils.random(10, true, true).toLowerCase())
         String password = RandomStringUtils.random(15, true, true)
+        password += "123!"
         String workdir = String.format(Constants.WORKDIR_PATTERN, username)
         return new WindowsUser(username: username, password: Secret.fromString(password), workdir: workdir)
     }

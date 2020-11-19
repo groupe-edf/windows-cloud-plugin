@@ -17,3 +17,10 @@ f.advanced(title: Messages.Cloud_Details()) {
         )
     }
 }
+
+f.section(title:Messages.Cloud_AgentsProperties()) {
+    f.entry(title:Messages.Cloud_IdleMinutes(), field:'idleMinutes') {
+        f.number(clazz: 'required', min: 1, default: 1)
+    }
+    f.dropdownDescriptorSelector(title:'Connect method', field:'connector')
+}

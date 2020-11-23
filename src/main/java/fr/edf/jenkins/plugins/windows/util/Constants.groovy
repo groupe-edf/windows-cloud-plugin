@@ -28,13 +28,6 @@ class Constants {
     /** Add-LocalGroupMember -Group \"%s\" -Member \"%s\ */
     static final String ADD_USER_TO_GROUP = "Add-LocalGroupMember -Group \"%s\" -Member \"%s\""
 
-    static final String STOP_USER_PROCESS = "Get-Process -IncludeUserName | Where-Object {\$_.UserName -eq \"\$env:COMPUTERNAME\\%s\"} | Stop-Process -Force"
-
-    static final String DELETE_USER = "Remove-LocalUser -Name \"%s\" -Verbose"
-
-    /** Add-LocalGroupMember -Group \"%s\" -Member \"%s\ */
-    static final String ADD_USER_TO_GROUP = "Add-LocalGroupMember -Group \"%s\" -Member \"%s\""
-
     /** Get-Process -IncludeUserName | Where-Object {\$_.UserName -eq \"\$env:COMPUTERNAME\\%s\"} | Stop-Process -Force */
     static final String STOP_USER_PROCESS = "Get-Process -IncludeUserName | Where-Object {\$_.UserName -eq \"\$env:COMPUTERNAME\\%s\"} | Stop-Process -Force"
 

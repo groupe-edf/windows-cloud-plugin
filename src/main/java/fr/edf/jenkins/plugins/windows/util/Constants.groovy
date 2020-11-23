@@ -67,7 +67,7 @@ class Constants {
     static final String GET_REMOTING_JAR = "Invoke-RestMethod -Uri %s -OutFile remoting.jar"
 
     /** (Get-LocalUser | Where-Object {\$_.Name -eq %s}).name */
-    static final String CHECK_USER_EXIST = "(Get-LocalUser | Where-Object {\$_.Name -eq %s}).name"
+    static final String CHECK_USER_EXIST = "(Get-LocalUser | Where-Object {\$_.Name -eq '%s'}).name"
 
     /** java -jar remoting.jar -jnlpUrl %scomputer/%s/slave-agent.jnlp -secret %s */
     static final String LAUNCH_JNLP = "java -jar remoting.jar -jnlpUrl %scomputer/%s/slave-agent.jnlp -secret %s"

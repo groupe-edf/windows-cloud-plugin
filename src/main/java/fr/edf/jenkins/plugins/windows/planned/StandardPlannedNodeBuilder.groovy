@@ -42,7 +42,7 @@ class StandardPlannedNodeBuilder extends PlannedNodeBuilder{
             LOGGER.log(Level.FINEST, "Exception : ", e)
             f = Futures.immediateFailedFuture(e)
             if (user != null ) {
-                WinRMCommand.deleteUser(user.username)
+                WinRMCommand.deleteUser(windowsHost, user.username)
             }
         }
         return new NodeProvisioner.PlannedNode(windowsHost.host, f, numExecutors)

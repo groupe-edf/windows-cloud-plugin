@@ -40,17 +40,17 @@ class Constants {
     /** New-Item -Path %s -ItemType 'directory' -Force */
     static final String CREATE_DIR = "New-Item -Path %s -ItemType 'directory' -Force"
 
-    /** \$acl = Get-Acl \"C:\\users\\%s\" + \$acl.SetAccessRuleProtection(\$true,\$true) + \$acl | Set-Acl \"C:\\users\\%s\" */
+    /** \$acl = Get-Acl \"C:\\users\\%s\" \$acl.SetAccessRuleProtection(\$true,\$true) \$acl | Set-Acl \"C:\\users\\%s\" */
     static final String DISABLE_INHERITED_WORKDIR = "\$acl = Get-Acl \"C:\\users\\%s\";" \
                                                     + "\$acl.SetAccessRuleProtection(\$true,\$true);" \
                                                     + "\$acl | Set-Acl \"C:\\users\\%s\""
 
-    /** \$acl = Get-Acl \"C:\\users\\%s\" +
-     * \$acl.Access | Where-Object {\$_.IdentityReference -notlike \"*Administrators*\" -and \$_.IdentityReference -notlike \"*SYSTEM*\"} | ForEach-Object -Process {\$acl.RemoveAccessRule(\$_)} +
-     * \$aclDef = \"\$env:COMPUTERNAME\\%s\", \"FullControl\", \"ContainerInherit,ObjectInherit\", \"None\", \"Allow\" +
-     * \$aclRule = New-Object System.Security.AccessControl.FileSystemAccessRule \$aclDef +
-     * \$acl.SetAccessRule(\$aclRule) +
-     * \$acl.SetOwner([System.Security.Principal.NTAccount]\"NT AUTHORITY\\SYSTEM\") +
+    /** \$acl = Get-Acl \"C:\\users\\%s\"
+     * \$acl.Access | Where-Object {\$_.IdentityReference -notlike \"*Administrators*\" -and \$_.IdentityReference -notlike \"*SYSTEM*\"} | ForEach-Object -Process {\$acl.RemoveAccessRule(\$_)}
+     * \$aclDef = \"\$env:COMPUTERNAME\\%s\", \"FullControl\", \"ContainerInherit,ObjectInherit\", \"None\", \"Allow\"
+     * \$aclRule = New-Object System.Security.AccessControl.FileSystemAccessRule \$aclDef
+     * \$acl.SetAccessRule(\$aclRule)
+     * \$acl.SetOwner([System.Security.Principal.NTAccount]\"NT AUTHORITY\\SYSTEM\")
      * \$acl | Set-Acl \"C:\\users\\%s\" */
     static final String GRANT_ACCESS_WORKDIR = "\$acl = Get-Acl \"C:\\users\\%s\";" \
                                                 + "\$acl.Access | Where-Object {\$_.IdentityReference -notlike \"*Administrators*\" -and \$_.IdentityReference -notlike \"*SYSTEM*\"} | ForEach-Object -Process {\$acl.RemoveAccessRule(\$_)};" \

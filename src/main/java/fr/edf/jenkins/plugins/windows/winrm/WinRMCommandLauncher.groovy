@@ -1,5 +1,9 @@
 package fr.edf.jenkins.plugins.windows.winrm
 
+import java.lang.ref.PhantomReference
+import java.util.logging.Level
+import java.util.logging.Logger
+
 import org.antlr.v4.runtime.misc.NotNull
 import org.kohsuke.accmod.Restricted
 import org.kohsuke.accmod.restrictions.NoExternalUse
@@ -8,6 +12,7 @@ import fr.edf.jenkins.plugins.windows.winrm.client.WinRMException
 import fr.edf.jenkins.plugins.windows.winrm.client.WinRMTool
 import fr.edf.jenkins.plugins.windows.winrm.client.output.CommandOutput
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionConfiguration
+import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionException
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionFactory
 
 /**
@@ -17,44 +22,92 @@ import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionFactory
  *
  */
 class WinRMCommandLauncher {
-    
+
+    private static final Logger LOGGER = Logger.getLogger(WinRMCommandLauncher.class.name)
+
+    WinRMTool winrmTool
+    String commandId
+    String shellId
+
+    /**
+     * Construct WinRMCommandLauncher with its own WinRmClient
+     * @param connectionConfiguration
+     */
+    protected WinRMCommandLauncher(@NotNull WinRMConnectionConfiguration connectionConfiguration) throws WinRMConnectionException {
+        this.winrmTool = WinRMConnectionFactory.getWinRMConnection(connectionConfiguration)
+    }
+
+    /**
+     * openShell on the remote machine
+     * @throws WinRMCommandException
+     */
+    protected void openShell() throws WinRMCommandException {
+        try {
+            this.shellId = winrmTool.openShell()
+        }catch(WinRMException winrme) {
+            throw new WinRMCommandException("Unable to open a shell", winrme)
+        }
+    }
+
+    /**
+     * Stop a command still running
+     * @param commandId
+     * @throws WinRMCommandException
+     */
+    protected void cleanupCommand(String commandId) throws WinRMCommandException {
+        commandId = commandId ?: this.commandId
+        try {
+            winrmTool.cleanupCommand(shellId, commandId)
+        }catch(WinRMException winrme) {
+            throw new WinRMCommandException("Unable to cleanup the command with id " + commandId, winrme)
+        }
+    }
+
+    /**
+     * Close the shell
+     * @throws WinRMException
+     */
+    protected void closeShell() throws WinRMException {
+        try {
+            winrmTool.deleteShellRequest(shellId)
+            this.shellId = null
+        }catch(WinRMException winrme) {
+            throw new WinRMCommandException("Unable to close the shell with id " + shellId, winrme)
+        }
+    }
+
     /**
      * Execute the command using the given connection configuration
-     * @param connectionConfiguration
-     * @param command i.e. the command that need to be launched
-     * @return the command output
+     * @param command : the powershell command to launch
+     * @param ignoreError : do not throw exception if status code != 0
+     * @param keepAlive : if true, keep the shell open. To close it, you must call the method closeShell manually or call an other command wich doesn't keepAlive
+     * @return command result
      * @throws Exception
      */
     @Restricted(NoExternalUse)
-    protected static String executeCommand(@NotNull WinRMConnectionConfiguration connectionConfiguration, @NotNull String command, @NotNull boolean keepAlive, @NotNull boolean ignoreError) throws Exception{
-
-        WinRMTool winrmTool = null
+    protected String executeCommand(@NotNull String command, @NotNull boolean ignoreError, @NotNull boolean keepAlive) throws WinRMCommandException {
         CommandOutput output = null
         String commandId = null
-        String shellId = null
         try {
-            winrmTool = WinRMConnectionFactory.getWinRMConnection(connectionConfiguration)
-            shellId = winrmTool.openShell()
+            LOGGER.log(Level.FINE, "####################  OPEN SHELL")
+            shellId = shellId ?: winrmTool.openShell()
+            LOGGER.log(Level.FINE, "####################  EXECUTE COMMAND " + command)
             commandId = winrmTool.executePSCommand(command)
+            this.commandId = commandId ?: this.commandId
+            LOGGER.log(Level.FINE, "####################  GET COMMAND OUTPUT")
             output = winrmTool.getCommandOutput(shellId, commandId)
+
             if(!ignoreError && output.exitStatus!=0) {
-                winrmTool.cleanupCommand(shellId, commandId)
-                winrmTool.deleteShellRequest(shellId)
-                throw new Exception(output.errorOutput)
+                closeShell()
+                throw new Exception("OUTPUT : " + output.output + " ;ERROR : " + output.errorOutput)
             }
             if(!keepAlive) {
-                winrmTool.deleteShellRequest(shellId)
+                closeShell()
             }
             return output.output
         } catch(WinRMException we) {
-            if(shellId != null) {
-                if(commandId != null) {
-                    winrmTool.cleanupCommand(shellId, commandId)
-                }
-                winrmTool.deleteShellRequest(shellId)
-            }
-            throw new WinRMCommandException("An unexpected error occured due to exception " + we.getLocalizedMessage(), we)
+            if(shellId != null) closeShell()
+            throw new WinRMCommandException("Unable to execute the command " + command, we)
         }
     }
-    
 }

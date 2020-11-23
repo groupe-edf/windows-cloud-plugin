@@ -13,8 +13,8 @@ class Constants {
     /** windows-%s */
     static final String USERNAME_PATTERN = "windows-%s"
 
-    /** jnlpJars\\remoting.jar-%s */
-    static final String REMOTING_JAR_PATH = "jnlpJars\\remoting.jar"
+    /** jnlpJars/remoting.jar-%s */
+    static final String REMOTING_JAR_URL = "jnlpJars/remoting.jar"
 
     /** whoami */
     static final String WHOAMI  = "whoami"

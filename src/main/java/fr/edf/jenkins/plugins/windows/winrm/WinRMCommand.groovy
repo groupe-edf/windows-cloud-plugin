@@ -27,7 +27,8 @@ class WinRMCommand {
      */
     @Restricted(NoExternalUse)
     static String checkConnection(WinRMGlobalConnectionConfiguration config) {
-        return WinRMCommandLauncher.executeCommand(config, Constants.WHOAMI, false, false)
+        WinRMCommandLauncher launcher = new WinRMCommandLauncher(config)
+        return launcher.executeCommand(Constants.WHOAMI, false, false)
     }
 
     /**
@@ -37,8 +38,8 @@ class WinRMCommand {
      * @return true if the user exists otherwise false
      * @throws Exception
      */
-    private static boolean doesUserExist(WinRMConnectionConfiguration config, String username) throws Exception{
-        String res = WinRMCommandLauncher.executeCommand(config, String.format(Constants.CHECK_USER_EXIST, username, false, false))
+    private static boolean doesUserExist(WinRMCommandLauncher launcher, String username) throws Exception{
+        String res = launcher.executeCommand(String.format(Constants.CHECK_USER_EXIST, username, false, true))
         return res.trim() == username
     }
 
@@ -50,7 +51,7 @@ class WinRMCommand {
     static WindowsUser generateUser() {
         String username = String.format(Constants.USERNAME_PATTERN, RandomStringUtils.random(10, true, true).toLowerCase())
         String password = RandomStringUtils.random(15, true, true)
-        password += "123!"
+        password += "!"
         String workdir = String.format(Constants.WORKDIR_PATTERN, username)
         return new WindowsUser(username: username, password: Secret.fromString(password), workdir: workdir)
     }
@@ -64,23 +65,25 @@ class WinRMCommand {
      * @throws Exception
      */
     @Restricted(NoExternalUse)
-    static WindowsUser createUser(WindowsHost host, WindowsUser user) throws WinRMCommandException, Exception{
-
+    static WindowsUser createUser(WindowsHost host, WindowsUser user) throws WinRMCommandException {
+        WinRMCommandLauncher launcher = null
         try {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
             context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
             authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
+            launcher = new WinRMCommandLauncher(config)
 
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.CREATE_USER, user.username, user.password.getPlainText(), user.username), false, false)
-            if(!doesUserExist(config, user.username)) {
-                throw new Exception(String.format("The user %s already exists", user.username))
-            }
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.CREATE_DIR, String.format(Constants.WORKDIR_PATTERN, user.username)), false, false)
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.DISABLE_INHERITED_WORKDIR, user.username, user.username), false, false)
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.GRANT_ACCESS_WORKDIR, user.username, user.username, user.username), false, false)
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username), false, false)
+            launcher.executeCommand(String.format(Constants.CREATE_USER, user.username, user.password.getPlainText(), user.username), false, true)
+//            if(!doesUserExist(launcher, user.username)) {
+//                throw new Exception(String.format("The user %s does not exist after creation", user.username))
+//            }
+//            launcher.executeCommand(String.format(Constants.CREATE_DIR, String.format(Constants.WORKDIR_PATTERN, user.username)), false, true)
+//            launcher.executeCommand(String.format(Constants.DISABLE_INHERITED_WORKDIR, user.username, user.username), false, true)
+//            launcher.executeCommand(String.format(Constants.GRANT_ACCESS_WORKDIR, user.username, user.username, user.username), false, true)
+            launcher.executeCommand(String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username), false, false)
             return user
         } catch(Exception e) {
+            if(launcher != null && launcher.shellId != null) launcher.closeShell()
             final String message = String.format(WinRMCommandException.CREATE_WINDOWS_USER_ERROR, host.host)
             throw new WinRMCommandException(message, e)
         }
@@ -94,18 +97,21 @@ class WinRMCommand {
      * @throws Exception
      */
     static void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception{
+        WinRMCommandLauncher launcher = null
         try {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
             context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
             authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
+            launcher = new WinRMCommandLauncher(config)
 
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.STOP_USER_PROCESS, username), false, false)
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.DELETE_USER, username), false, false)
+            launcher.executeCommand(String.format(Constants.STOP_USER_PROCESS, username), false, true)
+            launcher.executeCommand(String.format(Constants.DELETE_USER, username), false, false)
 
             if(doesUserExist(config, username)) {
                 throw new Exception(String.format("The user %s was not deleted", username))
             }
         }catch(Exception e) {
+            if(launcher?.shellId) launcher.closeShell()
             String message = String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host)
             throw new WinRMCommandException(message, e)
         }
@@ -122,8 +128,9 @@ class WinRMCommand {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
             context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
             authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
-
-            String result = WinRMCommandLauncher.executeCommand(config, String.format(Constants.LIST_USERS, Constants.USERNAME_PATTERN.substring(0, Constants.USERNAME_PATTERN.lastIndexOf("%"))), false, false)
+            WinRMCommandLauncher launcher = new WinRMCommandLauncher(config)
+            
+            String result = launcher.executeCommand(String.format(Constants.LIST_USERS, Constants.USERNAME_PATTERN.substring(0, Constants.USERNAME_PATTERN.lastIndexOf("%"))), false, false)
             if(StringUtils.isEmpty(result)) return new ArrayList()
             return result as List
         }catch(Exception e) {
@@ -143,23 +150,25 @@ class WinRMCommand {
      * @throws Exception
      */
     static boolean jnlpConnect(WindowsHost host, WindowsUser user, String jenkinsUrl, String slaveSecret) throws WinRMCommandException, Exception{
-        jenkinsUrl = StringUtils.isNotEmpty(jenkinsUrl) ?: Jenkins.get().getRootUrl()
+        jenkinsUrl = jenkinsUrl ?: Jenkins.get().getRootUrl()
         if(!jenkinsUrl.endsWith("/")) {
             jenkinsUrl += "/"
         }
 
-        String remotingUrl = jenkinsUrl + Constants.REMOTING_JAR_PATH
+        String remotingUrl = jenkinsUrl + Constants.REMOTING_JAR_URL
 
+        WinRMCommandLauncher launcher = null
         try {
             WinRMUserConnectionConfiguration config = new WinRMUserConnectionConfiguration(username: user.username, password: user.password,
             host: host.host, port: host.port, connectionTimeout: host.connectionTimeout, authenticationScheme: host.authenticationScheme,
             useHttps: host.useHttps)
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.GET_REMOTING_JAR, remotingUrl), false, false)
-            WinRMCommandLauncher.executeCommand(config, String.format(Constants.LAUNCH_JNLP, jenkinsUrl, user.username, slaveSecret), true, true)
+            launcher = new WinRMCommandLauncher(config)
+            launcher.executeCommand(String.format(Constants.GET_REMOTING_JAR, remotingUrl), false, true)
+            launcher.executeCommand(String.format(Constants.LAUNCH_JNLP, jenkinsUrl, user.username, slaveSecret), true, true)
             return true
         }catch(Exception e) {
+            if(launcher?.shellId) launcher.closeShell()
             final String message = String.format(WinRMCommandException.JNLP_CONNETION_ERROR, host.host, user.username)
-            e.getMessage()
             throw new WinRMCommandException(message, e)
         }
     }

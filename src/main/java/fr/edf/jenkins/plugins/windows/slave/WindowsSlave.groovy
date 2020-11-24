@@ -28,7 +28,7 @@ import jenkins.model.Jenkins
  * @author CHRIS BAHONDA
  *
  */
-class WindowsSlave extends AbstractCloudSlave{
+class WindowsSlave extends AbstractCloudSlave {
     private static final Logger LOGGER = Logger.getLogger(WindowsSlave.class.name)
 
     final String cloudId
@@ -43,10 +43,13 @@ class WindowsSlave extends AbstractCloudSlave{
         launcher
         )
         this.cloudId = cloud
-        this.labelString = label
         this.host = host
-        buildRetentionStrategy(idleMinutes)
-        this.nodeProperties = nodeProperties
+        setNumExecutors(1)
+        setMode(hudson.model.Node.Mode.EXCLUSIVE)
+        setLabelString(label)
+        setNodeProperties(nodeProperties)
+        setRetentionStrategy(buildRetentionStrategy(idleMinutes))
+        
     }
 
     /**
@@ -109,9 +112,8 @@ class WindowsSlave extends AbstractCloudSlave{
             LOGGER.log(Level.SEVERE, message, e)
             listener.fatalError(message)
         }
-
     }
-    
+
     /**
      * Retrieves the cloud attached to the WindowsSlave
      * @return WindowsCloud
@@ -119,18 +121,18 @@ class WindowsSlave extends AbstractCloudSlave{
     WindowsCloud getCloud() {
         if(cloudId == null) return null
         final Cloud cloud = Jenkins.get().getCloud(cloudId)
-        
+
         if(cloudId==null) {
             throw new RuntimeException("Failed to retrieve Cloud " + cloudId)
         }
-        
+
         if(!(cloud instanceof WindowsCloud)) {
             throw new RuntimeException(cloudId + " is not a WindowsCloud, it is a " + cloud.getClass().toString())
         }
-        
+
         return (WindowsCloud) cloud
     }
-    
+
     @Extension
     static final class WindowsSlaveDescriptor extends SlaveDescriptor {
 
@@ -138,7 +140,7 @@ class WindowsSlave extends AbstractCloudSlave{
          * {@inheritDoc}
          */
         @Override
-         boolean isInstantiable() {
+        boolean isInstantiable() {
             return false
         }
 
@@ -146,9 +148,8 @@ class WindowsSlave extends AbstractCloudSlave{
          * {@inheritDoc}
          */
         @Override
-         String getDisplayName() {
+        String getDisplayName() {
             return "Windows Agent"
         }
-        
     }
 }

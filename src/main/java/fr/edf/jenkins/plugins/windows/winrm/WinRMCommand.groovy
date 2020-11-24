@@ -38,8 +38,8 @@ class WinRMCommand {
      * @return true if the user exists otherwise false
      * @throws Exception
      */
-    private static boolean doesUserExist(WinRMCommandLauncher launcher, String username) throws Exception{
-        String res = launcher.executeCommand(String.format(Constants.CHECK_USER_EXIST, username, false, true))
+    private static boolean doesUserExist(WinRMCommandLauncher launcher, String username, boolean keepAlive) throws Exception{
+        String res = launcher.executeCommand(String.format(Constants.CHECK_USER_EXIST, username), false, keepAlive)
         return res.trim() == username
     }
 
@@ -74,12 +74,14 @@ class WinRMCommand {
             launcher = new WinRMCommandLauncher(config)
 
             launcher.executeCommand(String.format(Constants.CREATE_USER, user.username, user.password.getPlainText(), user.username), false, true)
-//            if(!doesUserExist(launcher, user.username)) {
-//                throw new Exception(String.format("The user %s does not exist after creation", user.username))
-//            }
-//            launcher.executeCommand(String.format(Constants.CREATE_DIR, String.format(Constants.WORKDIR_PATTERN, user.username)), false, true)
-//            launcher.executeCommand(String.format(Constants.DISABLE_INHERITED_WORKDIR, user.username, user.username), false, true)
-//            launcher.executeCommand(String.format(Constants.GRANT_ACCESS_WORKDIR, user.username, user.username, user.username), false, true)
+            if(!doesUserExist(launcher, user.username, true)) {
+                throw new Exception(String.format("The user %s does not exist after creation", user.username))
+            }
+            //              Windows Create the user directory and set ACL when the user connect
+            //            launcher.executeCommand(String.format(Constants.CREATE_DIR, String.format(Constants.WORKDIR_PATTERN, user.username)), false, true)
+            //            launcher.executeCommand(String.format(Constants.DISABLE_INHERITED_WORKDIR, user.username, user.username), false, true)
+            //            launcher.executeCommand(String.format(Constants.GRANT_ACCESS_WORKDIR, user.username, user.username, user.username), false, true)
+
             launcher.executeCommand(String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username), false, false)
             return user
         } catch(Exception e) {
@@ -105,9 +107,9 @@ class WinRMCommand {
             launcher = new WinRMCommandLauncher(config)
 
             launcher.executeCommand(String.format(Constants.STOP_USER_PROCESS, username), false, true)
-            launcher.executeCommand(String.format(Constants.DELETE_USER, username), false, false)
+            launcher.executeCommand(String.format(Constants.DELETE_USER, username), false, true)
 
-            if(doesUserExist(config, username)) {
+            if(doesUserExist(launcher, username, false)) {
                 throw new Exception(String.format("The user %s was not deleted", username))
             }
         }catch(Exception e) {
@@ -129,8 +131,8 @@ class WinRMCommand {
             context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
             authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
             WinRMCommandLauncher launcher = new WinRMCommandLauncher(config)
-            
-            String result = launcher.executeCommand(String.format(Constants.LIST_USERS, Constants.USERNAME_PATTERN.substring(0, Constants.USERNAME_PATTERN.lastIndexOf("%"))), false, false)
+
+            String result = launcher.executeCommand(Constants.LIST_USERS, false, false)
             if(StringUtils.isEmpty(result)) return new ArrayList()
             return result as List
         }catch(Exception e) {

@@ -24,6 +24,7 @@ import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionFactory
 class WinRMCommandLauncher {
 
     private static final Logger LOGGER = Logger.getLogger(WinRMCommandLauncher.class.name)
+    private static final String LOG_SEPARATOR = "####################  "
 
     WinRMTool winrmTool
     String commandId
@@ -42,6 +43,7 @@ class WinRMCommandLauncher {
      * @throws WinRMCommandException
      */
     protected void openShell() throws WinRMCommandException {
+        LOGGER.log(Level.FINEST, LOG_SEPARATOR + "OPEN SHELL")
         try {
             this.shellId = winrmTool.openShell()
         }catch(WinRMException winrme) {
@@ -56,6 +58,7 @@ class WinRMCommandLauncher {
      */
     protected void cleanupCommand(String commandId) throws WinRMCommandException {
         commandId = commandId ?: this.commandId
+        LOGGER.log(Level.FINEST, LOG_SEPARATOR + "CLEANUP COMMAND WITH ID " + commandId)
         try {
             winrmTool.cleanupCommand(shellId, commandId)
         }catch(WinRMException winrme) {
@@ -68,6 +71,7 @@ class WinRMCommandLauncher {
      * @throws WinRMException
      */
     protected void closeShell() throws WinRMException {
+        LOGGER.log(Level.FINEST, LOG_SEPARATOR + "CLOSE SHELL WITH ID " + shellId)
         try {
             winrmTool.deleteShellRequest(shellId)
             this.shellId = null
@@ -89,12 +93,11 @@ class WinRMCommandLauncher {
         CommandOutput output = null
         String commandId = null
         try {
-            LOGGER.log(Level.FINE, "####################  OPEN SHELL")
             shellId = shellId ?: winrmTool.openShell()
-            LOGGER.log(Level.FINE, "####################  EXECUTE COMMAND " + command)
+            LOGGER.log(Level.FINEST, LOG_SEPARATOR + "EXECUTE COMMAND " + command)
             commandId = winrmTool.executePSCommand(command)
             this.commandId = commandId ?: this.commandId
-            LOGGER.log(Level.FINE, "####################  GET COMMAND OUTPUT")
+            LOGGER.log(Level.FINEST, LOG_SEPARATOR + "GET COMMAND OUTPUT WITH ID " + commandId)
             output = winrmTool.getCommandOutput(shellId, commandId)
 
             if(!ignoreError && output.exitStatus!=0) {
@@ -106,7 +109,9 @@ class WinRMCommandLauncher {
             }
             return output.output
         } catch(WinRMException we) {
-            if(shellId != null) closeShell()
+            if(shellId != null) {
+                closeShell()
+            }
             throw new WinRMCommandException("Unable to execute the command " + command, we)
         }
     }

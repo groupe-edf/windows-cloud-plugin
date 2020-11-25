@@ -49,7 +49,6 @@ class WindowsSlave extends AbstractCloudSlave {
         setLabelString(label)
         setNodeProperties(nodeProperties)
         setRetentionStrategy(buildRetentionStrategy(idleMinutes))
-        
     }
 
     /**

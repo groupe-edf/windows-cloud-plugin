@@ -22,7 +22,7 @@ import hudson.slaves.NodeProvisioner.PlannedNode
  * @author CHRIS BAHONDA
  *
  */
-class WindowsCloud extends /*AbstractCloudImpl*/ Cloud {
+class WindowsCloud extends Cloud {
 
     private static final Logger LOGGER = Logger.getLogger(WindowsCloud.class.name)
 

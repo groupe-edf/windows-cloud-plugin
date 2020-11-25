@@ -1,5 +1,8 @@
 package fr.edf.jenkins.plugins.windows.winrm
 
+import java.util.logging.Level
+import java.util.logging.Logger
+
 import org.apache.commons.lang.RandomStringUtils
 import org.apache.commons.lang.StringUtils
 import org.kohsuke.accmod.Restricted
@@ -8,7 +11,6 @@ import org.kohsuke.accmod.restrictions.NoExternalUse
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.util.Constants
-import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionConfiguration
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMUserConnectionConfiguration
 import hudson.util.Secret
@@ -20,6 +22,8 @@ import jenkins.model.Jenkins
  */
 class WinRMCommand {
 
+    private static final Logger LOGGER = Logger.getLogger(WinRMCommand.class.name)
+
     /**
      * Checks whether the user is connected or not
      * @param config
@@ -27,6 +31,7 @@ class WinRMCommand {
      */
     @Restricted(NoExternalUse)
     static String checkConnection(WinRMGlobalConnectionConfiguration config) {
+        LOGGER.log(Level.FINE, config.host + " : check connection")
         WinRMCommandLauncher launcher = new WinRMCommandLauncher(config)
         return launcher.executeCommand(Constants.WHOAMI, false, false)
     }
@@ -39,6 +44,7 @@ class WinRMCommand {
      * @throws Exception
      */
     private static boolean doesUserExist(WinRMCommandLauncher launcher, String username, boolean keepAlive) throws Exception{
+        LOGGER.log(Level.FINE, username + " : check if user exist")
         String res = launcher.executeCommand(String.format(Constants.CHECK_USER_EXIST, username), false, keepAlive)
         return res.trim() == username
     }
@@ -73,15 +79,17 @@ class WinRMCommand {
             authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
             launcher = new WinRMCommandLauncher(config)
 
+            LOGGER.log(Level.FINE, user.username + " : create user")
             launcher.executeCommand(String.format(Constants.CREATE_USER, user.username, user.password.getPlainText(), user.username), false, true)
             if(!doesUserExist(launcher, user.username, true)) {
                 throw new Exception(String.format("The user %s does not exist after creation", user.username))
             }
-            //              Windows Create the user directory and set ACL when the user connect
+            //            Keep for potential enhancement : For now, Windows create the directory and set ACL when the user is connecting
             //            launcher.executeCommand(String.format(Constants.CREATE_DIR, String.format(Constants.WORKDIR_PATTERN, user.username)), false, true)
             //            launcher.executeCommand(String.format(Constants.DISABLE_INHERITED_WORKDIR, user.username, user.username), false, true)
             //            launcher.executeCommand(String.format(Constants.GRANT_ACCESS_WORKDIR, user.username, user.username, user.username), false, true)
 
+            LOGGER.log(Level.FINE, user.username + " : add user to the group Remote Management Users")
             launcher.executeCommand(String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username), false, false)
             return user
         } catch(Exception e) {
@@ -106,7 +114,9 @@ class WinRMCommand {
             authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
             launcher = new WinRMCommandLauncher(config)
 
+            LOGGER.log(Level.FINE, username + " : stop all process")
             launcher.executeCommand(String.format(Constants.STOP_USER_PROCESS, username), false, true)
+            LOGGER.log(Level.FINE, username + " : delete user")
             launcher.executeCommand(String.format(Constants.DELETE_USER, username), false, true)
 
             if(doesUserExist(launcher, username, false)) {
@@ -132,9 +142,10 @@ class WinRMCommand {
             authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
             WinRMCommandLauncher launcher = new WinRMCommandLauncher(config)
 
+            LOGGER.log(Level.FINE, host.host + " : list users")
             String result = launcher.executeCommand(Constants.LIST_USERS, false, false)
             if(StringUtils.isEmpty(result)) return new ArrayList()
-            return result as List
+            return result.split(Constants.REGEX_NEW_LINE) as List
         }catch(Exception e) {
             String message = String.format(WinRMCommandException.LIST_USERS_ERROR_MESSAGE, e.getMessage(), host.host)
             throw new WinRMCommandException(message, e)
@@ -165,7 +176,9 @@ class WinRMCommand {
             host: host.host, port: host.port, connectionTimeout: host.connectionTimeout, authenticationScheme: host.authenticationScheme,
             useHttps: host.useHttps)
             launcher = new WinRMCommandLauncher(config)
+            LOGGER.log(Level.FINE, user.username + " : get remoting.jar ")
             launcher.executeCommand(String.format(Constants.GET_REMOTING_JAR, remotingUrl), false, true)
+            LOGGER.log(Level.FINE, user.username + " : launch jnlp")
             launcher.executeCommand(String.format(Constants.LAUNCH_JNLP, jenkinsUrl, user.username, slaveSecret), true, true)
             return true
         }catch(Exception e) {

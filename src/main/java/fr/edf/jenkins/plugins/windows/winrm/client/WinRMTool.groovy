@@ -266,9 +266,9 @@ class WinRMTool {
             it.@CommandId == commandId && it.@State == 'http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Done'
         }) {
             Long exitStatus = results?.'*:Body'?.'*:ReceiveResponse'?.'*:CommandState'?.'*:ExitCode'?.text()?.toLong()
-            LOGGER.log(Level.FINEST, "exitStatus : " + exitStatus)
-            LOGGER.log(Level.FINEST, "commandOutput : " + output)
-            LOGGER.log(Level.FINEST, "errOutput : " + error)
+            LOGGER.log(Level.FINEST, "########## exitStatus : " + exitStatus)
+            LOGGER.log(Level.FINEST, "########## commandOutput : " + output)
+            LOGGER.log(Level.FINEST, "########## errOutput : " + error)
             return new CommandOutput(exitStatus, output, error)
         } else {
             return new CommandOutput(-1, output, error)

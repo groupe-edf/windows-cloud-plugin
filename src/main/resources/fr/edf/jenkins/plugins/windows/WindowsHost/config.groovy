@@ -33,7 +33,7 @@ f.advanced(title:Messages.Host_Details()) {
     
     
         f.entry(title: Messages.Host_MaxUsers(), field: 'maxUsers') {
-            f.number(clazz: 'required', min: 1)
+            f.number(clazz: 'required', min: 1, default: 5)
         }
         
         f.entry(title: Messages.Host_useHttps(), field: 'useHttps') {
@@ -45,11 +45,11 @@ f.advanced(title:Messages.Host_Details()) {
         }
         
         f.entry(title: Messages.Host_AgentConnectionTimeout(), field: 'agentConnectionTimeout'){
-            f.select(clazz: 'required', default: 15, min: 60)
+            f.number(clazz: 'required', default: 15, min: 60)
         }
         
         f.entry(title: Messages.Host_ConnectionTimeout(), field: 'connectionTimeout'){
-            f.select(clazz: 'required', default: 15, min: 60)
+            f.number(clazz: 'required', default: 15, min: 60)
         }
     
     

@@ -45,11 +45,11 @@ f.advanced(title:Messages.Host_Details()) {
         }
         
         f.entry(title: Messages.Host_AgentConnectionTimeout(), field: 'agentConnectionTimeout'){
-            f.select(clazz: 'required', default: 15, min: 60)
+            f.number(clazz: 'required', default: 15, min: 60)
         }
         
         f.entry(title: Messages.Host_ConnectionTimeout(), field: 'connectionTimeout'){
-            f.select(clazz: 'required', default: 15, min: 60)
+            f.number(clazz: 'required', default: 15, min: 60)
         }
     
     

@@ -11,7 +11,7 @@
   </parent>
 
   <groupId>fr.edf.jenkins.plugins</groupId>
-  <artifactId>windows</artifactId>
+  <artifactId>windows-cloud</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>hpi</packaging>
 
@@ -23,7 +23,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
 
-  <name>Windows plugin</name>
+  <name>Windows cloud plugin</name>
   <description>This plugin create Windows agents on which builds can be performed</description>
   <organization>
     <name>EDF</name>
@@ -34,6 +34,11 @@
       <id>feirychris</id>
       <name>Chris Bahonda</name>
       <email>chrisbahonda@gmail.com</email>
+    </developer>
+    <developer>
+      <id>mat1e</id>
+      <name>Mathieu Delrocq</name>
+      <email>delrocq.mathieu@gmail.com</email>
     </developer>
   </developers>
 

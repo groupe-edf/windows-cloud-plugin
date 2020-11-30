@@ -66,6 +66,7 @@ class WinRMConnectionFactory {
      * @param winRMContext
      * @return getConnection
      */
+    @Restricted(NoExternalUse)
     private static WinRMTool getUserWinRMConnection(WinRMUserConnectionConfiguration config = new WinRMUserConnectionConfiguration()) {
         String host = config.host
         Integer port = config.port ?: Integer.valueOf(5985)

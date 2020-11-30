@@ -340,7 +340,7 @@ class WinRMTool {
      * @return {@link HttpResponse}
      * @throws WinRMException
      */
-    private HttpResponse performRequest(HttpPost httpPost, HttpContext context, String requestDescription) throws WinRMException {
+    protected HttpResponse performRequest(HttpPost httpPost, HttpContext context, String requestDescription) throws WinRMException {
         HttpResponse response = null
         try {
             response = httpClient.execute(httpPost, context)

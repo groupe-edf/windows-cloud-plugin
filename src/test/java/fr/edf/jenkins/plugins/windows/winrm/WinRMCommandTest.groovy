@@ -109,41 +109,6 @@ class WinRMCommandTest extends Specification{
         notThrown Exception
     }
 
-    def "createUser throws an exception when no credentials are found"(){
-
-        given:
-        WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
-        WindowsUser user = WinRMCommand.generateUser()
-
-        String shellId = "shell"
-        String createUserId = "createUser"
-        String checkUserExist = "checkUserExist"
-        String addUserToGroup = "addUserToGroup"
-
-        WinRMTool tool = Stub(WinRMTool){
-            openShell() >> shellId
-            executePSCommand(String.format(Constants.CREATE_USER, user.username, user.password, user.username)) >> "createUserId"
-            executePSCommand(String.format(Constants.CHECK_USER_EXIST, user.username)) >> "checkUserExist"
-            executePSCommand(String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username)) >> "addUserToGroup"
-            getCommandOutput(shellId, createUserId) >> new CommandOutput(0, "user created", null)
-            getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, user.username, null)
-            getCommandOutput(shellId, addUserToGroup) >> new CommandOutput(0, "user added", null)
-            deleteShellRequest(shellId) >> {}
-        }
-
-
-        GroovyStub(WinRMConnectionFactory, global:true){
-            WinRMConnectionFactory.getWinRMConnection(_) >> null
-        }
-
-        when:
-        WindowsUser res = WinRMCommand.createUser(host, user)
-
-        then:
-        WinRMCommandException e = thrown()
-        e.printStackTrace()
-    }
-
 
     def "createUser throws an exception when user does not exist"(){
 
@@ -159,10 +124,10 @@ class WinRMCommandTest extends Specification{
         WinRMTool tool = Stub(WinRMTool){
             openShell() >> shellId
             executePSCommand(String.format(Constants.CREATE_USER, user.username, user.password, user.username)) >> "createUserId"
-            executePSCommand(String.format(Constants.CHECK_USER_EXIST, user.username)) >> ""
+            executePSCommand(String.format(Constants.CHECK_USER_EXIST, user.username)) >> checkUserExist
             executePSCommand(String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username)) >> "addUserToGroup"
             getCommandOutput(shellId, createUserId) >> new CommandOutput(0, "user created", null)
-            getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, user.username, null)
+            getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, "", null)
             getCommandOutput(shellId, addUserToGroup) >> new CommandOutput(0, "user added", null)
             deleteShellRequest(shellId) >> {}
         }
@@ -177,7 +142,8 @@ class WinRMCommandTest extends Specification{
 
         then:
         WinRMCommandException e = thrown()
-        e.getMessage().contains("Unable to create WindowsUser on host")
+        e.getMessage().contains(String.format(WinRMCommandException.CREATE_WINDOWS_USER_ERROR))
+        e.getCause().getMessage().contains(String.format(WinRMCommandException.USER_DOES_NOT_EXIST, user.username))
     }
 
 
@@ -188,11 +154,17 @@ class WinRMCommandTest extends Specification{
         String username = "windows_test_user"
         String shellId = "shell"
         String deleteUserId = "deleteUserId"
+        String checkUserExist = "checkUserExist"
+        String stopProcessId = "stopProcessId"
 
         WinRMTool tool = Stub(WinRMTool){
             openShell() >> shellId
-            executePSCommand(String.format(Constants.DELETE_USER, username)) >> "username"
-            getCommandOutput(shellId, deleteUserId) >> new CommandOutput(0, "deleteUserId", null)
+            executePSCommand(String.format(Constants.DELETE_USER, username)) >> deleteUserId
+            executePSCommand(String.format(Constants.CHECK_USER_EXIST, username)) >> checkUserExist
+            executePSCommand(String.format(Constants.STOP_USER_PROCESS, username)) >> stopProcessId
+            getCommandOutput(shellId, deleteUserId) >> new CommandOutput(0, "user is deleted", null)
+            getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, "", null)
+            getCommandOutput(shellId, stopProcessId) >> new CommandOutput(0, "the process has been stopped", null)
             deleteShellRequest(shellId) >> {}
         }
 
@@ -217,18 +189,21 @@ class WinRMCommandTest extends Specification{
         String shellId = "shell"
         String checkUserExist = "checkUserExist"
         String deleteUserId = "deleteUserId"
+        String stopProcessId = "stopProcessId"
 
         WinRMTool tool = Stub(WinRMTool){
             openShell() >> shellId
-            executePSCommand(String.format(Constants.DELETE_USER, username)) >> "username"
-            executePSCommand(String.format(Constants.CHECK_USER_EXIST, username)) >> username
-            getCommandOutput(shellId, deleteUserId) >> new CommandOutput(0, "deleteUserId", null)
+            executePSCommand(String.format(Constants.DELETE_USER, username)) >> deleteUserId
+            executePSCommand(String.format(Constants.CHECK_USER_EXIST, username)) >> checkUserExist
+            executePSCommand(String.format(Constants.STOP_USER_PROCESS, username)) >> stopProcessId
+            getCommandOutput(shellId, deleteUserId) >> new CommandOutput(0, "the user was not deleted", null)
             getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, username, null)
+            getCommandOutput(shellId, stopProcessId) >> new CommandOutput(0, "the process has been stopped", null)
             deleteShellRequest(shellId) >> {}
         }
 
         GroovyStub(WinRMConnectionFactory, global:true){
-            WinRMConnectionFactory.getWinRMConnection(_) >> null
+            WinRMConnectionFactory.getWinRMConnection(_) >> tool
         }
 
         when:
@@ -238,6 +213,7 @@ class WinRMCommandTest extends Specification{
         then:
         WinRMCommandException e = thrown()
         e.getMessage().contains(String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host))
+        e.getCause().getMessage().contains(String.format(WinRMCommandException.USER_STILL_EXISTS, username))
     }
 
 
@@ -253,7 +229,7 @@ class WinRMCommandTest extends Specification{
             openShell() >> shellId
             executePSCommand(String.format(Constants.LIST_USERS,
                     Constants.USERNAME_PATTERN.substring(0, Constants.USERNAME_PATTERN.lastIndexOf("%")))) >> listUserId
-            getCommandOutput(shellId, listUserId) >> new CommandOutput(0, "listUserId", null)
+            getCommandOutput(shellId, listUserId) >> new CommandOutput(0, "user\r\nusers1", null)
             deleteShellRequest(shellId) >> {}
         }
 
@@ -266,34 +242,7 @@ class WinRMCommandTest extends Specification{
 
         then:
         notThrown Exception
-        res.size()==1
-    }
-
-    def "listUsers throws an exception"(){
-
-        given:
-        String shellId = "shell"
-        WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
-        String listUserId = "listUserId"
-
-        WinRMTool tool = Stub(WinRMTool){
-            openShell() >> shellId
-            executePSCommand(String.format(Constants.LIST_USERS,
-                    Constants.USERNAME_PATTERN.substring(0, Constants.USERNAME_PATTERN.lastIndexOf("%")))) >> {throw new Exception("List unvailable")}
-            getCommandOutput(shellId, listUserId) >> new CommandOutput(0, "listUserId", null)
-            deleteShellRequest(shellId) >> {}
-        }
-
-        GroovySpy(WinRMConnectionFactory, global:true){
-            WinRMConnectionFactory.getWinRMConnection(_) >> tool
-        }
-
-        when:
-        List res = WinRMCommand.listUsers(host)
-        then:
-        WinRMCommandException e = thrown()
-        e.printStackTrace()
-        e.LIST_USERS_NOT_AVAILABLE
+        res.size()==2
     }
 
 
@@ -309,7 +258,7 @@ class WinRMCommandTest extends Specification{
         WinRMTool tool = Stub(WinRMTool){
             openShell() >> shellId
             executePSCommand(_,_,_) >> jnlpConnect
-            getCommandOutput(shellId, jnlpConnect) >> new CommandOutput(0, "jnlpConnect", null)
+            getCommandOutput(shellId, jnlpConnect) >> new CommandOutput(0, "jnlp connected", null)
             deleteShellRequest(shellId) >> {}
         }
 

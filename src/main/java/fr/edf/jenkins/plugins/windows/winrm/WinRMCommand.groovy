@@ -82,7 +82,7 @@ class WinRMCommand {
             LOGGER.log(Level.FINE, user.username + " : create user")
             launcher.executeCommand(String.format(Constants.CREATE_USER, user.username, user.password.getPlainText(), user.username), false, true)
             if(!doesUserExist(launcher, user.username, true)) {
-                throw new Exception(String.format("The user %s does not exist after creation", user.username))
+                throw new Exception(String.format(WinRMCommandException.USER_DOES_NOT_EXIST, user.username))
             }
             //            Keep for potential enhancement : For now, Windows create the directory and set ACL when the user is connecting
             //            launcher.executeCommand(String.format(Constants.CREATE_DIR, String.format(Constants.WORKDIR_PATTERN, user.username)), false, true)
@@ -120,7 +120,7 @@ class WinRMCommand {
             launcher.executeCommand(String.format(Constants.DELETE_USER, username), false, true)
 
             if(doesUserExist(launcher, username, false)) {
-                throw new Exception(String.format("The user %s was not deleted", username))
+                throw new Exception(String.format(WinRMCommandException.USER_STILL_EXISTS, username))
             }
         }catch(Exception e) {
             if(launcher?.shellId) launcher.closeShell()

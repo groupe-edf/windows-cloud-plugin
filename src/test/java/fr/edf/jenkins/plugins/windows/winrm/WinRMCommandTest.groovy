@@ -142,7 +142,7 @@ class WinRMCommandTest extends Specification{
 
         then:
         WinRMCommandException e = thrown()
-        e.getMessage().contains(String.format(WinRMCommandException.CREATE_WINDOWS_USER_ERROR))
+        e.getMessage().contains(String.format(WinRMCommandException.CREATE_WINDOWS_USER_ERROR, host.host))
         e.getCause().getMessage().contains(String.format(WinRMCommandException.USER_DOES_NOT_EXIST, user.username))
     }
 

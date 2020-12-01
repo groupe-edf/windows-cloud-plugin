@@ -6,7 +6,7 @@ package fr.edf.jenkins.plugins.windows.winrm
  */
 class WinRMCommandException extends Exception{
 
-    static final String CREATE_WINDOWS_USER_ERROR = "Unable to create WindowsUser on host"
+    static final String CREATE_WINDOWS_USER_ERROR = "Unable to create WindowsUser on host %s"
     static final String USER_DOES_NOT_EXIST = "The user %s does not exist after creation"
     static final String USER_STILL_EXISTS = "The user %s was not deleted"
     static final String DELETE_WINDOWS_USER_ERROR = "Unable to delete WindowsUser %s on host %s"

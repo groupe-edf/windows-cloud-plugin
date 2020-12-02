@@ -54,8 +54,8 @@ class WindowsHost implements Describable<WindowsHost> {
     transient Set<LabelAtom> labelSet
 
     @DataBoundConstructor
-    WindowsHost(String host, String credentialsId, Integer port, String authenticationScheme, Integer maxUsers,
-    Boolean disable,Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer maxTries, String label, Boolean useHttps, List<WindowsEnvVar> envVars) {
+    WindowsHost(String host, String credentialsId, Integer port, String authenticationScheme, Integer maxUsers, Boolean disable,
+        Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer maxTries, String label, Boolean useHttps, List<WindowsEnvVar> envVars) {
         this.host = host
         this.credentialsId = credentialsId
         this.port = port

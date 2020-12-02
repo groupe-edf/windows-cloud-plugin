@@ -63,6 +63,15 @@ f.advanced(title:Messages.Host_Details()) {
                 with: 'host,port,credentialsId,authenticationScheme,useHttps,connectionTimeout,readTimeout'
                 )
     }
+
+    f.entry(title: _(Messages.EnvVar_Title())) {
+        f.repeatableHeteroProperty(
+                field:'envVars',
+                hasHeader: 'true',
+                addCaption: Messages.EnvVar_Add(),
+                deleteCaption:Messages.EnvVar_Delete(),
+                oneEach:'false',
+                repeatableDeleteButton:'true'
+                )
+    }
 }
-
-

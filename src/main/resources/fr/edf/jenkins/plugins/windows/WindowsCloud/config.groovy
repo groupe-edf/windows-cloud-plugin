@@ -6,21 +6,22 @@ f.entry(title: Messages.Cloud_Name(), field:'name') {
 }
 
 f.advanced(title: Messages.Cloud_Details()) {
+
     f.entry(title:Messages.Host_DefaultName()) {
         f.repeatableHeteroProperty(
-        field:'windowsHosts',
-        hasHeader: 'true',
-        addCaption: 'Add Windows host',
-        deleteCaption: 'Remove Windows host',
-        oneEach:'false',
-        repeatableDeleteButton:'true'
-        )
+                field:'windowsHosts',
+                hasHeader: 'true',
+                addCaption: 'Add Windows host',
+                deleteCaption: 'Remove Windows host',
+                oneEach:'false',
+                repeatableDeleteButton:'true'
+                )
     }
-}
 
-f.section(title:Messages.Cloud_AgentsProperties()) {
-    f.entry(title:Messages.Cloud_IdleMinutes(), field:'idleMinutes') {
-        f.number(clazz: 'required', min: 1, default: 1)
+    f.section(title:Messages.Cloud_AgentsProperties()) {
+        f.entry(title:Messages.Cloud_IdleMinutes(), field:'idleMinutes') {
+            f.number(clazz: 'required', min: 1, default: 1)
+        }
+        f.dropdownDescriptorSelector(title:'Connect method', field:'connector')
     }
-    f.dropdownDescriptorSelector(title:'Connect method', field:'connector')
 }

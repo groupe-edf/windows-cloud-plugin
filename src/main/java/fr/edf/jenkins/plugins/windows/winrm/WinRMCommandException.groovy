@@ -32,5 +32,4 @@ class WinRMCommandException extends Exception{
      * Private constructor, objects cannot be created without parameters
      */
     private WinRMCommandException() {}
-    
 }

@@ -14,17 +14,17 @@ import hudson.slaves.NodeProvisioner.StrategyState
 import spock.lang.Specification
 
 class FastNodeProvisionerStrategyTest extends Specification{
-    
+
     @Rule
     JenkinsRule rule = new JenkinsRule()
-    
+
     private LoadStatisticsSnapshot buildSnapshot() {
         LoadStatisticsSnapshot.Builder builder = new LoadStatisticsSnapshot.Builder()
         builder.withQueueLength(1)
         builder.with((Computer) null)
         return builder.build()
     }
-    
+
     def"should not throw exception even if it cannot connect to the host"(){
         given:
         final List<PlannedNode> r = new ArrayList<>()
@@ -33,22 +33,20 @@ class FastNodeProvisionerStrategyTest extends Specification{
             getLabel() >> Label.parse("label").getAt(0)
             getSnapshot() >> snapshot
         }
-        
-        WindowsCloud cloud = new WindowsCloud("test", WindowsPojoBuilder.buildWindowsHost(), WindowsPojoBuilder.buildConnector(rule), 
-            new Integer(1))
+
+        WindowsCloud cloud = new WindowsCloud("test", WindowsPojoBuilder.buildWindowsHost(), WindowsPojoBuilder.buildConnector(rule),
+                new Integer(1))
         rule.jenkins.clouds.add(cloud)
-        
+
         when:
         FastNodeProvisionerStrategy provisioner = new FastNodeProvisionerStrategy()
         StrategyDecision decision = provisioner.apply(state)
-        
+
         then:
         notThrown Exception
         decision == StrategyDecision.CONSULT_REMAINING_STRATEGIES
     }
-    
+
     def"should throw exception"(){
-        
     }
-    
 }

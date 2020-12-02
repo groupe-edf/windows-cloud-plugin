@@ -4,7 +4,6 @@ import org.apache.http.HttpEntity
 import org.apache.http.HttpResponse
 import org.apache.http.ProtocolVersion
 import org.apache.http.entity.StringEntity
-import org.apache.http.entity.mime.Header
 import org.apache.http.message.BasicHeader
 import org.apache.http.message.BasicHttpResponse
 import org.apache.http.message.BasicStatusLine
@@ -175,7 +174,7 @@ class WinRMResponseBuilder {
         builder.append('</rsp:SignalResponse>')
         builder.append('</s:Body>')
         builder.append('</s:Envelope>')
-        
+
         System.out.println(builder.toString())
         StringEntity entity = new StringEntity(builder.toString())
         entity.setContentType(buildHeader())

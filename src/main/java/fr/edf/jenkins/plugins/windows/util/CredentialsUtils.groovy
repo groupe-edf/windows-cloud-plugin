@@ -24,7 +24,6 @@ class CredentialsUtils {
      * @param context
      * @return credentials
      */
-
     static StandardCredentials findCredentials(final String host, final String credentialsId, ModelObject context) {
         Preconditions.checkNotNull(host, "host not set")
         URI uri = FormUtils.getUri(host)

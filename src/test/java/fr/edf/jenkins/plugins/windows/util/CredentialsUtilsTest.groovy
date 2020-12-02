@@ -48,30 +48,30 @@ class CredentialsUtilsTest extends Specification{
         assert cred.id == "testing one"
     }
 
-// TODO : findCredentials throws an exception when id does not exist
-//    def "findCredentials throws an exception when id does not exist"(){
-//
-//        given:
-//        Domain domain = new Domain("domain", "testing domain", Arrays.asList(new HostnameSpecification("host.com", null)))
-//        StandardUsernamePasswordCredentials cred1 = new UsernamePasswordCredentialsImpl( CredentialsScope.SYSTEM,
-//                "testing one",
-//                null,
-//                "username1",
-//                "pass1"
-//                )
-//        StandardUsernamePasswordCredentials cred2 = new UsernamePasswordCredentialsImpl( CredentialsScope.SYSTEM,
-//                "testing two",
-//                null,
-//                "username2",
-//                "pass2"
-//                )
-//        CredentialsProvider.lookupStores(rule.jenkins).iterator().next().addDomain(domain, cred1)
-//        CredentialsProvider.lookupStores(rule.jenkins).iterator().next().addDomain(domain, cred2)
-//
-//        when:
-//        StandardCredentials cred = CredentialsUtils.findCredentials("host.com", "notFound", Jenkins.get())
-//
-//        then:
-//        IllegalArgumentException except = thrown()
-//    }
+    // TODO : findCredentials throws an exception when id does not exist
+    //    def "findCredentials throws an exception when id does not exist"(){
+    //
+    //        given:
+    //        Domain domain = new Domain("domain", "testing domain", Arrays.asList(new HostnameSpecification("host.com", null)))
+    //        StandardUsernamePasswordCredentials cred1 = new UsernamePasswordCredentialsImpl( CredentialsScope.SYSTEM,
+    //                "testing one",
+    //                null,
+    //                "username1",
+    //                "pass1"
+    //                )
+    //        StandardUsernamePasswordCredentials cred2 = new UsernamePasswordCredentialsImpl( CredentialsScope.SYSTEM,
+    //                "testing two",
+    //                null,
+    //                "username2",
+    //                "pass2"
+    //                )
+    //        CredentialsProvider.lookupStores(rule.jenkins).iterator().next().addDomain(domain, cred1)
+    //        CredentialsProvider.lookupStores(rule.jenkins).iterator().next().addDomain(domain, cred2)
+    //
+    //        when:
+    //        StandardCredentials cred = CredentialsUtils.findCredentials("host.com", "notFound", Jenkins.get())
+    //
+    //        then:
+    //        IllegalArgumentException except = thrown()
+    //    }
 }

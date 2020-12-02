@@ -5,7 +5,7 @@ import fr.edf.jenkins.plugins.windows.WindowsUser
 import hudson.model.AbstractDescribableImpl
 import hudson.slaves.ComputerLauncher
 abstract class WindowsComputerConnector extends AbstractDescribableImpl<WindowsComputerConnector>{
-    
+
     /**
      * Build and return the Launcher for a given connector
      * @param host

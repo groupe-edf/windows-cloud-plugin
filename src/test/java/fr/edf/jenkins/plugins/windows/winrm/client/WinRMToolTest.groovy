@@ -2,7 +2,6 @@ package fr.edf.jenkins.plugins.windows.winrm.client
 
 import org.apache.http.HttpResponse
 import org.apache.http.ProtocolVersion
-import org.apache.http.StatusLine
 import org.apache.http.client.config.AuthSchemes
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.message.BasicHttpResponse

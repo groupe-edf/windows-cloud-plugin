@@ -10,7 +10,7 @@ import hudson.model.Node
 
 @Extension
 class WindowsInProvisioning extends InProvisioning{
-    
+
     private static boolean isNotAcceptingTasks(Node n) {
         Computer computer = n.toComputer()
         return computer != null && (computer.isLaunchSupported()

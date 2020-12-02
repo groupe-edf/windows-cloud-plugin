@@ -59,7 +59,7 @@ class Constants {
                                                 + "\$acl.SetAccessRule(\$aclRule);" \
                                                 + "\$acl.SetOwner([System.Security.Principal.NTAccount]\"NT AUTHORITY\\SYSTEM\");" \
                                                 + "\$acl | Set-Acl \"C:\\users\\%s\""
-    
+
     /** Remove-Item 'C:\\Users\\%s' -Force -Recurse */
     static final String REMOVE_WORKDIR = "Remove-Item 'C:\\Users\\%s' -Force -Recurse"
 

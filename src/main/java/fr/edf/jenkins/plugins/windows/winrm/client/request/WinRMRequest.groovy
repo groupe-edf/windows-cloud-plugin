@@ -49,14 +49,14 @@ abstract class WinRMRequest {
         this.toAddress = toAddress
         this.timeout = "PT${timeout}S"
     }
-    
+
     /**
      * Creates pseudo random UUID string
      *
      * @return pseudo random UUID string
      */
     protected String composeUUID() {
-      "uuid:" + UUID.randomUUID().toString().toUpperCase()
+        "uuid:" + UUID.randomUUID().toString().toUpperCase()
     }
 
     @Override

@@ -64,14 +64,13 @@ class WindowsComputerJNLPConnector extends WindowsComputerConnector{
             this.host = host
             this.user = user
             this.jenkinsUrl = jenkinsUrl
-            
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-         boolean isLaunchSupported() {
+        boolean isLaunchSupported() {
             return !launched
         }
 
@@ -88,11 +87,11 @@ class WindowsComputerJNLPConnector extends WindowsComputerConnector{
             }catch(Exception e) {
                 launched = false
                 String message = String.format("Error while connecting computer %s due to %s ",
-                    computer.name, ExceptionUtils.getStackTrace(e))
+                        computer.name, ExceptionUtils.getStackTrace(e))
                 listener.error(message)
                 throw new InterruptedException(message)
             }
-            
+
             long currentTimestamp = Instant.now().toEpochMilli()
             while(!windowsComputer.isOnline()) {
                 if (windowsComputer == null) {
@@ -111,10 +110,6 @@ class WindowsComputerJNLPConnector extends WindowsComputerConnector{
                     throw new InterruptedException(message)
                 }
             }
-        
-            
         }
-        
-        
     }
 }

@@ -1,6 +1,5 @@
 package fr.edf.jenkins.plugins.windows.winrm
 
-import java.lang.ref.PhantomReference
 import java.util.logging.Level
 import java.util.logging.Logger
 

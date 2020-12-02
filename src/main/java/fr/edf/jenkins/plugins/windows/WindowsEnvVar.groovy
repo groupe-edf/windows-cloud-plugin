@@ -9,31 +9,31 @@ import hudson.model.Descriptor
 import jenkins.model.Jenkins
 
 class WindowsEnvVar implements Describable<WindowsEnvVar>{
-    
+
     String key
     String value
-    
+
     @DataBoundConstructor
     public WindowsEnvVar(String key, String value) {
         this.key = key
         this.value = value
     }
-    
+
     @DataBoundSetter
-     void setKey(String key) {
+    void setKey(String key) {
         this.key = key
     }
-    
+
     @DataBoundSetter
-     void setValue(String value) {
+    void setValue(String value) {
         this.value = value
     }
 
     @Override
-     Descriptor<WindowsEnvVar> getDescriptor() {
+    Descriptor<WindowsEnvVar> getDescriptor() {
         return Jenkins.get().getDescriptorOrDie(this.getClass())
     }
-    
+
     @Extension
     static class DescriptorImpl extends Descriptor<WindowsEnvVar> {
         /**
@@ -44,5 +44,4 @@ class WindowsEnvVar implements Describable<WindowsEnvVar>{
             return Messages.EnvVar_DisplayName()
         }
     }
-    
 }

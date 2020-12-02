@@ -21,7 +21,7 @@ import hudson.slaves.NodeProvisioner.PlannedNode
  *
  */
 class StandardPlannedNodeBuilder extends PlannedNodeBuilder{
-    
+
     private static final Logger LOGGER = Logger.getLogger(StandardPlannedNodeBuilder.class.name)
 
     /**
@@ -36,7 +36,6 @@ class StandardPlannedNodeBuilder extends PlannedNodeBuilder{
             ComputerLauncher launcher = cloud.connector.createLauncher(windowsHost, user)
             WindowsSlave agent = new WindowsSlave(cloud.name, windowsHost.label, user, windowsHost, launcher, cloud.idleMinutes, nodeProperties)
             f = Futures.immediateFuture(agent)
-            
         } catch (IOException | Descriptor.FormException | WinRMCommandException e) {
             LOGGER.log(Level.SEVERE, e.getMessage())
             LOGGER.log(Level.FINEST, "Exception : ", e)

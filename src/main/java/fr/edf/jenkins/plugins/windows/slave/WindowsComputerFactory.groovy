@@ -9,7 +9,7 @@ import hudson.ExtensionPoint
  *
  */
 abstract class WindowsComputerFactory implements ExtensionPoint{
-    
+
     /**
      * return all registered implementations of {@link WindowsComputerFactory}
      * @return all registered implementations of {@link WindowsComputerFactory}
@@ -17,14 +17,14 @@ abstract class WindowsComputerFactory implements ExtensionPoint{
     static ExtensionList <WindowsComputerFactory> all(){
         return ExtensionList.lookup(WindowsComputerFactory.class)
     }
-    
+
     /**
      * Creates a new instance of {@link WindowsComputer}
      * @param slave
      * @return
      */
     abstract WindowsComputer newInstance(WindowsSlave slave)
-    
+
     /**
      * Returns a new instance of {@link WindowsComputer}
      * @param slave
@@ -32,14 +32,11 @@ abstract class WindowsComputerFactory implements ExtensionPoint{
      */
     static WindowsComputer createInstance(WindowsSlave slave) {
         for (WindowsComputerFactory factory : all()) {
-            WindowsComputer computer = factory.newInstance(slave) 
+            WindowsComputer computer = factory.newInstance(slave)
             if(computer != null) {
                 return computer
             }
         }
         return new WindowsComputer(slave)
     }
-    
-    
-        
 }

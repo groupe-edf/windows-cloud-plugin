@@ -26,48 +26,46 @@ import groovy.xml.MarkupBuilder
  */
 class CleanupCommandRequest extends WinRMRequest {
 
-  String commandId
-  String shellId
+    String commandId
+    String shellId
 
-  CleanupCommandRequest(URL toAddress, String shellId, String commandId, int timeout = 60) {
-    super(toAddress, timeout)
-    this.shellId = shellId
-    this.commandId = commandId
-  }
-
-  @Override
-  String toString() {
-
-    StringWriter writer = new StringWriter()
-    MarkupBuilder xml = new MarkupBuilder(writer)
-
-    xml.'s:Envelope'('xmlns:s': NMSP_URI_S,
-        'xmlns:wsa': NMSP_URI_WSA,
-        'xmlns:wsman': NMSP_URI_WSMAN) {
-      's:Header' {
-        'wsa:To'(toAddress)
-        'wsman:ResourceURI'('s:mustUnderstand': true, URI_SHELL_CMD)
-        'wsa:ReplyTo' {
-          'wsa:Address'('s:mustUnderstand': true, URI_ADDRESS)
-        }
-        'wsa:Action'('s:mustUnderstand': true, 'http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Signal')
-        'wsman:MaxEnvelopeSize'('s:mustUnderstand': true, envelopSize)
-        'wsa:MessageID'(composeUUID())
-        'wsman:Locale'('s:mustUnderstand': false, 'xml:lang': locale)
-        'wsman:SelectorSet' {
-          'wsman:Selector'(Name: 'ShellId', "${shellId}")
-        }
-        'wsman:OperationTimeout'(timeout)
-      }
-      's:Body' {
-        'rsp:Signal'('xmlns:rsp': NMSP_URI_RSP, 'CommandId': commandId) {
-          'rsp:Code'('http://schemas.microsoft.com/wbem/wsman/1/windows/shell/signal/terminate')
-        }
-      }
+    CleanupCommandRequest(URL toAddress, String shellId, String commandId, int timeout = 60) {
+        super(toAddress, timeout)
+        this.shellId = shellId
+        this.commandId = commandId
     }
 
-    writer.toString()
+    @Override
+    String toString() {
 
-  }
+        StringWriter writer = new StringWriter()
+        MarkupBuilder xml = new MarkupBuilder(writer)
 
+        xml.'s:Envelope'('xmlns:s': NMSP_URI_S,
+        'xmlns:wsa': NMSP_URI_WSA,
+        'xmlns:wsman': NMSP_URI_WSMAN) {
+            's:Header' {
+                'wsa:To'(toAddress)
+                'wsman:ResourceURI'('s:mustUnderstand': true, URI_SHELL_CMD)
+                'wsa:ReplyTo' {
+                    'wsa:Address'('s:mustUnderstand': true, URI_ADDRESS)
+                }
+                'wsa:Action'('s:mustUnderstand': true, 'http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Signal')
+                'wsman:MaxEnvelopeSize'('s:mustUnderstand': true, envelopSize)
+                'wsa:MessageID'(composeUUID())
+                'wsman:Locale'('s:mustUnderstand': false, 'xml:lang': locale)
+                'wsman:SelectorSet' {
+                    'wsman:Selector'(Name: 'ShellId', "${shellId}")
+                }
+                'wsman:OperationTimeout'(timeout)
+            }
+            's:Body' {
+                'rsp:Signal'('xmlns:rsp': NMSP_URI_RSP, 'CommandId': commandId) {
+                    'rsp:Code'('http://schemas.microsoft.com/wbem/wsman/1/windows/shell/signal/terminate')
+                }
+            }
+        }
+
+        writer.toString()
+    }
 }

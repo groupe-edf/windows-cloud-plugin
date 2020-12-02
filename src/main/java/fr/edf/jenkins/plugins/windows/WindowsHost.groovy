@@ -45,6 +45,7 @@ class WindowsHost implements Describable<WindowsHost> {
     Integer maxUsers
     Boolean disable
     Integer connectionTimeout
+    Integer readTimeout
     Integer agentConnectionTimeout
     Integer maxTries
     String label
@@ -54,7 +55,7 @@ class WindowsHost implements Describable<WindowsHost> {
 
     @DataBoundConstructor
     WindowsHost(String host, String credentialsId, Integer port, String authenticationScheme, Integer maxUsers,
-    Boolean disable,Integer connectionTimeout, Integer agentConnectionTimeout, Integer maxTries, String label, Boolean useHttps, List<WindowsEnvVar> envVars) {
+    Boolean disable,Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer maxTries, String label, Boolean useHttps, List<WindowsEnvVar> envVars) {
         this.host = host
         this.credentialsId = credentialsId
         this.port = port
@@ -62,6 +63,7 @@ class WindowsHost implements Describable<WindowsHost> {
         this.maxUsers = maxUsers
         this.disable = disable
         this.connectionTimeout = connectionTimeout
+        this.readTimeout = readTimeout
         this.agentConnectionTimeout = agentConnectionTimeout
         this.maxTries = maxTries
         this.label = label
@@ -133,6 +135,15 @@ class WindowsHost implements Describable<WindowsHost> {
         this.connectionTimeout = connectionTimeout
     }
 
+    Integer getReadTimeout() {
+        return readTimeout
+    }
+
+    @DataBoundSetter
+    void setReadTimeout(Integer readTimeout) {
+        this.readTimeout = readTimeout
+    }
+
     Integer getAgentConnectionTimeout() {
         return agentConnectionTimeout
     }
@@ -168,7 +179,7 @@ class WindowsHost implements Describable<WindowsHost> {
     void setUseHttps(Boolean useHttps) {
         this.useHttps = useHttps
     }
-    
+
     @DataBoundSetter
     void setEnvVars(List<WindowsEnvVar> envVars) {
         this.envVars = envVars
@@ -178,8 +189,8 @@ class WindowsHost implements Describable<WindowsHost> {
     Descriptor<WindowsHost> getDescriptor() {
         return Jenkins.get().getDescriptorOrDie(this.getClass())
     }
-    
-    
+
+
     Set<LabelAtom> getLabelSet() {
         return Label.parse(StringUtils.defaultIfEmpty(this.label, ""))
     }
@@ -207,14 +218,14 @@ class WindowsHost implements Describable<WindowsHost> {
         @POST
         ListBoxModel doFillAuthenticationSchemeItems(@QueryParameter String authenticationScheme) {
             ListBoxModel result = new ListBoxModel()
-            [AuthSchemes.NTLM, AuthSchemes.BASIC, AuthSchemes.KERBEROS].each {
+            [AuthSchemes.NTLM, AuthSchemes.BASIC].each {
                 result.add(it,it)
             }
             return result
         }
 
         /**
-         * List the available credentials        
+         * List the available credentials
          * @param host
          * @param credentialsId
          * @param item
@@ -254,13 +265,15 @@ class WindowsHost implements Describable<WindowsHost> {
         @POST
         FormValidation doVerifyConnection(@QueryParameter String host, @QueryParameter Integer port,
                 @QueryParameter String credentialsId, @QueryParameter String authenticationScheme,
-                @QueryParameter Boolean useHttps, @AncestorInPath Item item) {
+                @QueryParameter Boolean useHttps, Integer connectionTimeout,
+                Integer readTimeout, @AncestorInPath Item item) {
 
             try {
 
                 Jenkins.get().checkPermission(Jenkins.ADMINISTER)
-                String result = WinRMCommand.checkConnection(new WinRMGlobalConnectionConfiguration(credentialsId: credentialsId,
-                context: item, host: host, port: port, authenticationScheme: AuthSchemes.NTLM, useHttps: useHttps))
+                String result = WinRMCommand.checkConnection(new WinRMGlobalConnectionConfiguration(
+                        credentialsId: credentialsId,context: item, host: host, port: port, authenticationScheme: AuthSchemes.NTLM,
+                        useHttps: useHttps, connectionTimeout: connectionTimeout, readTimeout: readTimeout))
                 return FormValidation.ok("Connection success : " + (result).toString())
             } catch(Exception e) {
                 return FormValidation.error("Connection failed : " + (e.getMessage()).toString())

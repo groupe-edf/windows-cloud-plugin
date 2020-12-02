@@ -64,13 +64,13 @@ class WinRMConnectionFactoryTest extends Specification{
         String host ="host"
         WinRMTool tool = Mock()
         GroovySpy(WinRMConnectionFactory, global:true){
-            WinRMConnectionFactory.getConnection(host, _, _, _, _) >> tool
+            WinRMConnectionFactory.getConnection(host, _, _, _, _, _, _) >> tool
         }
         
         when:
         WinRMTool res = WinRMConnectionFactory.getWinRMConnection(new WinRMUserConnectionConfiguration(username: "username",
-            password: Secret.fromString("passwoed"),
-            host: host, port: null, connectionTimeout: null, authenticationScheme: null, useHttps: null))
+            password: Secret.fromString("password"),
+            host: host, port: null, connectionTimeout: null, readTimeout: null, authenticationScheme: null, useHttps: null))
         
         then:
         notThrown Exception

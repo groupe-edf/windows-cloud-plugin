@@ -38,7 +38,7 @@ class WinRMToolTest extends Specification {
         String shellId = "C443F44F-28E4-486F-A5A1-12745F90CF5A"
         HttpResponse httpResponse = WinRMResponseBuilder.buildHttpResponse()
         httpResponse.setEntity(WinRMResponseBuilder.buildOpenShellResponseEntity(shellId))
-        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 1]) {
+        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 15, 15]) {
             performRequest(*_) >> httpResponse
         }
 
@@ -56,7 +56,7 @@ class WinRMToolTest extends Specification {
         BasicStatusLine basicStatusLine = new BasicStatusLine(protocolVersion, 401, "Unauthorized")
         HttpResponse  httpResponse = new BasicHttpResponse(basicStatusLine)
 
-        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 1]) {
+        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 15, 15]) {
             performRequest(*_) >> httpResponse
         }
 
@@ -81,7 +81,7 @@ class WinRMToolTest extends Specification {
         String commandId = "34B95100-EC13-485F-B918-0BDFAFE26439"
         HttpResponse httpResponse = WinRMResponseBuilder.buildHttpResponse()
         httpResponse.setEntity(WinRMResponseBuilder.buildExecuteCommandResponseEntity(commandId))
-        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 1]) {
+        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 15, 15]) {
             performRequest(*_) >> httpResponse
         }
 
@@ -100,7 +100,7 @@ class WinRMToolTest extends Specification {
         BasicStatusLine basicStatusLine = new BasicStatusLine(protocolVersion, 500, "Error")
         HttpResponse  httpResponse = new BasicHttpResponse(basicStatusLine)
 
-        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 1]) {
+        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 15, 15]) {
             performRequest(*_) >> httpResponse
         }
 
@@ -128,7 +128,7 @@ class WinRMToolTest extends Specification {
         String encodedOut = out.getBytes().encodeBase64()
         HttpResponse httpResponse = WinRMResponseBuilder.buildHttpResponse()
         httpResponse.setEntity(WinRMResponseBuilder.buildGetCommandOutputResponseEntity(commandId, encodedOut))
-        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 1]) {
+        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 15, 15]) {
             performRequest(*_) >> httpResponse
         }
 
@@ -149,7 +149,7 @@ class WinRMToolTest extends Specification {
         BasicStatusLine basicStatusLine = new BasicStatusLine(protocolVersion, 500, "Error")
         HttpResponse  httpResponse = new BasicHttpResponse(basicStatusLine)
 
-        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 1]) {
+        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 15, 15]) {
             performRequest(*_) >> httpResponse
         }
 
@@ -174,7 +174,7 @@ class WinRMToolTest extends Specification {
         String commandId = "34B95100-EC13-485F-B918-0BDFAFE26439"
         HttpResponse httpResponse = WinRMResponseBuilder.buildHttpResponse()
         httpResponse.setEntity(WinRMResponseBuilder.buildCloseShellResponseEntity())
-        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 1]) {
+        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 15, 15]) {
             performRequest(*_) >> httpResponse
         }
 
@@ -193,7 +193,7 @@ class WinRMToolTest extends Specification {
         BasicStatusLine basicStatusLine = new BasicStatusLine(protocolVersion, 500, "Error")
         HttpResponse  httpResponse = new BasicHttpResponse(basicStatusLine)
 
-        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 1]) {
+        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 15, 15]) {
             performRequest(*_) >> httpResponse
         }
 
@@ -218,7 +218,7 @@ class WinRMToolTest extends Specification {
         String shellId = "C443F44F-28E4-486F-A5A1-12745F90CF5A"
         HttpResponse httpResponse = WinRMResponseBuilder.buildHttpResponse()
         httpResponse.setEntity(WinRMResponseBuilder.buildCloseShellResponseEntity())
-        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 1]) {
+        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 15, 15]) {
             performRequest(*_) >> httpResponse
         }
 
@@ -236,7 +236,7 @@ class WinRMToolTest extends Specification {
         BasicStatusLine basicStatusLine = new BasicStatusLine(protocolVersion, 500, "Error")
         HttpResponse  httpResponse = new BasicHttpResponse(basicStatusLine)
 
-        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 1]) {
+        WinRMTool tool = Spy(WinRMTool, constructorArgs: ["127.0.0.1", 5986, "username", "password", AuthSchemes.NTLM, true, true, 15, 15]) {
             performRequest(*_) >> httpResponse
         }
 

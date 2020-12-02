@@ -11,6 +11,7 @@ abstract class WinRMConnectionConfiguration {
     String host
     Integer port
     Integer connectionTimeout
+    Integer readTimeout
     String authenticationScheme
     Boolean useHttps
 }

@@ -75,8 +75,8 @@ class WinRMCommand {
         WinRMCommandLauncher launcher = null
         try {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
-            context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
-            authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
+            context: Jenkins.get(), host: host.host, port: host.port, authenticationScheme: host.authenticationScheme,
+            useHttps: host.useHttps, connectionTimeout: host.connectionTimeout, readTimeout: host.readTimeout)
             launcher = new WinRMCommandLauncher(config)
 
             LOGGER.log(Level.FINE, user.username + " : create user")
@@ -110,8 +110,8 @@ class WinRMCommand {
         WinRMCommandLauncher launcher = null
         try {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
-            context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
-            authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
+            context: Jenkins.get(), host: host.host, port: host.port, authenticationScheme: host.authenticationScheme,
+            useHttps: host.useHttps, connectionTimeout: host.connectionTimeout, readTimeout: host.readTimeout)
             launcher = new WinRMCommandLauncher(config)
 
             LOGGER.log(Level.FINE, username + " : stop all process")
@@ -138,8 +138,8 @@ class WinRMCommand {
     static List<String> listUsers(WindowsHost host) throws WinRMCommandException{
         try {
             WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
-            context: Jenkins.get(), host: host.host, port: host.port, connectionTimeout: host.connectionTimeout,
-            authenticationScheme: host.authenticationScheme, useHttps: host.useHttps)
+            context: Jenkins.get(), host: host.host, port: host.port, authenticationScheme: host.authenticationScheme,
+            useHttps: host.useHttps, connectionTimeout: host.connectionTimeout, readTimeout: host.readTimeout)
             WinRMCommandLauncher launcher = new WinRMCommandLauncher(config)
 
             LOGGER.log(Level.FINE, host.host + " : list users")
@@ -173,8 +173,8 @@ class WinRMCommand {
         WinRMCommandLauncher launcher = null
         try {
             WinRMUserConnectionConfiguration config = new WinRMUserConnectionConfiguration(username: user.username, password: user.password,
-            host: host.host, port: host.port, connectionTimeout: host.connectionTimeout, authenticationScheme: host.authenticationScheme,
-            useHttps: host.useHttps)
+            host: host.host, port: host.port, authenticationScheme: host.authenticationScheme, useHttps: host.useHttps,
+            connectionTimeout: host.connectionTimeout, readTimeout: host.readTimeout)
             launcher = new WinRMCommandLauncher(config)
             LOGGER.log(Level.FINE, user.username + " : get remoting.jar ")
             launcher.executeCommand(String.format(Constants.GET_REMOTING_JAR, remotingUrl), false, true)

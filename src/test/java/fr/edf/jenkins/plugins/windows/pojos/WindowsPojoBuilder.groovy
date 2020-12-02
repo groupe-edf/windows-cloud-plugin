@@ -24,6 +24,7 @@ class WindowsPojoBuilder {
                 Boolean.FALSE,
                 60,
                 60,
+                60,
                 5,
                 "testLabel",
                 Boolean.FALSE,
@@ -65,6 +66,7 @@ class WindowsPojoBuilder {
                 AuthSchemes.NTLM,
                 true,
                 true,
-                1)
+                15,
+                15)
     }
 }

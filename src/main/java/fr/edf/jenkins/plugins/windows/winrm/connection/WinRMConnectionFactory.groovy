@@ -48,7 +48,8 @@ class WinRMConnectionFactory {
     private static WinRMTool getGlobalWinRMConnection(WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration()) throws WinRMConnectionException {
         String host = config.host
         Integer port = config.port ?: Integer.valueOf(5985)
-        Integer connectionTimeout = config.connectionTimeout ?: Integer.valueOf(1000)
+        Integer connectionTimeout = config.connectionTimeout ?: Integer.valueOf(15)
+        Integer readTimeout = config.readTimeout ?: Integer.valueOf(15)
         String authenticationScheme = config.authenticationScheme ?: AuthSchemes.NTLM
         Boolean useHttps = config.useHttps ?: Boolean.FALSE
         def context = config.context ?: Jenkins.get()
@@ -70,7 +71,8 @@ class WinRMConnectionFactory {
     private static WinRMTool getUserWinRMConnection(WinRMUserConnectionConfiguration config = new WinRMUserConnectionConfiguration()) {
         String host = config.host
         Integer port = config.port ?: Integer.valueOf(5985)
-        Integer connectionTimeout = config.connectionTimeout ?: Integer.valueOf(1000)
+        Integer connectionTimeout = config.connectionTimeout ?: Integer.valueOf(15)
+        Integer readTimeout = config.readTimeout ?: Integer.valueOf(15)
         String authenticationScheme = config.authenticationScheme ?: AuthSchemes.NTLM
         Boolean useHttps = config.useHttps ?: Boolean.FALSE
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.SYSTEM,
@@ -79,7 +81,7 @@ class WinRMConnectionFactory {
                 config.username,
                 config.password.getPlainText()
                 )
-        return getConnection(host, credentials, port, authenticationScheme, useHttps)
+        return getConnection(host, credentials, port, authenticationScheme, useHttps, connectionTimeout, readTimeout)
     }
 
     /**
@@ -94,7 +96,7 @@ class WinRMConnectionFactory {
 
     @Restricted(NoExternalUse)
     private static WinRMTool getConnection(final String host, final StandardCredentials credentials, final Integer port,
-            final String authenticationScheme, final Boolean useHttps) throws WinRMConnectionException {
+            final String authenticationScheme, final Boolean useHttps, final Integer connectionTimeout, final Integer readTimeout) throws WinRMConnectionException {
         if (credentials instanceof StandardUsernamePasswordCredentials) {
             StandardUsernamePasswordCredentials usernamePasswordCredentials = credentials
             WinRMTool winRmTool = new WinRMTool(
@@ -105,7 +107,8 @@ class WinRMConnectionFactory {
                     AuthSchemes.NTLM,
                     useHttps.booleanValue(),
                     true,
-                    10000)
+                    connectionTimeout,
+                    readTimeout)
             return winRmTool
         } else {
             throw new WinRMConnectionException("Only Username and Password Credentials are allowed")

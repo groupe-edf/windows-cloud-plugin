@@ -73,12 +73,23 @@ import groovy.util.slurpersupport.GPathResult
 class WinRMTool {
 
     static final Logger LOGGER = Logger.getLogger(WinRMTool.name)
+    /** http */
     public static final String PROTOCOL_HTTP = "http"
+    /** https */
     public static final String PROTOCOL_HTTPS = "https"
+    /** application/soap+xml; charset=UTF-8 */
     private static final String SOAP_REQUEST_CONTENT_TYPE = "application/soap+xml; charset=UTF-8"
+    /** /wsman */
     private static final String WSMAN_ROOT_URI = "/wsman"
+    /** TLS */
     private static final String TLS = "TLS"
-    final List<Integer> sucessStatus = [200, 201, 202, 204]
+    /** array of success status of an HTTP response */
+    private static final List<Integer> SUCCESS_STATUS = [200, 201, 202, 204]
+    /** Default timeout of a wsman operation is 60 seconds
+     * @see <a href="https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-wsmv/10a60f39-7bb8-49b3-a4dc-2de481fef094">Microsoft Documentation</a>
+     * @see <a href="https://www.dmtf.org/sites/default/files/standards/documents/DSP0226_1.0.0.pdf#%5B%7B%22num%22%3A342%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C0%2C792%2Cnull%5D">WS-Management Specifications</a>
+     */
+    private static final Integer DEFAULT_OPERATION_TIMEOUT = 60
 
     /** username to connect  with. */
     String username
@@ -94,12 +105,10 @@ class WinRMTool {
     boolean disableCertificateChecks
     /** "http" or "https", usage of static constants recommended. */
     boolean useHttps
-    /** timeout of the command */
-    Integer commandTimeout = 60
-    /** timeout of the connection */
-    Integer connectionTimeout = 20
-    /** timeout to receive response */
-    Integer readTimeout = 60
+    /** timeout of the connection in second */
+    Integer connectionTimeout = 15
+    /** timeout to receive response in second */
+    Integer readTimeout = 15
 
     URL url
     String lastShellId
@@ -118,14 +127,15 @@ class WinRMTool {
      * @param timeout : delay before the command have to respond
      */
     WinRMTool(String address, int port, String username, String password, String authSheme, boolean useHttps,
-    boolean disableCertificateChecks, Integer commandTimeout) {
+    boolean disableCertificateChecks, Integer connectionTimeout, Integer readTimeout) {
         this.url = buildUrl(useHttps?PROTOCOL_HTTPS:PROTOCOL_HTTP,address,port)
         this.username = username
         this.password = password
         this.authSheme = authSheme
         this.useHttps = useHttps
         this.disableCertificateChecks = disableCertificateChecks
-        this.commandTimeout = commandTimeout
+        this.connectionTimeout = connectionTimeout
+        this.readTimeout = readTimeout
     }
 
     /**
@@ -136,12 +146,12 @@ class WinRMTool {
      */
     String openShell() throws WinRMException {
         HttpClient httpClient = getHttpClient()
-        HttpPost httpPost = buildHttpPostRequest(new OpenShellRequest(url, commandTimeout))
+        HttpPost httpPost = buildHttpPostRequest(new OpenShellRequest(url, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context, "OpenShellRequest")
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
-        if(!sucessStatus.contains(responseCode)) {
+        if(!SUCCESS_STATUS.contains(responseCode)) {
             throw new WinRMException(String.format(
             WinRMException.FORMATTED_MESSAGE,
             "OpenShell",
@@ -189,12 +199,12 @@ class WinRMTool {
             throw new WinRMException("Call openShell() before execute command")
         }
         HttpClient httpClient = getHttpClient()
-        HttpPost httpPost = buildHttpPostRequest(new ExecuteCommandRequest(url, shellId, commandLine, args, commandTimeout))
+        HttpPost httpPost = buildHttpPostRequest(new ExecuteCommandRequest(url, shellId, commandLine, args, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context, "ExecuteCommand " + commandLine)
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
-        if(!sucessStatus.contains(responseCode)) {
+        if(!SUCCESS_STATUS.contains(responseCode)) {
             throw new WinRMException(String.format(
             WinRMException.FORMATTED_MESSAGE,
             "ExecuteCommand",
@@ -233,12 +243,12 @@ class WinRMTool {
             throw new WinRMException("No command was executed")
         }
         HttpClient httpClient = getHttpClient()
-        HttpPost httpPost = buildHttpPostRequest(new GetCommandOutputRequest(url, shellId, commandId, commandTimeout))
+        HttpPost httpPost = buildHttpPostRequest(new GetCommandOutputRequest(url, shellId, commandId, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context, "GetCommandOutput with id " + commandId)
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
-        if(!sucessStatus.contains(responseCode)) {
+        if(!SUCCESS_STATUS.contains(responseCode)) {
             throw new WinRMException(String.format(
             WinRMException.FORMATTED_MESSAGE,
             "GetCommandOutput",
@@ -288,12 +298,12 @@ class WinRMTool {
             throw new WinRMException("No command was executed")
         }
         HttpClient httpClient = getHttpClient()
-        HttpPost httpPost = buildHttpPostRequest(new CleanupCommandRequest(url, shellId, commandId, commandTimeout))
+        HttpPost httpPost = buildHttpPostRequest(new CleanupCommandRequest(url, shellId, commandId, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context, "CleanupCommand with id " + commandId)
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
-        if(!sucessStatus.contains(responseCode)) {
+        if(!SUCCESS_STATUS.contains(responseCode)) {
             throw new WinRMException(String.format(
             WinRMException.FORMATTED_MESSAGE,
             "CleanupCommand",
@@ -315,12 +325,12 @@ class WinRMTool {
             throw new WinRMException("There is no shell Id")
         }
         HttpClient httpClient = getHttpClient()
-        HttpPost httpPost = buildHttpPostRequest(new DeleteShellRequest(url, shellId, commandTimeout))
+        HttpPost httpPost = buildHttpPostRequest(new DeleteShellRequest(url, shellId, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context, "DeleteShellRequest with id " + shellId)
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
-        if(!sucessStatus.contains(responseCode)) {
+        if(!SUCCESS_STATUS.contains(responseCode)) {
             throw new WinRMException(String.format(
             WinRMException.FORMATTED_MESSAGE,
             "DeleteShellRequest",
@@ -390,8 +400,8 @@ class WinRMTool {
             httpPost.setEntity(entity)
             // Request config
             RequestConfig.Builder configBuilder = RequestConfig.custom()
-            .setConnectionRequestTimeout(connectionTimeout.intValue()*1000)
-            .setSocketTimeout(readTimeout.intValue()*1000)
+                    .setConnectionRequestTimeout(connectionTimeout.intValue()*1000)
+                    .setSocketTimeout(readTimeout.intValue()*1000)
             httpPost.setConfig(configBuilder.build())
         }catch (Exception e) {
             throw new WinRMException("Cannot build HttpPost request due to unexpected exception : " + e.getLocalizedMessage(), e)
@@ -450,7 +460,7 @@ class WinRMTool {
                 .register(AuthSchemes.BASIC, new BasicSchemeFactory())
                 .register(AuthSchemes.SPNEGO,
                 authenticationScheme.equals(AuthSchemes.NTLM) ? new SpNegoNTLMSchemeFactory() : new WsmanSPNegoSchemeFactory())
-                .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())//
+                .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())
                 .build()
         return authSchemeRegistry
     }

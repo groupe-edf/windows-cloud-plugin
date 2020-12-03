@@ -38,13 +38,14 @@ class WinRMCommandLauncher {
     }
 
     /**
-     * openShell on the remote machine
+     * Open a shell on the remote machine
+     * @return shellId
      * @throws WinRMCommandException
      */
-    protected void openShell() throws WinRMCommandException {
+    protected String openShell() throws WinRMCommandException {
         LOGGER.log(Level.FINEST, LOG_SEPARATOR + "OPEN SHELL")
         try {
-            this.shellId = winrmTool.openShell()
+            return winrmTool.openShell()
         }catch(WinRMException winrme) {
             throw new WinRMCommandException("Unable to open a shell", winrme)
         }
@@ -92,7 +93,7 @@ class WinRMCommandLauncher {
         CommandOutput output = null
         String commandId = null
         try {
-            shellId = shellId ?: winrmTool.openShell()
+            shellId = shellId ?: openShell()
             LOGGER.log(Level.FINEST, LOG_SEPARATOR + "EXECUTE COMMAND " + command)
             commandId = winrmTool.executePSCommand(command)
             this.commandId = commandId ?: this.commandId

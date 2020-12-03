@@ -156,15 +156,18 @@ class WinRMCommandTest extends Specification{
         String deleteUserId = "deleteUserId"
         String checkUserExist = "checkUserExist"
         String stopProcessId = "stopProcessId"
+        String removeWorkdirId = "removeWorkdirId"
 
         WinRMTool tool = Stub(WinRMTool){
             openShell() >> shellId
             executePSCommand(String.format(Constants.DELETE_USER, username)) >> deleteUserId
             executePSCommand(String.format(Constants.CHECK_USER_EXIST, username)) >> checkUserExist
             executePSCommand(String.format(Constants.STOP_USER_PROCESS, username)) >> stopProcessId
+            executePSCommand(String.format(Constants.REMOVE_WORKDIR, username)) >> removeWorkdirId
             getCommandOutput(shellId, deleteUserId) >> new CommandOutput(0, "user is deleted", null)
             getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, "", null)
             getCommandOutput(shellId, stopProcessId) >> new CommandOutput(0, "the process has been stopped", null)
+            getCommandOutput(shellId, removeWorkdirId) >> new CommandOutput(0, "the workdir has been removed", null)
             deleteShellRequest(shellId) >> {}
         }
 
@@ -190,15 +193,18 @@ class WinRMCommandTest extends Specification{
         String checkUserExist = "checkUserExist"
         String deleteUserId = "deleteUserId"
         String stopProcessId = "stopProcessId"
+        String removeWorkdirId = "removeWorkdirId"
 
         WinRMTool tool = Stub(WinRMTool){
             openShell() >> shellId
             executePSCommand(String.format(Constants.DELETE_USER, username)) >> deleteUserId
             executePSCommand(String.format(Constants.CHECK_USER_EXIST, username)) >> checkUserExist
             executePSCommand(String.format(Constants.STOP_USER_PROCESS, username)) >> stopProcessId
+            executePSCommand(String.format(Constants.REMOVE_WORKDIR, username)) >> removeWorkdirId
             getCommandOutput(shellId, deleteUserId) >> new CommandOutput(0, "the user was not deleted", null)
             getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, username, null)
             getCommandOutput(shellId, stopProcessId) >> new CommandOutput(0, "the process has been stopped", null)
+            getCommandOutput(shellId, removeWorkdirId) >> new CommandOutput(0, "the workdir has been removed", null)
             deleteShellRequest(shellId) >> {}
         }
 

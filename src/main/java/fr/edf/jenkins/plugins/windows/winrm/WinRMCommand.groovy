@@ -119,9 +119,11 @@ class WinRMCommand {
             LOGGER.log(Level.FINE, username + " : delete user")
             launcher.executeCommand(String.format(Constants.DELETE_USER, username), false, true)
 
-            if(doesUserExist(launcher, username, false)) {
+            if(doesUserExist(launcher, username, true)) {
                 throw new Exception(String.format(WinRMCommandException.USER_STILL_EXISTS, username))
             }
+            LOGGER.log(Level.FINE, username + " : remove workdir")
+            launcher.executeCommand(String.format(Constants.REMOVE_WORKDIR, username), false, false)
         }catch(Exception e) {
             if(launcher?.shellId) launcher.closeShell()
             String message = String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host)

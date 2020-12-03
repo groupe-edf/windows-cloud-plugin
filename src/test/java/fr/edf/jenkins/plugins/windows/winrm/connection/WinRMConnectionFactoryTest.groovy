@@ -43,7 +43,7 @@ class WinRMConnectionFactoryTest extends Specification{
 
         WinRMTool tool = Mock()
         GroovySpy(WinRMConnectionFactory, global:true){
-            WinRMConnectionFactory.getConnection(host, cred, _, _, _) >> tool
+            WinRMConnectionFactory.getConnection(host, cred, _, _, _, _, _, _) >> tool
         }
         GroovyStub(CredentialsUtils, global:true){
             CredentialsUtils.findCredentials(host, _, _) >> cred
@@ -51,7 +51,7 @@ class WinRMConnectionFactoryTest extends Specification{
 
         when:
         WinRMTool res = WinRMConnectionFactory.getWinRMConnection(new WinRMGlobalConnectionConfiguration(credentialsId: host,
-        context: Jenkins.get(), host: host, port: null, connectionTimeout: null, authenticationScheme: null, useHttps: null))
+        context: Jenkins.get(), host: host, port: null, connectionTimeout: null, authenticationScheme: null, useHttps: null, disableCertificateCheck: null))
 
         then:
         notThrown Exception
@@ -64,13 +64,13 @@ class WinRMConnectionFactoryTest extends Specification{
         String host ="host"
         WinRMTool tool = Mock()
         GroovySpy(WinRMConnectionFactory, global:true){
-            WinRMConnectionFactory.getConnection(host, _, _, _, _, _, _) >> tool
+            WinRMConnectionFactory.getConnection(host, _, _, _, _, _, _, _) >> tool
         }
 
         when:
         WinRMTool res = WinRMConnectionFactory.getWinRMConnection(new WinRMUserConnectionConfiguration(username: "username",
         password: Secret.fromString("password"),
-        host: host, port: null, connectionTimeout: null, readTimeout: null, authenticationScheme: null, useHttps: null))
+        host: host, port: null, connectionTimeout: null, readTimeout: null, authenticationScheme: null, useHttps: null, disableCertificateCheck: null))
 
         then:
         notThrown Exception

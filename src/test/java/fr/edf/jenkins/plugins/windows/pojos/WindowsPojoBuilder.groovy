@@ -28,6 +28,7 @@ class WindowsPojoBuilder {
                 5,
                 "testLabel",
                 Boolean.FALSE,
+                Boolean.FALSE,
                 buildEnvVars())
         List<WindowsHost> hostList = new ArrayList()
         hostList.add(host)

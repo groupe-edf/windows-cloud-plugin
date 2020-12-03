@@ -52,13 +52,14 @@ class WinRMConnectionFactory {
         Integer readTimeout = config.readTimeout ?: Integer.valueOf(15)
         String authenticationScheme = config.authenticationScheme ?: AuthSchemes.NTLM
         Boolean useHttps = config.useHttps ?: Boolean.FALSE
+        Boolean disableCertificateCheck = config.disableCertificateCheck ?: Boolean.FALSE
         def context = config.context ?: Jenkins.get()
         def credentialsId = config.credentialsId ?: null
         if(!credentialsId) {
             throw new WinRMConnectionException("No credentials found for the host " + host)
         }
         def credentials = CredentialsUtils.findCredentials(host, credentialsId, context)
-        return getConnection(host, credentials, port, authenticationScheme, useHttps)
+        return getConnection(host, credentials, port, authenticationScheme, useHttps, disableCertificateCheck, connectionTimeout, readTimeout)
     }
 
     /**
@@ -75,13 +76,14 @@ class WinRMConnectionFactory {
         Integer readTimeout = config.readTimeout ?: Integer.valueOf(15)
         String authenticationScheme = config.authenticationScheme ?: AuthSchemes.NTLM
         Boolean useHttps = config.useHttps ?: Boolean.FALSE
+        Boolean disableCertificateCheck = config.disableCertificateCheck ?: Boolean.FALSE
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.SYSTEM,
                 "cred",
                 null,
                 config.username,
                 config.password.getPlainText()
                 )
-        return getConnection(host, credentials, port, authenticationScheme, useHttps, connectionTimeout, readTimeout)
+        return getConnection(host, credentials, port, authenticationScheme, useHttps, disableCertificateCheck, connectionTimeout, readTimeout)
     }
 
     /**
@@ -96,7 +98,8 @@ class WinRMConnectionFactory {
 
     @Restricted(NoExternalUse)
     private static WinRMTool getConnection(final String host, final StandardCredentials credentials, final Integer port,
-            final String authenticationScheme, final Boolean useHttps, final Integer connectionTimeout, final Integer readTimeout) throws WinRMConnectionException {
+            final String authenticationScheme, final Boolean useHttps, final Boolean disableCertificateCheck,
+            final Integer connectionTimeout, final Integer readTimeout) throws WinRMConnectionException {
         if (credentials instanceof StandardUsernamePasswordCredentials) {
             StandardUsernamePasswordCredentials usernamePasswordCredentials = credentials
             WinRMTool winRmTool = new WinRMTool(
@@ -106,7 +109,7 @@ class WinRMConnectionFactory {
                     usernamePasswordCredentials.getPassword().getPlainText(),
                     AuthSchemes.NTLM,
                     useHttps.booleanValue(),
-                    true,
+                    disableCertificateCheck.booleanValue(),
                     connectionTimeout,
                     readTimeout)
             return winRmTool

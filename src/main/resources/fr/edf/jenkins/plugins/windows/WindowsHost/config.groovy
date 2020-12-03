@@ -5,12 +5,12 @@ import fr.edf.jenkins.plugins.windows.Messages
 def f = namespace(lib.FormTagLib)
 def c = namespace(lib.CredentialsTagLib)
 
-f.entry(title: Messages.Host_Host(), field:'host') {
-    f.textbox(clazz: 'required', checkMethod: 'post')
-}
-
 f.entry(title: Messages.Host_Disable() , field:'disable') {
     f.checkbox()
+}
+
+f.entry(title: Messages.Host_Host(), field:'host') {
+    f.textbox(clazz: 'required', checkMethod: 'post')
 }
 
 f.advanced(title:Messages.Host_Details()) {
@@ -19,12 +19,16 @@ f.advanced(title:Messages.Host_Details()) {
         f.textbox()
     }
 
-    f.entry(title: Messages.Host_Port(), field: 'port') {
-        f.number(clazz: 'required', default: 5985, min: 1)
-    }
-
     f.entry(title: Messages.Host_useHttps(), field: 'useHttps') {
         f.checkbox(default: false)
+    }
+
+    f.entry(title: 'Disable certificate check', field: 'disableCertificateCheck') {
+        f.checkbox(default: false)
+    }
+
+    f.entry(title: Messages.Host_Port(), field: 'port') {
+        f.number(clazz: 'required', default: 5985, min: 1)
     }
 
     f.entry(title: Messages.Host_AuthenticationScheme(), field: 'authenticationScheme'){
@@ -60,7 +64,7 @@ f.advanced(title:Messages.Host_Details()) {
                 title: 'Test Connection',
                 progress: 'Testing...',
                 method: 'verifyConnection',
-                with: 'host,port,credentialsId,authenticationScheme,useHttps,connectionTimeout,readTimeout'
+                with: 'host,port,credentialsId,authenticationScheme,useHttps,disableCertificateCheck,connectionTimeout,readTimeout'
                 )
     }
 

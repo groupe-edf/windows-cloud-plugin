@@ -14,6 +14,7 @@ abstract class WinRMConnectionConfiguration {
     Integer readTimeout
     String authenticationScheme
     Boolean useHttps
+    Boolean disableCertificateCheck
 }
 /**
  * Global connection configuration

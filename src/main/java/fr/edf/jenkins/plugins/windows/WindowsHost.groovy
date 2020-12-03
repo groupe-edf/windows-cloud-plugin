@@ -43,19 +43,21 @@ class WindowsHost implements Describable<WindowsHost> {
     Integer port
     String authenticationScheme
     Integer maxUsers
-    Boolean disable
+    Boolean disable = Boolean.FALSE
     Integer connectionTimeout
     Integer readTimeout
     Integer agentConnectionTimeout
     Integer maxTries
     String label
     Boolean useHttps = Boolean.FALSE
+    Boolean disableCertificateCheck = Boolean.FALSE
     List<WindowsEnvVar> envVars = new ArrayList()
     transient Set<LabelAtom> labelSet
 
     @DataBoundConstructor
     WindowsHost(String host, String credentialsId, Integer port, String authenticationScheme, Integer maxUsers, Boolean disable,
-        Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer maxTries, String label, Boolean useHttps, List<WindowsEnvVar> envVars) {
+    Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer maxTries, String label, Boolean useHttps,
+    Boolean disableCertificateCheck, List<WindowsEnvVar> envVars) {
         this.host = host
         this.credentialsId = credentialsId
         this.port = port
@@ -68,6 +70,7 @@ class WindowsHost implements Describable<WindowsHost> {
         this.maxTries = maxTries
         this.label = label
         this.useHttps = useHttps
+        this.disableCertificateCheck = disableCertificateCheck
         this.envVars = envVars
         labelSet = Label.parse(StringUtils.defaultIfEmpty(label, ""))
     }
@@ -180,6 +183,19 @@ class WindowsHost implements Describable<WindowsHost> {
         this.useHttps = useHttps
     }
 
+    Boolean isDisableCertificateCheck() {
+        return disableCertificateCheck
+    }
+
+    @DataBoundSetter
+    void setDisableCertificateCheck(Boolean disableCertificateCheck) {
+        this.disableCertificateCheck = disableCertificateCheck
+    }
+
+    List<WindowsEnvVar> getEnvVars() {
+        return envVars
+    }
+
     @DataBoundSetter
     void setEnvVars(List<WindowsEnvVar> envVars) {
         this.envVars = envVars
@@ -265,15 +281,17 @@ class WindowsHost implements Describable<WindowsHost> {
         @POST
         FormValidation doVerifyConnection(@QueryParameter String host, @QueryParameter Integer port,
                 @QueryParameter String credentialsId, @QueryParameter String authenticationScheme,
-                @QueryParameter Boolean useHttps, Integer connectionTimeout,
-                Integer readTimeout, @AncestorInPath Item item) {
+                @QueryParameter Boolean useHttps, @QueryParameter Boolean disableCertificateCheck,
+                @QueryParameter Integer connectionTimeout, @QueryParameter Integer readTimeout,
+                @AncestorInPath Item item) {
 
             try {
 
                 Jenkins.get().checkPermission(Jenkins.ADMINISTER)
                 String result = WinRMCommand.checkConnection(new WinRMGlobalConnectionConfiguration(
-                        credentialsId: credentialsId,context: item, host: host, port: port, authenticationScheme: AuthSchemes.NTLM,
-                        useHttps: useHttps, connectionTimeout: connectionTimeout, readTimeout: readTimeout))
+                        credentialsId: credentialsId, context: item, host: host, port: port, authenticationScheme: AuthSchemes.NTLM,
+                        useHttps: useHttps, disableCertificateCheck: disableCertificateCheck,
+                        connectionTimeout: connectionTimeout, readTimeout: readTimeout))
                 return FormValidation.ok("Connection success : " + (result).toString())
             } catch(Exception e) {
                 return FormValidation.error("Connection failed : " + (e.getMessage()).toString())

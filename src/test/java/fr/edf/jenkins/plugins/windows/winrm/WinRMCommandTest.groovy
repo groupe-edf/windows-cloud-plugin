@@ -157,6 +157,7 @@ class WinRMCommandTest extends Specification{
         String checkUserExist = "checkUserExist"
         String stopProcessId = "stopProcessId"
         String removeWorkdirId = "removeWorkdirId"
+        String checkWorkdirExist = "checkWorkdirExistId"
 
         WinRMTool tool = Stub(WinRMTool){
             openShell() >> shellId
@@ -164,8 +165,10 @@ class WinRMCommandTest extends Specification{
             executePSCommand(String.format(Constants.CHECK_USER_EXIST, username)) >> checkUserExist
             executePSCommand(String.format(Constants.STOP_USER_PROCESS, username)) >> stopProcessId
             executePSCommand(String.format(Constants.REMOVE_WORKDIR, username)) >> removeWorkdirId
+            executePSCommand(String.format(Constants.CHECK_WORKDIR_EXIST, username)) >> checkWorkdirExist
             getCommandOutput(shellId, deleteUserId) >> new CommandOutput(0, "user is deleted", null)
             getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, "", null)
+            getCommandOutput(shellId, checkWorkdirExist) >> new CommandOutput(0, "False", null)
             getCommandOutput(shellId, stopProcessId) >> new CommandOutput(0, "the process has been stopped", null)
             getCommandOutput(shellId, removeWorkdirId) >> new CommandOutput(0, "the workdir has been removed", null)
             deleteShellRequest(shellId) >> {}
@@ -194,6 +197,7 @@ class WinRMCommandTest extends Specification{
         String deleteUserId = "deleteUserId"
         String stopProcessId = "stopProcessId"
         String removeWorkdirId = "removeWorkdirId"
+        String checkWorkdirExist = "checkWorkdirExistId"
 
         WinRMTool tool = Stub(WinRMTool){
             openShell() >> shellId
@@ -201,8 +205,10 @@ class WinRMCommandTest extends Specification{
             executePSCommand(String.format(Constants.CHECK_USER_EXIST, username)) >> checkUserExist
             executePSCommand(String.format(Constants.STOP_USER_PROCESS, username)) >> stopProcessId
             executePSCommand(String.format(Constants.REMOVE_WORKDIR, username)) >> removeWorkdirId
+            executePSCommand(String.format(Constants.CHECK_WORKDIR_EXIST, username)) >> checkWorkdirExist
             getCommandOutput(shellId, deleteUserId) >> new CommandOutput(0, "the user was not deleted", null)
             getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, username, null)
+            getCommandOutput(shellId, checkWorkdirExist) >> new CommandOutput(0, "False", null)
             getCommandOutput(shellId, stopProcessId) >> new CommandOutput(0, "the process has been stopped", null)
             getCommandOutput(shellId, removeWorkdirId) >> new CommandOutput(0, "the workdir has been removed", null)
             deleteShellRequest(shellId) >> {}
@@ -220,6 +226,47 @@ class WinRMCommandTest extends Specification{
         WinRMCommandException e = thrown()
         e.getMessage().contains(String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host))
         e.getCause().getMessage().contains(String.format(WinRMCommandException.USER_STILL_EXISTS, username))
+    }
+
+    def "deleteUser returns an exception because workdir stills exists"(){
+
+        given:
+        WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
+        String username = "windows_test_user"
+        String shellId = "shell"
+        String checkUserExist = "checkUserExist"
+        String deleteUserId = "deleteUserId"
+        String stopProcessId = "stopProcessId"
+        String removeWorkdirId = "removeWorkdirId"
+        String checkWorkdirExist = "checkWorkdirExistId"
+
+        WinRMTool tool = Stub(WinRMTool){
+            openShell() >> shellId
+            executePSCommand(String.format(Constants.DELETE_USER, username)) >> deleteUserId
+            executePSCommand(String.format(Constants.CHECK_USER_EXIST, username)) >> checkUserExist
+            executePSCommand(String.format(Constants.STOP_USER_PROCESS, username)) >> stopProcessId
+            executePSCommand(String.format(Constants.REMOVE_WORKDIR, username)) >> removeWorkdirId
+            executePSCommand(String.format(Constants.CHECK_WORKDIR_EXIST, username)) >> checkWorkdirExist
+            getCommandOutput(shellId, deleteUserId) >> new CommandOutput(0, "the user was not deleted", null)
+            getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, "", null)
+            getCommandOutput(shellId, checkWorkdirExist) >> new CommandOutput(0, "True", null)
+            getCommandOutput(shellId, stopProcessId) >> new CommandOutput(0, "the process has been stopped", null)
+            getCommandOutput(shellId, removeWorkdirId) >> new CommandOutput(0, "the workdir has been removed", null)
+            deleteShellRequest(shellId) >> {}
+        }
+
+        GroovyStub(WinRMConnectionFactory, global:true){
+            WinRMConnectionFactory.getWinRMConnection(_) >> tool
+        }
+
+        when:
+        String res = WinRMCommand.deleteUser(host, username)
+
+
+        then:
+        WinRMCommandException e = thrown()
+        e.getMessage().contains(String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host))
+        e.getCause().getMessage().contains(String.format(WinRMCommandException.WORKDIR_STILL_EXISTS, username))
     }
 
 

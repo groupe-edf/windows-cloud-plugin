@@ -50,6 +50,19 @@ class WinRMCommand {
     }
 
     /**
+     * Checks if workdir exists
+     * @param config
+     * @param username
+     * @return true if the workdir exists otherwise false
+     * @throws Exception
+     */
+    private static boolean doesWorkdirExist(WinRMCommandLauncher launcher, String username, boolean keepAlive) throws Exception{
+        LOGGER.log(Level.FINE, username + " : check if workdir exist")
+        String res = launcher.executeCommand(String.format(Constants.CHECK_WORKDIR_EXIST, username), false, keepAlive)
+        return Boolean.valueOf(res)
+    }
+
+    /**
      * Randomly generate Windows user
      * @return a new Windows user
      */
@@ -123,7 +136,10 @@ class WinRMCommand {
                 throw new Exception(String.format(WinRMCommandException.USER_STILL_EXISTS, username))
             }
             LOGGER.log(Level.FINE, username + " : remove workdir")
-            launcher.executeCommand(String.format(Constants.REMOVE_WORKDIR, username), false, false)
+            launcher.executeCommand(String.format(Constants.REMOVE_WORKDIR, username), false, true)
+            if(doesWorkdirExist(launcher, username, false)) {
+                throw new Exception(String.format(WinRMCommandException.WORKDIR_STILL_EXISTS, username))
+            }
         }catch(Exception e) {
             if(launcher?.shellId) launcher.closeShell()
             String message = String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host)

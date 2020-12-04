@@ -121,7 +121,7 @@ class WindowsCloud extends Cloud {
             while(true) {
                 try {
                     int existingUsers = WinRMCommand.listUsers(it).size()
-                    return existingUsers <= it.maxUsers
+                    return existingUsers < it.maxUsers
                 } catch(WinRMCommandException e) {
                     nbTries ++
                     if(nbTries < it.maxTries) {

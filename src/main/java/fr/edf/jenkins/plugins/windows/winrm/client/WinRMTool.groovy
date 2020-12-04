@@ -97,7 +97,7 @@ class WinRMTool {
     String password
     /** @see AuthSchemes. */
     String authSheme
-    /** windos domain of the machine (**optional value for ntlm authentication**). */
+    /** windows domain of the machine (**optional value for ntlm authentication**). */
     String domain
     /** name of the windows machine (**optional value for ntlm authentication**). */
     String workstation

@@ -64,7 +64,7 @@ class Constants {
     static final String REMOVE_WORKDIR = "Remove-Item 'C:\\Users\\%s' -Force -Recurse"
 
     /** Check-Path -PathType Container 'C:\\Users\\%s' */
-    static final String CHECK_WORKDIR_EXIST = "Check-Path -PathType Container 'C:\\Users\\%s'"
+    static final String CHECK_WORKDIR_EXIST = "Test-Path -PathType Container 'C:\\Users\\%s'"
 
     /** Invoke-RestMethod -Uri %s -OutFile remoting.jar */
     static final String GET_REMOTING_JAR = "Invoke-RestMethod -Uri %s -OutFile remoting.jar"

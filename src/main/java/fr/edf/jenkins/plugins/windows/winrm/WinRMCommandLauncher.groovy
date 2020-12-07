@@ -1,5 +1,6 @@
 package fr.edf.jenkins.plugins.windows.winrm
 
+import java.time.Instant
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -23,18 +24,21 @@ import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionFactory
 class WinRMCommandLauncher {
 
     private static final Logger LOGGER = Logger.getLogger(WinRMCommandLauncher.class.name)
-    private static final String LOG_SEPARATOR = "####################  "
+    private static final String LOG_SEPARATOR = "####################"
 
     WinRMTool winrmTool
     String commandId
     String shellId
+    long commandTimeout
 
     /**
      * Construct WinRMCommandLauncher with its own WinRmClient
      * @param connectionConfiguration
      */
-    protected WinRMCommandLauncher(@NotNull WinRMConnectionConfiguration connectionConfiguration) throws WinRMConnectionException {
+    @Restricted(NoExternalUse)
+    protected WinRMCommandLauncher(@NotNull WinRMConnectionConfiguration connectionConfiguration, Integer commandTimeout) throws WinRMConnectionException {
         this.winrmTool = WinRMConnectionFactory.getWinRMConnection(connectionConfiguration)
+        this.commandTimeout = commandTimeout*1000.longValue()
     }
 
     /**
@@ -42,8 +46,9 @@ class WinRMCommandLauncher {
      * @return shellId
      * @throws WinRMCommandException
      */
+    @Restricted(NoExternalUse)
     protected String openShell() throws WinRMCommandException {
-        LOGGER.log(Level.FINEST, LOG_SEPARATOR + "OPEN SHELL")
+        LOGGER.log(Level.FINEST, "$LOG_SEPARATOR OPEN SHELL")
         try {
             return winrmTool.openShell()
         }catch(WinRMException winrme) {
@@ -56,13 +61,14 @@ class WinRMCommandLauncher {
      * @param commandId
      * @throws WinRMCommandException
      */
+    @Restricted(NoExternalUse)
     protected void cleanupCommand(String commandId) throws WinRMCommandException {
         commandId = commandId ?: this.commandId
-        LOGGER.log(Level.FINEST, LOG_SEPARATOR + "CLEANUP COMMAND WITH ID " + commandId)
+        LOGGER.log(Level.FINEST, "$LOG_SEPARATOR CLEANUP COMMAND WITH ID $commandId")
         try {
             winrmTool.cleanupCommand(shellId, commandId)
         }catch(WinRMException winrme) {
-            throw new WinRMCommandException("Unable to cleanup the command with id " + commandId, winrme)
+            throw new WinRMCommandException("Unable to cleanup the command with id $commandId", winrme)
         }
     }
 
@@ -70,13 +76,14 @@ class WinRMCommandLauncher {
      * Close the shell
      * @throws WinRMException
      */
+    @Restricted(NoExternalUse)
     protected void closeShell() throws WinRMException {
-        LOGGER.log(Level.FINEST, LOG_SEPARATOR + "CLOSE SHELL WITH ID " + shellId)
+        LOGGER.log(Level.FINEST, "$LOG_SEPARATOR CLOSE SHELL WITH ID $shellId")
         try {
             winrmTool.deleteShellRequest(shellId)
             this.shellId = null
         }catch(WinRMException winrme) {
-            throw new WinRMCommandException("Unable to close the shell with id " + shellId, winrme)
+            throw new WinRMCommandException("Unable to close the shell with id $shellId", winrme)
         }
     }
 
@@ -89,20 +96,20 @@ class WinRMCommandLauncher {
      * @throws Exception
      */
     @Restricted(NoExternalUse)
-    protected String executeCommand(@NotNull String command, @NotNull boolean ignoreError, @NotNull boolean keepAlive) throws WinRMCommandException {
+    protected String executeCommand(@NotNull String command, @NotNull boolean ignoreError, @NotNull boolean keepAlive, @NotNull boolean waitResult) throws WinRMCommandException {
         CommandOutput output = null
         String commandId = null
         try {
             shellId = shellId ?: openShell()
-            LOGGER.log(Level.FINEST, LOG_SEPARATOR + "EXECUTE COMMAND " + command)
+            LOGGER.log(Level.FINEST, "$LOG_SEPARATOR EXECUTE COMMAND $command")
             commandId = winrmTool.executePSCommand(command)
             this.commandId = commandId ?: this.commandId
-            LOGGER.log(Level.FINEST, LOG_SEPARATOR + "GET COMMAND OUTPUT WITH ID " + commandId)
-            output = winrmTool.getCommandOutput(shellId, commandId)
+            LOGGER.log(Level.FINEST, "$LOG_SEPARATOR GET COMMAND OUTPUT WITH ID $commandId")
+            output = getCommandOutput(shellId, commandId, waitResult)
 
             if(!ignoreError && output.exitStatus!=0) {
                 closeShell()
-                throw new Exception("OUTPUT : " + output.output + " ;ERROR : " + output.errorOutput)
+                throw new Exception("OUTPUT : $output.output; ERROR : $output.errorOutput")
             }
             if(!keepAlive) {
                 closeShell()
@@ -112,7 +119,21 @@ class WinRMCommandLauncher {
             if(shellId != null) {
                 closeShell()
             }
-            throw new WinRMCommandException("Unable to execute the command " + command, we)
+            throw new WinRMCommandException("Unable to execute the command $command", we)
         }
+    }
+    
+    @Restricted(NoExternalUse)
+    protected CommandOutput getCommandOutput(String shellId, @NotNull String commandId, @NotNull boolean waitResult) throws WinRMException{
+        CommandOutput output = winrmTool.getCommandOutput(shellId, commandId)
+        long startTimestamp = Instant.now().toEpochMilli()
+        while(waitResult && output.isCommandRunning() && Instant.now().toEpochMilli() - startTimestamp < commandTimeout) {
+            output = winrmTool.getCommandOutput(shellId, commandId)
+            sleep(1000)
+        }
+        if(waitResult && output.isCommandRunning()) {
+            throw new WinRMCommandException("The command $commandId takes to much time to complete")
+        }
+        return output
     }
 }

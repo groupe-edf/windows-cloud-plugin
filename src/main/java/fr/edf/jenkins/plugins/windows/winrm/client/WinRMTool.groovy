@@ -161,7 +161,8 @@ class WinRMTool {
         }
         HttpEntity responseEntity = response.getEntity();
         String responseBody = responseEntity?.getContent()?.text
-        LOGGER.log(Level.FINEST, "RESPONSE BODY :" + responseBody)
+        LOGGER.log(Level.FINEST, "RESPONSE BODY :")
+        LOGGER.log(Level.FINEST, responseBody)
         GPathResult results = new XmlSlurper().parseText(responseBody)
         String shellId = results?.'*:Body'?.'*:Shell'?.'*:ShellId'
         if(StringUtils.isEmpty(shellId)) {
@@ -201,7 +202,7 @@ class WinRMTool {
         HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new ExecuteCommandRequest(url, shellId, commandLine, args, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
-        HttpResponse response = performRequest(httpPost, context, "ExecuteCommand " + commandLine)
+        HttpResponse response = performRequest(httpPost, context, "ExecuteCommand $commandLine")
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
         if(!SUCCESS_STATUS.contains(responseCode)) {
@@ -214,7 +215,8 @@ class WinRMTool {
         }
         HttpEntity responseEntity = response.getEntity();
         String responseBody = responseEntity.getContent().text
-        LOGGER.log(Level.FINEST, "RESPONSE BODY :" + responseBody)
+        LOGGER.log(Level.FINEST, "RESPONSE BODY :")
+        LOGGER.log(Level.FINEST, responseBody)
         GPathResult results = new XmlSlurper().parseText(responseBody)
         String commandId = results?.'*:Body'?.'*:CommandResponse'?.'*:CommandId'
         if(StringUtils.isEmpty(commandId)) {
@@ -245,7 +247,7 @@ class WinRMTool {
         HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new GetCommandOutputRequest(url, shellId, commandId, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
-        HttpResponse response = performRequest(httpPost, context, "GetCommandOutput with id " + commandId)
+        HttpResponse response = performRequest(httpPost, context, "GetCommandOutput with id $commandId")
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
         if(!SUCCESS_STATUS.contains(responseCode)) {
@@ -258,7 +260,8 @@ class WinRMTool {
         }
         HttpEntity responseEntity = response.getEntity();
         String responseBody = responseEntity.getContent().text
-        LOGGER.log(Level.FINEST, "RESPONSE BODY :" + responseBody)
+        LOGGER.log(Level.FINEST, "RESPONSE BODY :")
+        LOGGER.log(Level.FINEST, responseBody)
         GPathResult results = new XmlSlurper().parseText(responseBody)
 
         String output = ''
@@ -276,11 +279,14 @@ class WinRMTool {
             it.@CommandId == commandId && it.@State == 'http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Done'
         }) {
             Long exitStatus = results?.'*:Body'?.'*:ReceiveResponse'?.'*:CommandState'?.'*:ExitCode'?.text()?.toLong()
-            LOGGER.log(Level.FINEST, "########## exitStatus : " + exitStatus)
-            LOGGER.log(Level.FINEST, "########## commandOutput : " + output)
-            LOGGER.log(Level.FINEST, "########## errOutput : " + error)
+            LOGGER.log(Level.FINEST, "########## exitStatus : $exitStatus")
+            LOGGER.log(Level.FINEST, "########## commandOutput : $output")
+            LOGGER.log(Level.FINEST, "########## errOutput : $error")
             return new CommandOutput(exitStatus, output, error)
         } else {
+            LOGGER.log(Level.FINEST, "########## exitStatus : -1")
+            LOGGER.log(Level.FINEST, "########## commandOutput : $output")
+            LOGGER.log(Level.FINEST, "########## errOutput : $error")
             return new CommandOutput(-1, output, error)
         }
     }
@@ -300,7 +306,7 @@ class WinRMTool {
         HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new CleanupCommandRequest(url, shellId, commandId, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
-        HttpResponse response = performRequest(httpPost, context, "CleanupCommand with id " + commandId)
+        HttpResponse response = performRequest(httpPost, context, "CleanupCommand with id $commandId")
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
         if(!SUCCESS_STATUS.contains(responseCode)) {
@@ -311,7 +317,8 @@ class WinRMTool {
             responseCode,
             status.getReasonPhrase()))
         }
-        LOGGER.log(Level.FINEST, "RESPONSE BODY :" + response.getEntity().getContent().text)
+        LOGGER.log(Level.FINEST, "RESPONSE BODY :")
+        LOGGER.log(Level.FINEST, response.getEntity().getContent().text)
     }
 
     /**
@@ -327,7 +334,7 @@ class WinRMTool {
         HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new DeleteShellRequest(url, shellId, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
-        HttpResponse response = performRequest(httpPost, context, "DeleteShellRequest with id " + shellId)
+        HttpResponse response = performRequest(httpPost, context, "DeleteShellRequest with id $shellId")
         StatusLine status = response.getStatusLine()
         int responseCode = status.getStatusCode()
         if(!SUCCESS_STATUS.contains(responseCode)) {
@@ -338,7 +345,8 @@ class WinRMTool {
             responseCode,
             status.getReasonPhrase()))
         }
-        LOGGER.log(Level.FINEST, "RESPONSE BODY :" + response.getEntity().getContent().text)
+        LOGGER.log(Level.FINEST, "RESPONSE BODY :")
+        LOGGER.log(Level.FINEST, response.getEntity().getContent().text)
     }
 
     /**
@@ -355,7 +363,7 @@ class WinRMTool {
         try {
             response = httpClient.execute(httpPost, context)
         } catch(Exception e) {
-            throw new WinRMException("Cannot perform request " + requestDescription + " due to unexpected exception : " + e.getLocalizedMessage(), e)
+            throw new WinRMException("Cannot perform request $requestDescription due to unexpected exception : $e.localizedMessage", e)
         }
         return response
     }
@@ -393,7 +401,8 @@ class WinRMTool {
         try {
             // Build request entity
             String requestString = request.toString()
-            LOGGER.log(Level.FINEST, "REQUEST BODY :" + requestString)
+            LOGGER.log(Level.FINEST, "REQUEST BODY :")
+            LOGGER.log(Level.FINEST, requestString)
             StringEntity entity = new StringEntity(requestString)
             Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, SOAP_REQUEST_CONTENT_TYPE)
             entity.setContentType(contentTypeHeader)
@@ -404,7 +413,7 @@ class WinRMTool {
                     .setSocketTimeout(readTimeout.intValue()*1000)
             httpPost.setConfig(configBuilder.build())
         }catch (Exception e) {
-            throw new WinRMException("Cannot build HttpPost request due to unexpected exception : " + e.getLocalizedMessage(), e)
+            throw new WinRMException("Cannot build HttpPost request due to unexpected exception : $e.localizedMessage", e)
         }
         return httpPost
     }
@@ -429,7 +438,7 @@ class WinRMTool {
             sslContext = SSLContext.getInstance(TLS)
             sslContext.init(null, [nullTrustManager as X509TrustManager] as TrustManager[], new SecureRandom())
         }catch(Exception e) {
-            throw new WinRMException("Cannot init SSLContext due to unexpected exception : " + e.getLocalizedMessage(), e)
+            throw new WinRMException("Cannot init SSLContext due to unexpected exception : $e.localizedMessage", e)
         }
         return sslContext
     }
@@ -484,7 +493,7 @@ class WinRMTool {
                 new NTCredentials(username, password, workstation, domain))
                 break
             default:
-                throw new WinRMException("No such authentication scheme " + authSheme)
+                throw new WinRMException("No such authentication scheme $authSheme")
         }
         localContext.setAttribute(HttpClientContext.CREDS_PROVIDER, credsProvider)
         return localContext
@@ -499,7 +508,7 @@ class WinRMTool {
     private String compilePs(String psScript) {
         byte[] cmd = psScript.getBytes(Charset.forName("UTF-16LE"))
         String arg = cmd.encodeBase64().toString()
-        return "powershell -encodedcommand " + arg
+        return "powershell -encodedcommand $arg"
     }
 
     /**

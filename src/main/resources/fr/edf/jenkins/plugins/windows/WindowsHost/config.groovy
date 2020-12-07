@@ -54,9 +54,14 @@ f.advanced(title:Messages.Host_Details()) {
     f.entry(title: Messages.Host_ReadTimeout(), field: 'readTimeout'){
         f.number(clazz: 'required', default: 60, min: 30)
     }
+    f.advanced('Advanced settings') {
+        f.entry(title: Messages.Host_AgentConnectionTimeout(), field: 'agentConnectionTimeout'){
+            f.number(clazz: 'required', default: 60, min: 15)
+        }
 
-    f.entry(title: Messages.Host_AgentConnectionTimeout(), field: 'agentConnectionTimeout'){
-        f.number(clazz: 'required', default: 15, min: 15)
+        f.entry(title: Messages.Host_CommandTimeout(), field: 'commandTimeout'){
+            f.number(clazz: 'required', default: 20, min: 10)
+        }
     }
 
     f.block() {

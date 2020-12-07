@@ -47,6 +47,7 @@ class WindowsHost implements Describable<WindowsHost> {
     Integer connectionTimeout
     Integer readTimeout
     Integer agentConnectionTimeout
+    Integer commandTimeout
     Integer maxTries
     String label
     Boolean useHttps = Boolean.FALSE
@@ -56,8 +57,8 @@ class WindowsHost implements Describable<WindowsHost> {
 
     @DataBoundConstructor
     WindowsHost(String host, String credentialsId, Integer port, String authenticationScheme, Integer maxUsers, Boolean disable,
-    Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer maxTries, String label, Boolean useHttps,
-    Boolean disableCertificateCheck, List<WindowsEnvVar> envVars) {
+    Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer commandTimeout, Integer maxTries, String label,
+    Boolean useHttps, Boolean disableCertificateCheck, List<WindowsEnvVar> envVars) {
         this.host = host
         this.credentialsId = credentialsId
         this.port = port
@@ -72,6 +73,7 @@ class WindowsHost implements Describable<WindowsHost> {
         this.useHttps = useHttps
         this.disableCertificateCheck = disableCertificateCheck
         this.envVars = envVars
+        this.commandTimeout = commandTimeout
         labelSet = Label.parse(StringUtils.defaultIfEmpty(label, ""))
     }
 
@@ -154,6 +156,15 @@ class WindowsHost implements Describable<WindowsHost> {
     @DataBoundSetter
     void setAgentConnectionTimeout(Integer agentConnectionTimeout) {
         this.agentConnectionTimeout = agentConnectionTimeout
+    }
+
+    Integer getCommandTimeout() {
+        return commandTimeout
+    }
+
+    @DataBoundSetter
+    void setCommandTimeout(Integer commandTimeout) {
+        this.commandTimeout = commandTimeout
     }
 
     Integer getMaxTries() {

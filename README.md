@@ -18,12 +18,11 @@ This plugin builds Windows agents to perform builds.
 JNLP must be enabled on Jenkins.
 
 **Make sure you have WinRM configured on your server with NTLM or Basic authentication.**
-
 See [Microsoft documentation](https://docs.microsoft.com/en-us/windows/win32/winrm/installation-and-configuration-for-windows-remote-management)
 
 Java must be installed on the server and included in Path environment variable.
 
-This plugin has been tested on a WMWare virtual machine with Windows Server 2012 R2.
+This plugin has been tested on a VMware virtual machine with Windows Server 2012 R2.
 
 ### WinRM Authorization Configuration
 
@@ -131,7 +130,7 @@ After configure a job to run on this host, you should see Jenkins agents created
 <img src="https://zupimages.net/up/20/50/5cvf.png" width="300"/>
 
 ## Troubleshooting
-The plugin was tested on a WM ware virtual machine with 2 processors and 8GB Memory.
+The plugin was tested on a VMware virtual machine with 2 processors and 8GB Memory.
 The memory was wide, but the processor touched 100% many times.
 
 When it happens, the creation of the agents can be slow or sometimes, it cannot be created before the timeout. 

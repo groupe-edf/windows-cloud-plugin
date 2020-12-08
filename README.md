@@ -2,7 +2,7 @@
 
 This plugin builds Windows agents to perform builds.
 
-**Team : **
+**Team :**
 
 - [feirychris](https://github.com/feirychris)
 

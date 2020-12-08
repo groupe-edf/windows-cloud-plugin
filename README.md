@@ -1,5 +1,8 @@
 # Windows Plugin
 
+[![Build Status](https://travis-ci.org/groupe-edf/windows-cloud-plugin.svg?branch=master)](https://travis-ci.org/github/groupe-edf/windows-cloud-plugin)
+[![Coverage Status](https://coveralls.io/repos/github/groupe-edf/windows-cloud-plugin/badge.svg?branch=master)](https://coveralls.io/github/groupe-edf/windows-cloud-plugin?branch=master)
+
 This plugin builds Windows agents to perform builds.
 
 **Team :**

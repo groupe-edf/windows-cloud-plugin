@@ -2,17 +2,64 @@
 
 This plugin builds Windows agents to perform builds.
 
+**Team : **
+
+- [feirychris](https://github.com/feirychris)
+
+- [Aelotmani](https://github.com/Aelotmani)
+
+- [mat1e](https://github.com/mat1e)
+
+
 ## Requirements
-**JNLP must be enabled on Jenkins**
+JNLP must be enabled on Jenkins.
 
-
-**Make sure you have WinRM configured on your server**
+**Make sure you have WinRM configured on your server with NTLM or Basic authentication.**
 
 See [Microsoft documentation](https://docs.microsoft.com/en-us/windows/win32/winrm/installation-and-configuration-for-windows-remote-management)
 
+Java must be installed on the server and included in Path environment variable.
+
+This plugin has been tested on a WMWare virtual machine with Windows Server 2012 R2.
+
 ### WinRM Authorization Configuration
 
-In a PowerShell terminal on the server, verify PowerShell permissions :
+In a PowerShell terminal,
+
+Check Winrm configuration :
+
+```
+PS C:\Users\admsrv> winrm get winrm/config
+Config
+(...)
+    Service
+        RootSDDL = O:NSG:BAD:P(A;;GA;;;BA)(A;;GR;;;IU)(A;;GX;;;RM)S:P(AU;FA;GA;;;WD)(AU;SA;GXGW;;;WD)
+        MaxConcurrentOperations = 4294967295
+        MaxConcurrentOperationsPerUser = 1500
+        EnumerationTimeoutms = 240000
+        MaxConnections = 300
+        MaxPacketRetrievalTimeSeconds = 120
+        AllowUnencrypted = false
+        Auth
+            Basic = false // --> NTLM or Basic must be enabled
+            Kerberos = true
+            Negotiate = true // --> NTLM or Basic must be enabled
+            Certificate = false
+            CredSSP = true
+            CbtHardeningLevel = Relaxed
+        DefaultPorts
+            HTTP = 5985 // --> Port for http
+            HTTPS = 5986 // --> Port for https
+        IPv4Filter = *
+        IPv6Filter = *
+        EnableCompatibilityHttpListener = false
+        EnableCompatibilityHttpsListener = false
+        CertificateThumbprint
+        AllowRemoteAccess = true
+(...)
+```
+
+Verify PowerShell permissions :
 
 ```
 PS C:\Users\admsrv> (Get-PSSessionConfiguration -Name Microsoft.PowerShell).Permission
@@ -56,3 +103,41 @@ PS C:\Users\admsrv> Restart-Service winrm
 ```
 ## Plugin configuration
 
+In the "Configure Clouds" section of Jenkins Nodes Configuration.
+
+Add a new Windows cloud
+
+<img src="https://zupimages.net/up/20/50/bs3n.png" width="300"/>
+
+Give a unique name to the cloud. Then click on "Cloud Details..."
+
+In the Agent Properties section, fill the Jenkins URL. Then add a new Windows Host and click on "Host Details..."
+
+Fill the fields like in the given example :
+
+<img src="https://zupimages.net/up/20/50/u1ce.png" width="700"/>
+
+**The Credential is an username and password type and the account used must be in Administrator group on the server.**
+
+Click on "Test Connection" to test the configuration. If it works, you should see the name of the windows computer and the user used to connect.
+
+<img src="https://zupimages.net/up/20/50/buor.png" width="500"/>
+
+After configure a job to run on this host, you should see Jenkins agents created
+
+<img src="https://zupimages.net/up/20/50/5cvf.png" width="300"/>
+
+## Troubleshooting
+The plugin was tested on a WM ware virtual machine with 2 processors and 8GB Memory.
+The memory was wide, but the processor touched 100% many times.
+
+When it happens, the creation of the agents can be slow or sometimes, it cannot be created before the timeout. 
+
+In this case, it is better to reduce the number of users allowed on the Host in the cloud configuration. If you really want to keep the max users, you can upgrade "Agent connection timeout", "Command timeout" in advanced properties of the host. 
+
+
+## References
+This project contains code under Apache-2.0 License from :
+
+ - [cloudsoft/winrm4j](https://github.com/cloudsoft/winrm4j) for WinRM authentication
+ - [sshoogr/groovy-winrm-client](https://github.com/sshoogr/groovy-winrm-client) for WinRM requests

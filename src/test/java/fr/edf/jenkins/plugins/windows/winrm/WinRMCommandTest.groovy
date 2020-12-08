@@ -70,9 +70,9 @@ class WinRMCommandTest extends Specification{
 
         WinRMTool tool = Stub(WinRMTool) {
             openShell() >> shellId
-            executePSCommand(String.format(Constants.CREATE_USER, user.username, user.password.getPlainText(), user.username)) >> "createUserId"
-            executePSCommand(String.format(Constants.CHECK_USER_EXIST, user.username)) >> "checkUserExist"
-            executePSCommand(String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username)) >> "addUserToGroup"
+            executePSCommand(String.format(Constants.CREATE_USER, user.username, user.password.getPlainText(), user.username)) >> createUserId
+            executePSCommand(String.format(Constants.CHECK_USER_EXIST, user.username)) >> checkUserExist
+            executePSCommand(String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username)) >> addUserToGroup
             getCommandOutput(shellId, createUserId) >> new CommandOutput(0, "user created", null)
             getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, user.username, null)
             getCommandOutput(shellId, addUserToGroup) >> new CommandOutput(0, "user added", null)
@@ -90,26 +90,6 @@ class WinRMCommandTest extends Specification{
         assert result.username == user.username
     }
 
-
-    def "execute command throws no exception"() {
-        given:
-        WinRMConnectionConfiguration config = Mock(WinRMConnectionConfiguration)
-        WinRMCommandLauncher launcher = new WinRMCommandLauncher(config)
-        WinRMTool conn = Stub()
-        CommandOutput response = Stub()
-        String command = "whoami"
-        GroovySpy(WinRMCommandLauncher, global:true){
-            _ * launcher.executeCommand(_,_,_) >> response.getOutput()
-        }
-
-        when:
-        conn.executePSCommand(command)
-
-        then:
-        notThrown Exception
-    }
-
-
     def "createUser throws an exception when user does not exist"(){
 
         given:
@@ -123,9 +103,9 @@ class WinRMCommandTest extends Specification{
 
         WinRMTool tool = Stub(WinRMTool){
             openShell() >> shellId
-            executePSCommand(String.format(Constants.CREATE_USER, user.username, user.password, user.username)) >> "createUserId"
+            executePSCommand(String.format(Constants.CREATE_USER, user.username, user.password, user.username)) >> createUserId
             executePSCommand(String.format(Constants.CHECK_USER_EXIST, user.username)) >> checkUserExist
-            executePSCommand(String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username)) >> "addUserToGroup"
+            executePSCommand(String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username)) >> addUserToGroup
             getCommandOutput(shellId, createUserId) >> new CommandOutput(0, "user created", null)
             getCommandOutput(shellId, checkUserExist) >> new CommandOutput(0, "", null)
             getCommandOutput(shellId, addUserToGroup) >> new CommandOutput(0, "user added", null)

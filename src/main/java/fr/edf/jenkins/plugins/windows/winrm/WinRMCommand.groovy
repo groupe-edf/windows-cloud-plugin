@@ -33,7 +33,7 @@ class WinRMCommand {
     static String checkConnection(WinRMGlobalConnectionConfiguration config) {
         LOGGER.log(Level.FINE, "$config.host : check connection")
         WinRMCommandLauncher launcher = new WinRMCommandLauncher(config, 10)
-        return launcher.executeCommand(Constants.WHOAMI, false, false)
+        return launcher.executeCommand(Constants.WHOAMI, false, false, true)
     }
 
     /**

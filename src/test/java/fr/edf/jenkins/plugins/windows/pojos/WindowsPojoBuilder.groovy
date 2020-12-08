@@ -25,6 +25,7 @@ class WindowsPojoBuilder {
                 60,
                 60,
                 60,
+                60,
                 5,
                 "testLabel",
                 Boolean.FALSE,

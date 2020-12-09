@@ -145,7 +145,6 @@ class WinRMTool {
      * @throws {@link WinRMException}
      */
     String openShell() throws WinRMException {
-        HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new OpenShellRequest(url, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context, "OpenShellRequest")
@@ -199,7 +198,6 @@ class WinRMTool {
         if(StringUtils.isEmpty(shellId)) {
             throw new WinRMException("Call openShell() before execute command")
         }
-        HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new ExecuteCommandRequest(url, shellId, commandLine, args, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context, "ExecuteCommand $commandLine")
@@ -244,7 +242,6 @@ class WinRMTool {
         if(StringUtils.isEmpty(commandId)) {
             throw new WinRMException("No command was executed")
         }
-        HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new GetCommandOutputRequest(url, shellId, commandId, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context, "GetCommandOutput with id $commandId")
@@ -303,7 +300,6 @@ class WinRMTool {
         if(StringUtils.isEmpty(commandId)) {
             throw new WinRMException("No command was executed")
         }
-        HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new CleanupCommandRequest(url, shellId, commandId, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context, "CleanupCommand with id $commandId")
@@ -331,7 +327,6 @@ class WinRMTool {
         if(StringUtils.isEmpty(shellId)) {
             throw new WinRMException("There is no shell Id")
         }
-        HttpClient httpClient = getHttpClient()
         HttpPost httpPost = buildHttpPostRequest(new DeleteShellRequest(url, shellId, DEFAULT_OPERATION_TIMEOUT))
         HttpContext context = buildHttpContext()
         HttpResponse response = performRequest(httpPost, context, "DeleteShellRequest with id $shellId")
@@ -361,7 +356,7 @@ class WinRMTool {
     protected HttpResponse performRequest(HttpPost httpPost, HttpContext context, String requestDescription) throws WinRMException {
         HttpResponse response = null
         try {
-            response = httpClient.execute(httpPost, context)
+            response = getHttpClient().execute(httpPost, context)
         } catch(Exception e) {
             throw new WinRMException("Cannot perform request $requestDescription due to unexpected exception : $e.localizedMessage", e)
         }

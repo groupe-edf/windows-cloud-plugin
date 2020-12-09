@@ -243,7 +243,7 @@ class WindowsHost implements Describable<WindowsHost> {
          * @return authentication scheme
          */
         @POST
-        ListBoxModel doFillAuthenticationSchemeItems(@QueryParameter String authenticationScheme) {
+        ListBoxModel doFillAuthenticationSchemeItems() {
             ListBoxModel result = new ListBoxModel()
             [AuthSchemes.NTLM, AuthSchemes.BASIC].each {
                 result.add(it,it)
@@ -300,7 +300,7 @@ class WindowsHost implements Describable<WindowsHost> {
 
                 Jenkins.get().checkPermission(Jenkins.ADMINISTER)
                 String result = WinRMCommand.checkConnection(new WinRMGlobalConnectionConfiguration(
-                        credentialsId: credentialsId, context: item, host: host, port: port, authenticationScheme: AuthSchemes.NTLM,
+                        credentialsId: credentialsId, context: item, host: host, port: port, authenticationScheme: authenticationScheme,
                         useHttps: useHttps, disableCertificateCheck: disableCertificateCheck,
                         connectionTimeout: connectionTimeout, readTimeout: readTimeout))
                 return FormValidation.ok("Connection success : " + (result).toString())

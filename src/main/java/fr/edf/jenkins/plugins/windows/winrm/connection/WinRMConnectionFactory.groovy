@@ -107,7 +107,7 @@ class WinRMConnectionFactory {
                     port.intValue(),
                     usernamePasswordCredentials.getUsername(),
                     usernamePasswordCredentials.getPassword().getPlainText(),
-                    AuthSchemes.NTLM,
+                    authenticationScheme,
                     useHttps.booleanValue(),
                     disableCertificateCheck.booleanValue(),
                     connectionTimeout,

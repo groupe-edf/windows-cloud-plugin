@@ -5,6 +5,8 @@
 
 This plugin builds Windows agents to perform builds.
 
+It has been tested on VMware virtual machines with Windows Server 2012 R2 and Windows Server 2016.
+
 **Team :**
 
 - [feirychris](https://github.com/feirychris)
@@ -21,8 +23,6 @@ JNLP must be enabled on Jenkins.
 See [Microsoft documentation](https://docs.microsoft.com/en-us/windows/win32/winrm/installation-and-configuration-for-windows-remote-management)
 
 Java must be installed on the server and included in Path environment variable.
-
-This plugin has been tested on a VMware virtual machine with Windows Server 2012 R2.
 
 ### WinRM Authorization Configuration
 

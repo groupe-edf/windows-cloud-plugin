@@ -29,6 +29,14 @@
     <name>EDF</name>
   </organization>
 
+  <licenses>
+    <license>
+      <name>Apache-2.0 License</name>
+      <url>https://opensource.org/licenses/Apache-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
   <developers>
     <developer>
       <id>feirychris</id>
@@ -72,7 +80,6 @@
     </dependencies>
 
   </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -177,5 +184,3 @@
     </pluginManagement>
   </build>
 </project>
-
-

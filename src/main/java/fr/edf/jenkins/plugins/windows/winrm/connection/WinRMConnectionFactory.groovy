@@ -105,8 +105,8 @@ class WinRMConnectionFactory {
             WinRMTool winRmTool = new WinRMTool(
                     host,
                     port.intValue(),
-                    usernamePasswordCredentials.getUsername(),
-                    usernamePasswordCredentials.getPassword().getPlainText(),
+                    usernamePasswordCredentials.username,
+                    usernamePasswordCredentials.password,
                     authenticationScheme,
                     useHttps.booleanValue(),
                     disableCertificateCheck.booleanValue(),

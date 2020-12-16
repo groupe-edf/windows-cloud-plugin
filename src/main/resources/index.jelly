@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-    Allows to setup Windows machines as Jenkins Slaves.
+    Allows to setup Windows machines as Jenkins Agents.
 </div>

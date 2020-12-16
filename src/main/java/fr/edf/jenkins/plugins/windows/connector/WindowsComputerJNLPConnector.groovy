@@ -9,7 +9,7 @@ import org.kohsuke.stapler.DataBoundSetter
 
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
-import fr.edf.jenkins.plugins.windows.slave.WindowsComputer
+import fr.edf.jenkins.plugins.windows.agent.WindowsComputer
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
 import hudson.Extension
 import hudson.model.Descriptor

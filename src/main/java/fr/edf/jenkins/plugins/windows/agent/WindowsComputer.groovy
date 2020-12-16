@@ -1,4 +1,4 @@
-package fr.edf.jenkins.plugins.windows.slave
+package fr.edf.jenkins.plugins.windows.agent
 
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -14,11 +14,11 @@ import hudson.model.Queue
 import hudson.model.Queue.Task
 import hudson.slaves.AbstractCloudComputer
 
-class WindowsComputer extends AbstractCloudComputer<WindowsSlave>{
+class WindowsComputer extends AbstractCloudComputer<WindowsAgent>{
 
     private static final Logger LOGGER = Logger.getLogger(WindowsComputer.class.name)
 
-    WindowsComputer(WindowsSlave node){
+    WindowsComputer(WindowsAgent node){
         super(node)
     }
 
@@ -27,31 +27,31 @@ class WindowsComputer extends AbstractCloudComputer<WindowsSlave>{
      */
     @CheckForNull
     @Override
-    WindowsSlave getNode() {
-        return (WindowsSlave) super.getNode()
+    WindowsAgent getNode() {
+        return (WindowsAgent) super.getNode()
     }
 
     @CheckForNull
     WindowsCloud getCloud() {
-        final WindowsSlave node = getNode()
+        final WindowsAgent node = getNode()
         return node == null ?: node.getCloud()
     }
 
     @CheckForNull
     String getUserId() {
-        final WindowsSlave node = getNode()
+        final WindowsAgent node = getNode()
         return node == null ?: node.getUserId()
     }
 
     @CheckForNull
     String getCloudId() {
-        final WindowsSlave node = getNode()
+        final WindowsAgent node = getNode()
         return node == null ?: node.getCloudId()
     }
 
     @CheckForNull
     WindowsHost getWindowsHost() {
-        final WindowsSlave node = getNode()
+        final WindowsAgent node = getNode()
         return node == null ?: node.getHost()
     }
 

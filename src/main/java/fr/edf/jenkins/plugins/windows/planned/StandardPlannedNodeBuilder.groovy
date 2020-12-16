@@ -7,7 +7,7 @@ import java.util.logging.Logger
 import com.google.common.util.concurrent.Futures
 
 import fr.edf.jenkins.plugins.windows.WindowsUser
-import fr.edf.jenkins.plugins.windows.slave.WindowsSlave
+import fr.edf.jenkins.plugins.windows.agent.WindowsAgent
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommandException
 import hudson.model.Descriptor
@@ -34,7 +34,7 @@ class StandardPlannedNodeBuilder extends PlannedNodeBuilder{
         try {
             user = WinRMCommand.generateUser()
             ComputerLauncher launcher = cloud.connector.createLauncher(windowsHost, user)
-            WindowsSlave agent = new WindowsSlave(cloud.name, windowsHost.label, user, windowsHost, launcher, cloud.idleMinutes, nodeProperties)
+            WindowsAgent agent = new WindowsAgent(cloud.name, windowsHost.label, user, windowsHost, launcher, cloud.idleMinutes, nodeProperties)
             f = Futures.immediateFuture(agent)
         } catch (IOException | Descriptor.FormException | WinRMCommandException e) {
             LOGGER.log(Level.SEVERE, e.getMessage())

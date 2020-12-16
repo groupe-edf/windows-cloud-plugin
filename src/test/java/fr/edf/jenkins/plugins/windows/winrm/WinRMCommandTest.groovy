@@ -286,7 +286,7 @@ class WinRMCommandTest extends Specification{
         WindowsUser user = WinRMCommand.generateUser()
         WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
         String jnlpConnect = "jnlpConnect"
-        String slaveSecret = "secret"
+        String agentSecret = "secret"
 
         WinRMTool tool = Stub(WinRMTool){
             openShell() >> shellId
@@ -300,7 +300,7 @@ class WinRMCommandTest extends Specification{
         }
 
         when:
-        WinRMCommand.jnlpConnect(host, user, null, slaveSecret)
+        WinRMCommand.jnlpConnect(host, user, null, agentSecret)
 
         then:
         notThrown Exception
@@ -311,10 +311,10 @@ class WinRMCommandTest extends Specification{
         given:
         WindowsUser user = WinRMCommand.generateUser()
         WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
-        String slaveSecret = "secret"
+        String agentSecret = "secret"
 
         when:
-        WinRMCommand.jnlpConnect(host, user, null, slaveSecret)
+        WinRMCommand.jnlpConnect(host, user, null, agentSecret)
 
         then:
         WinRMCommandException e = thrown()

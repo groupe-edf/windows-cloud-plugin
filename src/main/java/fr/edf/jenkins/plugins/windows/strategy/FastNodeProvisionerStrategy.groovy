@@ -82,7 +82,7 @@ class FastNodeProvisionerStrategy extends Strategy{
     }
 
     /**
-     * Ping the nodeProvisioner as a new task enters the queue, so it can provision a DockerSlave without delay
+     * Ping the nodeProvisioner as a new task enters the queue, so it can provision a WindowsAgent without delay
      *
      */
     @Extension

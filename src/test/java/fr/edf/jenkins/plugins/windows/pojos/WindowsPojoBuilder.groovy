@@ -7,9 +7,9 @@ import fr.edf.jenkins.plugins.windows.WindowsCloud
 import fr.edf.jenkins.plugins.windows.WindowsEnvVar
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
+import fr.edf.jenkins.plugins.windows.agent.WindowsAgent
 import fr.edf.jenkins.plugins.windows.connector.WindowsComputerConnector
 import fr.edf.jenkins.plugins.windows.connector.WindowsComputerJNLPConnector
-import fr.edf.jenkins.plugins.windows.slave.WindowsSlave
 import fr.edf.jenkins.plugins.windows.winrm.client.WinRMTool
 import hudson.util.Secret
 
@@ -48,8 +48,8 @@ class WindowsPojoBuilder {
         return new WindowsComputerJNLPConnector(jenkinsRule.getURL().toString())
     }
 
-    static WindowsSlave buildSlave(String cloudId, WindowsUser user, WindowsHost host, WindowsComputerConnector connector) {
-        return new WindowsSlave(cloudId, "testLabel", user, host, connector.createLauncher(host, user), new Integer(1), Collections.EMPTY_LIST)
+    static WindowsAgent buildAgent(String cloudId, WindowsUser user, WindowsHost host, WindowsComputerConnector connector) {
+        return new WindowsAgent(cloudId, "testLabel", user, host, connector.createLauncher(host, user), new Integer(1), Collections.EMPTY_LIST)
     }
 
     static List<WindowsEnvVar> buildEnvVars(){
@@ -64,7 +64,7 @@ class WindowsPojoBuilder {
                 "127.0.0.1",
                 5986,
                 "username",
-                "password",
+                Secret.fromString("password"),
                 AuthSchemes.NTLM,
                 true,
                 true,

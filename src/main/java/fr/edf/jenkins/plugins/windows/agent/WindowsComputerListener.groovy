@@ -1,4 +1,4 @@
-package fr.edf.jenkins.plugins.windows.slave
+package fr.edf.jenkins.plugins.windows.agent
 
 import java.util.logging.Level
 import java.util.logging.Logger

@@ -1,4 +1,4 @@
-package fr.edf.jenkins.plugins.windows.slave
+package fr.edf.jenkins.plugins.windows.agent
 
 import hudson.ExtensionList
 import hudson.ExtensionPoint
@@ -20,23 +20,23 @@ abstract class WindowsComputerFactory implements ExtensionPoint{
 
     /**
      * Creates a new instance of {@link WindowsComputer}
-     * @param slave
+     * @param agent
      * @return
      */
-    abstract WindowsComputer newInstance(WindowsSlave slave)
+    abstract WindowsComputer newInstance(WindowsAgent agent)
 
     /**
      * Returns a new instance of {@link WindowsComputer}
-     * @param slave
+     * @param agent
      * @return a new instance of {@link WindowsComputer}
      */
-    static WindowsComputer createInstance(WindowsSlave slave) {
+    static WindowsComputer createInstance(WindowsAgent agent) {
         for (WindowsComputerFactory factory : all()) {
-            WindowsComputer computer = factory.newInstance(slave)
+            WindowsComputer computer = factory.newInstance(agent)
             if(computer != null) {
                 return computer
             }
         }
-        return new WindowsComputer(slave)
+        return new WindowsComputer(agent)
     }
 }

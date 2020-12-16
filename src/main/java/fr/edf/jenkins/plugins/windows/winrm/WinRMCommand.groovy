@@ -176,12 +176,12 @@ class WinRMCommand {
      * @param host
      * @param user
      * @param jenkinsUrl
-     * @param slaveSecret
+     * @param agentSecret
      * @return true if connection succeeds
      * @throws WinRMCommandException
      * @throws Exception
      */
-    static boolean jnlpConnect(WindowsHost host, WindowsUser user, String jenkinsUrl, String slaveSecret) throws WinRMCommandException, Exception{
+    static boolean jnlpConnect(WindowsHost host, WindowsUser user, String jenkinsUrl, String agentSecret) throws WinRMCommandException, Exception{
         jenkinsUrl = jenkinsUrl ?: Jenkins.get().getRootUrl()
         if(!jenkinsUrl.endsWith("/")) {
             jenkinsUrl += "/"
@@ -198,7 +198,7 @@ class WinRMCommand {
             LOGGER.log(Level.FINE, "$user.username : get remoting.jar")
             launcher.executeCommand(String.format(Constants.GET_REMOTING_JAR, remotingUrl), false, true, true)
             LOGGER.log(Level.FINE, "$user.username : launch jnlp")
-            launcher.executeCommand(String.format(Constants.LAUNCH_JNLP, jenkinsUrl, user.username, slaveSecret), true, true, false)
+            launcher.executeCommand(String.format(Constants.LAUNCH_JNLP, jenkinsUrl, user.username, agentSecret), true, true, false)
             return true
         }catch(Exception e) {
             if(launcher?.shellId) launcher.closeShell()

@@ -1,4 +1,4 @@
-package fr.edf.jenkins.plugins.windows.slave
+package fr.edf.jenkins.plugins.windows.agent
 
 import org.junit.Rule
 import org.jvnet.hudson.test.JenkinsRule
@@ -6,53 +6,54 @@ import org.jvnet.hudson.test.JenkinsRule
 import fr.edf.jenkins.plugins.windows.WindowsCloud
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
+import fr.edf.jenkins.plugins.windows.agent.WindowsAgent
 import fr.edf.jenkins.plugins.windows.connector.WindowsComputerConnector
 import fr.edf.jenkins.plugins.windows.pojos.WindowsPojoBuilder
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
 import spock.lang.Specification
 
-class WindowsSlaveTest extends Specification{
+class WindowsAgentTest extends Specification{
     @Rule
     JenkinsRule rule
 
-    def"should create slave"(){
+    def"should create agent"(){
 
         given:
         WindowsComputerConnector connector = WindowsPojoBuilder.buildConnector(rule)
         List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost()
         WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host, connector)
         WindowsUser user = WindowsPojoBuilder.buildUser()
-        WindowsSlave slave = WindowsPojoBuilder.buildSlave(cloud.name, user, host.get(0), connector)
+        WindowsAgent agent = WindowsPojoBuilder.buildAgent(cloud.name, user, host.get(0), connector)
 
         when:
         rule.jenkins.get().clouds.add(cloud)
-        rule.jenkins.get().addNode(slave)
+        rule.jenkins.get().addNode(agent)
 
         then:
         notThrown Exception
-        rule.jenkins.get().getNode(slave.name)==slave
+        rule.jenkins.get().getNode(agent.name)==agent
     }
 
-    def"should terminate and remove slave"(){
+    def"should terminate and remove agent"(){
         given:
         WindowsComputerConnector connector = WindowsPojoBuilder.buildConnector(rule)
         List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost()
         WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host, connector)
         WindowsUser user = WindowsPojoBuilder.buildUser()
-        WindowsSlave slave = WindowsPojoBuilder.buildSlave(cloud.name, user, host.get(0), connector)
+        WindowsAgent agent = WindowsPojoBuilder.buildAgent(cloud.name, user, host.get(0), connector)
 
         GroovyStub(WinRMCommand, global:true){
             WinRMCommand.deleteUser(host.get(0), user) >> "OK"
         }
         when:
         rule.jenkins.get().clouds.add(cloud)
-        rule.jenkins.get().addNode(slave)
-        assert rule.jenkins.get().getNode(slave.name)==slave
-        slave.terminate()
+        rule.jenkins.get().addNode(agent)
+        assert rule.jenkins.get().getNode(agent.name)==agent
+        agent.terminate()
 
         then:
         notThrown Exception
-        rule.jenkins.get().getNode(slave.name)==null
+        rule.jenkins.get().getNode(agent.name)==null
     }
 
     def"should return node name on windows cloud"(){
@@ -62,33 +63,33 @@ class WindowsSlaveTest extends Specification{
         List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost()
         WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host, connector)
         WindowsUser user = WindowsPojoBuilder.buildUser()
-        WindowsSlave slave = WindowsPojoBuilder.buildSlave(cloud.name, user, host.get(0), connector)
+        WindowsAgent agent = WindowsPojoBuilder.buildAgent(cloud.name, user, host.get(0), connector)
 
         when:
         rule.jenkins.get().clouds.add(cloud)
-        rule.jenkins.get().addNode(slave)
-        assert rule.jenkins.get().getNode(slave.name)==slave
-        String res = slave.getDisplayName()
+        rule.jenkins.get().addNode(agent)
+        assert rule.jenkins.get().getNode(agent.name)==agent
+        String res = agent.getDisplayName()
 
         then:
         notThrown Exception
-        res == slave.name + " on " + cloud.name
+        res == agent.name + " on " + cloud.name
     }
 
-    def"should return the windows cloud of the slave"(){
+    def"should return the windows cloud of the agent"(){
 
         given:
         WindowsComputerConnector connector = WindowsPojoBuilder.buildConnector(rule)
         List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost()
         WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host, connector)
         WindowsUser user = WindowsPojoBuilder.buildUser()
-        WindowsSlave slave = WindowsPojoBuilder.buildSlave(cloud.name, user, host.get(0), connector)
+        WindowsAgent agent = WindowsPojoBuilder.buildAgent(cloud.name, user, host.get(0), connector)
 
         when:
         rule.jenkins.get().clouds.add(cloud)
-        rule.jenkins.get().addNode(slave)
-        assert rule.jenkins.get().getNode(slave.name)==slave
-        WindowsCloud res = slave.getCloud()
+        rule.jenkins.get().addNode(agent)
+        assert rule.jenkins.get().getNode(agent.name)==agent
+        WindowsCloud res = agent.getCloud()
 
         then:
         notThrown Exception
@@ -102,12 +103,12 @@ class WindowsSlaveTest extends Specification{
         List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost()
         WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host, connector)
         WindowsUser user = WindowsPojoBuilder.buildUser()
-        WindowsSlave slave = WindowsPojoBuilder.buildSlave(cloud.name, user, host.get(0), connector)
+        WindowsAgent agent = WindowsPojoBuilder.buildAgent(cloud.name, user, host.get(0), connector)
 
         when:
-        rule.jenkins.get().addNode(slave)
-        assert rule.jenkins.get().getNode(slave.name)==slave
-        String res = slave.displayName
+        rule.jenkins.get().addNode(agent)
+        assert rule.jenkins.get().getNode(agent.name)==agent
+        String res = agent.displayName
 
         then:
         notThrown Exception

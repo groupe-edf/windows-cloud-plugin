@@ -64,6 +64,7 @@ import fr.edf.jenkins.plugins.windows.winrm.client.request.GetCommandOutputReque
 import fr.edf.jenkins.plugins.windows.winrm.client.request.OpenShellRequest
 import fr.edf.jenkins.plugins.windows.winrm.client.request.WinRMRequest
 import groovy.util.slurpersupport.GPathResult
+import hudson.util.Secret
 
 /**
  * Allow Jenkins to launch PowerShell commands on a windows remote machine
@@ -94,7 +95,7 @@ class WinRMTool {
     /** username to connect  with. */
     String username
     /** password associated to the user. */
-    String password
+    Secret password
     /** @see AuthSchemes. */
     String authSheme
     /** windows domain of the machine (**optional value for ntlm authentication**). */
@@ -126,7 +127,7 @@ class WinRMTool {
      * @param disableCertificateChecks : <code>true</code> if you want to ignore certificate check
      * @param timeout : delay before the command have to respond
      */
-    WinRMTool(String address, int port, String username, String password, String authSheme, boolean useHttps,
+    WinRMTool(String address, int port, String username, Secret password, String authSheme, boolean useHttps,
     boolean disableCertificateChecks, Integer connectionTimeout, Integer readTimeout) {
         this.url = buildUrl(useHttps?PROTOCOL_HTTPS:PROTOCOL_HTTP,address,port)
         this.username = username
@@ -481,11 +482,11 @@ class WinRMTool {
         switch(authSheme) {
             case AuthSchemes.BASIC:
                 credsProvider.setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(username, password))
+                new UsernamePasswordCredentials(username, password.plainText))
                 break
             case AuthSchemes.NTLM:
                 credsProvider.setCredentials(AuthScope.ANY,
-                new NTCredentials(username, password, workstation, domain))
+                new NTCredentials(username, password.plainText, workstation, domain))
                 break
             default:
                 throw new WinRMException("No such authentication scheme $authSheme")

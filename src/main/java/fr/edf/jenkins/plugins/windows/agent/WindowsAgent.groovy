@@ -1,4 +1,4 @@
-package fr.edf.jenkins.plugins.windows.slave
+package fr.edf.jenkins.plugins.windows.agent
 
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
@@ -28,14 +28,14 @@ import jenkins.model.Jenkins
  * @author CHRIS BAHONDA
  *
  */
-class WindowsSlave extends AbstractCloudSlave {
-    private static final Logger LOGGER = Logger.getLogger(WindowsSlave.class.name)
+class WindowsAgent extends AbstractCloudSlave {
+    private static final Logger LOGGER = Logger.getLogger(WindowsAgent.class.name)
 
     final String cloudId
     final WindowsHost host
     AtomicBoolean acceptingTasks = new AtomicBoolean(true)
 
-    WindowsSlave(String cloud, String label, WindowsUser user, WindowsHost host, ComputerLauncher launcher,
+    WindowsAgent(String cloud, String label, WindowsUser user, WindowsHost host, ComputerLauncher launcher,
     Integer idleMinutes, List <? extends NodeProperty<?>> nodeProperties){
         super(
         user.username,
@@ -52,7 +52,7 @@ class WindowsSlave extends AbstractCloudSlave {
     }
 
     /**
-     * Returns the retention strategy used for this slave
+     * Returns the retention strategy used for this agent
      * @param idleMinutes
      * @return
      */
@@ -114,7 +114,7 @@ class WindowsSlave extends AbstractCloudSlave {
     }
 
     /**
-     * Retrieves the cloud attached to the WindowsSlave
+     * Retrieves the cloud attached to the WindowsAgent
      * @return WindowsCloud
      */
     WindowsCloud getCloud() {
@@ -133,7 +133,7 @@ class WindowsSlave extends AbstractCloudSlave {
     }
 
     @Extension
-    static final class WindowsSlaveDescriptor extends SlaveDescriptor {
+    static final class WindowsAgentDescriptor extends SlaveDescriptor {
 
         /**
          * {@inheritDoc}

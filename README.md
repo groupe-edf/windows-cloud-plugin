@@ -1,6 +1,5 @@
 # Windows Plugin
-
-[![Build Status](https://travis-ci.org/groupe-edf/windows-cloud-plugin.svg?branch=master)](https://travis-ci.org/github/groupe-edf/windows-cloud-plugin)
+[![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins%2Fwindows-cloud-plugin%2Fmaster)](https://ci.jenkins.io/job/Plugins/job/windows-cloud-plugin/job/master/)
 [![Coverage Status](https://coveralls.io/repos/github/groupe-edf/windows-cloud-plugin/badge.svg?branch=master)](https://coveralls.io/github/groupe-edf/windows-cloud-plugin?branch=master)
 
 

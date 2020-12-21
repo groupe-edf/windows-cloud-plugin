@@ -10,7 +10,7 @@
 
   <groupId>fr.edf.jenkins.plugins</groupId>
   <artifactId>windows-cloud</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <url>https://github.com/jenkinsci/windows-cloud-plugin</url>
 
@@ -18,7 +18,7 @@
     <connection>scm:git:https://github.com/jenkinsci/windows-cloud-plugin.git</connection>
     <developerConnection>scm:git:https://github.com/jenkinsci/windows-cloud-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/windows-cloud-plugin</url>
-    <tag>windows-cloud-1.0.0</tag>
+    <tag>${scmTag}</tag>
   </scm>
 
   <properties>

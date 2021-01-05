@@ -1,6 +1,7 @@
 # Windows Plugin
 [![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins%2Fwindows-cloud-plugin%2Fmaster)](https://ci.jenkins.io/job/Plugins/job/windows-cloud-plugin/job/master/)
-[![Coverage Status](https://coveralls.io/repos/github/groupe-edf/windows-cloud-plugin/badge.svg?branch=master)](https://coveralls.io/github/groupe-edf/windows-cloud-plugin?branch=master) [![Join the chat at https://gitter.im/jenkinsci/windows-cloud-plugin](https://badges.gitter.im/jenkinsci/windows-cloud-plugin.svg)](https://gitter.im/jenkinsci/windows-cloud-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Coverage Status](https://coveralls.io/repos/github/groupe-edf/windows-cloud-plugin/badge.svg?branch=master)](https://coveralls.io/github/groupe-edf/windows-cloud-plugin?branch=master) 
+[![Join the chat at https://gitter.im/jenkinsci/windows-cloud-plugin](https://badges.gitter.im/jenkinsci/windows-cloud-plugin.svg)](https://gitter.im/jenkinsci/windows-cloud-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 This plugin builds Windows agents to perform builds.
@@ -143,3 +144,6 @@ This project contains code under Apache-2.0 License from :
 
  - [cloudsoft/winrm4j](https://github.com/cloudsoft/winrm4j) for WinRM authentication
  - [sshoogr/groovy-winrm-client](https://github.com/sshoogr/groovy-winrm-client) for WinRM requests
+ 
+## Contact
+Any question ? You can ask it on the [Gitter](https://gitter.im/jenkinsci/windows-cloud-plugin) room or open an issue.

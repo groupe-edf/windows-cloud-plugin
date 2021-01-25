@@ -132,6 +132,7 @@ After configure a job to run on this host, you should see Jenkins agents created
 <img src="https://zupimages.net/up/20/50/5cvf.png" width="300"/>
 
 ## Troubleshooting
+
 The plugin was tested on a VMware virtual machine with 2 processors and 8GB Memory.
 The memory was wide, but the processor touched 100% many times.
 
@@ -141,10 +142,12 @@ In this case, it is better to reduce the number of users allowed on the Host in 
 
 
 ## References
+
 This project contains code under Apache-2.0 License from :
 
  - [cloudsoft/winrm4j](https://github.com/cloudsoft/winrm4j) for WinRM authentication
  - [sshoogr/groovy-winrm-client](https://github.com/sshoogr/groovy-winrm-client) for WinRM requests
  
 ## Contact
+
 Any question ? You can ask it on the [Gitter](https://gitter.im/jenkinsci/windows-cloud-plugin) room or open an issue.

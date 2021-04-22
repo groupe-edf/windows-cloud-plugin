@@ -9,7 +9,7 @@ import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.agent.WindowsAgent
 import fr.edf.jenkins.plugins.windows.connector.WindowsComputerConnector
-import fr.edf.jenkins.plugins.windows.connector.WindowsComputerJNLPConnector
+import fr.edf.jenkins.plugins.windows.connector.WinRmJNLPConnector
 import fr.edf.jenkins.plugins.windows.winrm.client.WinRMTool
 import hudson.util.Secret
 
@@ -45,7 +45,7 @@ class WindowsPojoBuilder {
     }
 
     static WindowsComputerConnector buildConnector(JenkinsRule jenkinsRule) {
-        return new WindowsComputerJNLPConnector(jenkinsRule.getURL().toString())
+        return new WinRmJNLPConnector(jenkinsRule.getURL().toString())
     }
 
     static WindowsAgent buildAgent(String cloudId, WindowsUser user, WindowsHost host, WindowsComputerConnector connector) {

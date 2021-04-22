@@ -11,6 +11,7 @@ import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.agent.WindowsComputer
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
+import fr.edf.jenkins.plugins.windows.winrm.WinRMCommandException
 import hudson.Extension
 import hudson.model.Descriptor
 import hudson.model.TaskListener
@@ -18,12 +19,12 @@ import hudson.slaves.ComputerLauncher
 import hudson.slaves.JNLPLauncher
 import hudson.slaves.SlaveComputer
 
-class WindowsComputerJNLPConnector extends WindowsComputerConnector{
+class WinRmJNLPConnector extends WindowsComputerConnector {
 
     private String jenkinsUrl
 
     @DataBoundConstructor
-    WindowsComputerJNLPConnector(String jenkinsUrl) {
+    WinRmJNLPConnector(String jenkinsUrl) {
         this.jenkinsUrl = jenkinsUrl
     }
 
@@ -34,6 +35,22 @@ class WindowsComputerJNLPConnector extends WindowsComputerConnector{
 
     public String getJenkinsUrl() {
         return jenkinsUrl
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<String> listUsers(WindowsHost host) throws WinRMCommandException {
+        return WinRMCommand.listUsers(host);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception {
+        WinRMCommand.deleteUser(host, username);
     }
 
     @Extension @Symbol("jnlp")
@@ -50,16 +67,16 @@ class WindowsComputerJNLPConnector extends WindowsComputerConnector{
 
     @Override
     protected ComputerLauncher createLauncher(WindowsHost host, WindowsUser user) {
-        return new WindowsJNLPLauncher(host, user, jenkinsUrl)
+        return new WinRmJNLPLauncher(host, user, jenkinsUrl)
     }
 
-    private static class WindowsJNLPLauncher extends JNLPLauncher {
+    private static class WinRmJNLPLauncher extends JNLPLauncher {
         WindowsHost host
         WindowsUser user
         String jenkinsUrl
         boolean launched
 
-        WindowsJNLPLauncher(WindowsHost host, WindowsUser user, String jenkinsUrl) {
+        WinRmJNLPLauncher(WindowsHost host, WindowsUser user, String jenkinsUrl) {
             super(true)
             this.host = host
             this.user = user

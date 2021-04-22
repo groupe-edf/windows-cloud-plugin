@@ -18,6 +18,7 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
 
+import fr.edf.jenkins.plugins.windows.connector.WindowsComputerConnector
 import fr.edf.jenkins.plugins.windows.util.FormUtils
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
@@ -54,11 +55,12 @@ class WindowsHost implements Describable<WindowsHost> {
     Boolean disableCertificateCheck = Boolean.FALSE
     List<WindowsEnvVar> envVars = new ArrayList()
     transient Set<LabelAtom> labelSet
+    WindowsComputerConnector connector
 
     @DataBoundConstructor
     WindowsHost(String host, String credentialsId, Integer port, String authenticationScheme, Integer maxUsers, Boolean disable,
     Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer commandTimeout, Integer maxTries, String label,
-    Boolean useHttps, Boolean disableCertificateCheck, List<WindowsEnvVar> envVars) {
+    Boolean useHttps, Boolean disableCertificateCheck, List<WindowsEnvVar> envVars, WindowsComputerConnector connector) {
         this.host = host
         this.credentialsId = credentialsId
         this.port = port
@@ -74,6 +76,7 @@ class WindowsHost implements Describable<WindowsHost> {
         this.disableCertificateCheck = disableCertificateCheck
         this.envVars = envVars
         this.commandTimeout = commandTimeout
+        this.connector = connector;
         labelSet = Label.parse(StringUtils.defaultIfEmpty(label, ""))
     }
 
@@ -210,6 +213,15 @@ class WindowsHost implements Describable<WindowsHost> {
     @DataBoundSetter
     void setEnvVars(List<WindowsEnvVar> envVars) {
         this.envVars = envVars
+    }
+
+    public WindowsComputerConnector getConnector() {
+        return connector
+    }
+
+    @DataBoundSetter
+    public void setConnector(WindowsComputerConnector connector) {
+        this.connector = connector
     }
 
     @Override

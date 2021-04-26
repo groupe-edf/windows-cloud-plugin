@@ -1,26 +1,52 @@
 package fr.edf.jenkins.plugins.windows.connector
 
+
+import static com.cloudbees.plugins.credentials.CredentialsMatchers.anyOf
+import static com.cloudbees.plugins.credentials.CredentialsMatchers.instanceOf
+import static com.cloudbees.plugins.credentials.domains.URIRequirementBuilder.fromUri
+
 import java.time.Instant
 
 import org.apache.commons.lang.exception.ExceptionUtils
+import org.apache.http.client.config.AuthSchemes
 import org.jenkinsci.Symbol
+import org.kohsuke.stapler.AncestorInPath
 import org.kohsuke.stapler.DataBoundConstructor
 import org.kohsuke.stapler.DataBoundSetter
+import org.kohsuke.stapler.QueryParameter
+import org.kohsuke.stapler.verb.POST
+
+import com.cloudbees.plugins.credentials.CredentialsProvider
+import com.cloudbees.plugins.credentials.common.StandardCredentials
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
 
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.agent.WindowsComputer
+import fr.edf.jenkins.plugins.windows.util.FormUtils
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommandException
+import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
 import hudson.Extension
 import hudson.model.Descriptor
+import hudson.model.Item
 import hudson.model.TaskListener
+import hudson.security.ACL
 import hudson.slaves.ComputerLauncher
 import hudson.slaves.JNLPLauncher
 import hudson.slaves.SlaveComputer
+import hudson.util.FormValidation
+import hudson.util.ListBoxModel
+import jenkins.model.Jenkins
 
 class WinRmJNLPConnector extends WindowsComputerConnector {
 
+    String credentialsId
+    Integer port
+    String authenticationScheme
+    Boolean useHttps = Boolean.FALSE
+    Boolean disableCertificateCheck = Boolean.FALSE
     private String jenkinsUrl
 
     @DataBoundConstructor
@@ -53,7 +79,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
         WinRMCommand.deleteUser(host, username);
     }
 
-    @Extension @Symbol("jnlp")
+    @Extension @Symbol("winrm")
     static final class DescriptorImpl extends Descriptor<WindowsComputerConnector>{
 
         /**
@@ -61,7 +87,79 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
          */
         @Override
         String getDisplayName() {
-            return "Connect with JNLP"
+            return "Connect with WinRM and JNLP"
+        }
+
+        /**
+         * List the available authentication schemes for WinRm. However NTLM is the default one
+         * @param authenticationScheme
+         * @return authentication scheme
+         */
+        @POST
+        ListBoxModel doFillAuthenticationSchemeItems() {
+            ListBoxModel result = new ListBoxModel()
+            [AuthSchemes.NTLM, AuthSchemes.BASIC].each {
+                result.add(it,it)
+            }
+            return result
+        }
+
+        /**
+         * List the available credentials
+         * @param host
+         * @param credentialsId
+         * @param item
+         * @return CredentialsId
+         */
+        @POST
+        ListBoxModel doFillCredentialsIdItems(@QueryParameter String host, @QueryParameter String credentialsId,
+                @AncestorInPath Item item) {
+            StandardListBoxModel result = new StandardListBoxModel()
+            boolean notAdmin = item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)
+            boolean noCredentials = item != null && !item.hasPermission(Item.EXTENDED_READ) &&
+                    !item.hasPermission(CredentialsProvider.USE_ITEM)
+
+            if(notAdmin || noCredentials) {
+                return result.includeCurrentValue(credentialsId)
+            }
+            return result
+                    .includeEmptyValue()
+                    .includeMatchingAs(ACL.SYSTEM,
+                    item ?: Jenkins.get(),
+                    StandardCredentials.class,
+                    fromUri(FormUtils.getUri(host).toString()).build(),
+                    anyOf(instanceOf(StandardUsernamePasswordCredentials)))
+                    .includeCurrentValue(credentialsId)
+        }
+
+        /**
+         * Checks connection on Windows machine
+         * @param host
+         * @param port
+         * @param credentialsId
+         * @param authenticationScheme
+         * @param useHttps
+         * @param item
+         * @return connection success otherwise connection failed
+         */
+        @POST
+        FormValidation doVerifyConnection(@QueryParameter String host, @QueryParameter Integer port,
+                @QueryParameter String credentialsId, @QueryParameter String authenticationScheme,
+                @QueryParameter Boolean useHttps, @QueryParameter Boolean disableCertificateCheck,
+                @QueryParameter Integer connectionTimeout, @QueryParameter Integer readTimeout,
+                @AncestorInPath Item item) {
+
+            try {
+
+                Jenkins.get().checkPermission(Jenkins.ADMINISTER)
+                String result = WinRMCommand.checkConnection(new WinRMGlobalConnectionConfiguration(
+                        credentialsId: credentialsId, context: item, host: host, port: port, authenticationScheme: authenticationScheme,
+                        useHttps: useHttps, disableCertificateCheck: disableCertificateCheck,
+                        connectionTimeout: connectionTimeout, readTimeout: readTimeout))
+                return FormValidation.ok("Connection success : " + (result).toString())
+            } catch(Exception e) {
+                return FormValidation.error("Connection failed : " + (e.getMessage()).toString())
+            }
         }
     }
 

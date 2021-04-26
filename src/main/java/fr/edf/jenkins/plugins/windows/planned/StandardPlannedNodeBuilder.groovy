@@ -33,7 +33,7 @@ class StandardPlannedNodeBuilder extends PlannedNodeBuilder{
         WindowsUser user = null
         try {
             user = WinRMCommand.generateUser()
-            ComputerLauncher launcher = cloud.connector.createLauncher(windowsHost, user)
+            ComputerLauncher launcher = windowsHost.connector.createLauncher(windowsHost, user)
             WindowsAgent agent = new WindowsAgent(cloud.name, windowsHost.label, user, windowsHost, launcher, cloud.idleMinutes, nodeProperties)
             f = Futures.immediateFuture(agent)
         } catch (IOException | Descriptor.FormException | WinRMCommandException e) {

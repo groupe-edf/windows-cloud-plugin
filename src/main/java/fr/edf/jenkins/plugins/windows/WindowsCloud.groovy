@@ -27,14 +27,12 @@ class WindowsCloud extends Cloud {
     private static final Logger LOGGER = Logger.getLogger(WindowsCloud.class.name)
 
     List<WindowsHost> windowsHosts = new ArrayList()
-    WindowsComputerConnector connector
     Integer idleMinutes
 
     @DataBoundConstructor
-    WindowsCloud(String name, List<WindowsHost> windowsHosts, WindowsComputerConnector connector, Integer idleMinutes) {
+    WindowsCloud(String name, List<WindowsHost> windowsHosts, Integer idleMinutes) {
         super(name)
         this.windowsHosts = windowsHosts
-        this.connector = connector
         this.idleMinutes = idleMinutes
     }
 
@@ -120,7 +118,7 @@ class WindowsCloud extends Cloud {
             int nbTries = 0
             while(true) {
                 try {
-                    int existingUsers = WinRMCommand.listUsers(it).size()
+                    int existingUsers = it.connector.listUsers(it).size()
                     return existingUsers < it.maxUsers
                 } catch(WinRMCommandException e) {
                     nbTries ++

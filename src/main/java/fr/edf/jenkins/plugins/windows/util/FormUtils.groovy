@@ -15,6 +15,7 @@ class FormUtils {
      */
 
     static URI getUri(@NotNull String host) {
+        if(!host) return null
         if (!(host.startsWith("http://"))) {
             host = "http://" + host
         }

@@ -18,6 +18,14 @@ import hudson.slaves.SlaveComputer
 
 class MicroServiceJNLPConnector extends WindowsComputerConnector {
 
+    private String jenkinsUrl;
+    private Integer port;
+    private boolean useHttps;
+    private boolean ignoreCertificate;
+    private String credentialsId;
+    private Integer connectionTimeout;
+    private Integer readTimeout;
+
     @Override
     protected ComputerLauncher createLauncher(WindowsHost host, WindowsUser user) {
         return new MicroServiceJNLPLauncher(host, user, jenkinsUrl)
@@ -37,7 +45,7 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
     @Override
     protected void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception {
     }
-    
+
     @Extension @Symbol("microservice")
     static final class DescriptorImpl extends Descriptor<WindowsComputerConnector>{
 

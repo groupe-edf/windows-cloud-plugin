@@ -105,7 +105,7 @@ class WindowsAgent extends AbstractCloudSlave {
             listener.error(message)
         }
         try {
-            WinRMCommand.deleteUser(this.host, this.name)
+            host.connector.deleteUser(this.host, this.name)
         } catch (Exception e) {
             String message = String.format("Failed to remove user %s on Windows %s due to : %s", this.name, this.host.host, e.message)
             LOGGER.log(Level.SEVERE, message, e)

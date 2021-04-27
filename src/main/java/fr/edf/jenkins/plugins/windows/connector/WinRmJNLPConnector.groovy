@@ -42,25 +42,132 @@ import jenkins.model.Jenkins
 
 class WinRmJNLPConnector extends WindowsComputerConnector {
 
-    String credentialsId
-    Integer port
-    String authenticationScheme
     Boolean useHttps = Boolean.FALSE
     Boolean disableCertificateCheck = Boolean.FALSE
+    Integer port
+    String authenticationScheme
+    String credentialsId
+    Integer maxTries
+    Integer connectionTimeout
+    Integer readTimeout
+    Integer agentConnectionTimeout
+    Integer commandTimeout
     private String jenkinsUrl
 
     @DataBoundConstructor
-    WinRmJNLPConnector(String jenkinsUrl) {
+    WinRmJNLPConnector(Boolean useHttps, Boolean disableCertificateCheck, Integer port, String authenticationScheme,
+    String credentialsId, Integer maxTries, Integer connectionTimeout, Integer readTimeout,
+    Integer agentConnectionTimeout, Integer commandTimeout, String jenkinsUrl) {
         this.jenkinsUrl = jenkinsUrl
+        this.useHttps = useHttps
+        this.disableCertificateCheck = disableCertificateCheck
+        this.port = port
+        this.authenticationScheme = authenticationScheme
+        this.credentialsId = credentialsId
+        this.maxTries = maxTries
+        this.connectionTimeout = connectionTimeout
+        this.readTimeout = readTimeout
+        this.agentConnectionTimeout = agentConnectionTimeout
+        this.commandTimeout = commandTimeout
     }
 
     @DataBoundSetter
-    void setJenkinsUrl(String jenkinsUrl){
+    void setJenkinsUrl(String jenkinsUrl) {
         this.jenkinsUrl = jenkinsUrl
     }
 
     public String getJenkinsUrl() {
         return jenkinsUrl
+    }
+
+    public Boolean getUseHttps() {
+        return useHttps
+    }
+
+    @DataBoundSetter
+    void setUseHttps(Boolean useHttps) {
+        this.useHttps = useHttps
+    }
+
+    public Boolean getDisableCertificateCheck() {
+        return disableCertificateCheck
+    }
+
+    @DataBoundSetter
+    void setDisableCertificateCheck(Boolean disableCertificateCheck) {
+        this.disableCertificateCheck = disableCertificateCheck
+    }
+
+    public Integer getPort() {
+        return port
+    }
+
+    @DataBoundSetter
+    void setPort(Integer port) {
+        this.port = port
+    }
+
+    public String getAuthenticationScheme() {
+        return authenticationScheme
+    }
+
+    @DataBoundSetter
+    void setAuthenticationScheme(String authenticationScheme) {
+        this.authenticationScheme = authenticationScheme
+    }
+
+    public String getCredentialsId() {
+        return credentialsId
+    }
+
+    @DataBoundSetter
+    void setCredentialsId(String credentialsId) {
+        this.credentialsId = credentialsId
+    }
+
+    public Integer getMaxTries() {
+        return maxTries
+    }
+
+    @DataBoundSetter
+    void setMaxTries(Integer maxTries) {
+        this.maxTries = maxTries
+    }
+
+    public Integer getConnectionTimeout() {
+        return connectionTimeout
+    }
+
+    @DataBoundSetter
+    void setConnectionTimeout(Integer connectionTimeout) {
+        this.connectionTimeout = connectionTimeout
+    }
+
+    public Integer getReadTimeout() {
+        return readTimeout
+    }
+
+    @DataBoundSetter
+    void setReadTimeout(Integer readTimeout) {
+        this.readTimeout = readTimeout
+    }
+
+    public Integer getAgentConnectionTimeout() {
+        return agentConnectionTimeout
+    }
+
+    @DataBoundSetter
+    void setAgentConnectionTimeout(Integer agentConnectionTimeout) {
+        this.agentConnectionTimeout = agentConnectionTimeout;
+    }
+
+    public Integer getCommandTimeout() {
+        return commandTimeout
+    }
+
+    @DataBoundSetter
+    void setCommandTimeout(Integer commandTimeout) {
+        this.commandTimeout = commandTimeout
     }
 
     /**
@@ -79,15 +186,23 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
         WinRMCommand.deleteUser(host, username);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ComputerLauncher createLauncher(WindowsHost host, WindowsUser user) {
+        return new WinRmJNLPLauncher(host, user, jenkinsUrl)
+    }
+
     @Extension @Symbol("winrm")
-    static final class DescriptorImpl extends Descriptor<WindowsComputerConnector>{
+    static final class DescriptorImpl extends Descriptor<WindowsComputerConnector> {
 
         /**
          * {@inheritDoc}
          */
         @Override
         String getDisplayName() {
-            return "Connect with WinRM and JNLP"
+            return "WinRM and JNLP"
         }
 
         /**
@@ -163,11 +278,6 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
         }
     }
 
-    @Override
-    protected ComputerLauncher createLauncher(WindowsHost host, WindowsUser user) {
-        return new WinRmJNLPLauncher(host, user, jenkinsUrl)
-    }
-
     private static class WinRmJNLPLauncher extends JNLPLauncher {
         WindowsHost host
         WindowsUser user
@@ -218,7 +328,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
                 if (windowsComputer.isOnline()) {
                     break
                 }
-                if((Instant.now().toEpochMilli() - currentTimestamp) > host.agentConnectionTimeout.multiply(1000).intValue()) {
+                if((Instant.now().toEpochMilli() - currentTimestamp) > host.connector.agentConnectionTimeout.multiply(1000).intValue()) {
                     launched = false
                     String message = toString().format("Connection timeout for the computer %s", computer.name)
                     listener.error(message)

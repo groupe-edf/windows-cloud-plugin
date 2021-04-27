@@ -20,42 +20,20 @@ import jenkins.model.Jenkins
 class WindowsHost implements Describable<WindowsHost> {
 
     String host
-    String credentialsId
-    Integer port
-    String authenticationScheme
     Integer maxUsers
     Boolean disable = Boolean.FALSE
-    Integer connectionTimeout
-    Integer readTimeout
-    Integer agentConnectionTimeout
-    Integer commandTimeout
-    Integer maxTries
     String label
-    Boolean useHttps = Boolean.FALSE
-    Boolean disableCertificateCheck = Boolean.FALSE
     List<WindowsEnvVar> envVars = new ArrayList()
     transient Set<LabelAtom> labelSet
     WindowsComputerConnector connector
 
     @DataBoundConstructor
-    WindowsHost(String host, String credentialsId, Integer port, String authenticationScheme, Integer maxUsers, Boolean disable,
-    Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer commandTimeout, Integer maxTries, String label,
-    Boolean useHttps, Boolean disableCertificateCheck, List<WindowsEnvVar> envVars, WindowsComputerConnector connector) {
+    WindowsHost(String host, Boolean disable, String label, List<WindowsEnvVar> envVars, WindowsComputerConnector connector) {
         this.host = host
-        this.credentialsId = credentialsId
-        this.port = port
-        this.authenticationScheme = authenticationScheme
         this.maxUsers = maxUsers
         this.disable = disable
-        this.connectionTimeout = connectionTimeout
-        this.readTimeout = readTimeout
-        this.agentConnectionTimeout = agentConnectionTimeout
-        this.maxTries = maxTries
         this.label = label
-        this.useHttps = useHttps
-        this.disableCertificateCheck = disableCertificateCheck
         this.envVars = envVars
-        this.commandTimeout = commandTimeout
         this.connector = connector;
         labelSet = Label.parse(StringUtils.defaultIfEmpty(label, ""))
     }
@@ -69,32 +47,6 @@ class WindowsHost implements Describable<WindowsHost> {
         this.host = host
     }
 
-    String getCredentialsId() {
-        return credentialsId
-    }
-
-    @DataBoundSetter
-    void setCredentialsId(String credentialsId) {
-        this.credentialsId = credentialsId
-    }
-
-    Integer getPort() {
-        return port
-    }
-
-    @DataBoundSetter
-    void setPort(Integer port) {
-        this.port = port
-    }
-
-    String getAuthenticationScheme() {
-        return authenticationScheme
-    }
-
-    @DataBoundSetter
-    void setAuthenticationScheme(String authenticationScheme) {
-        this.authenticationScheme = authenticationScheme
-    }
 
     Integer getMaxUsers() {
         return maxUsers
@@ -114,51 +66,6 @@ class WindowsHost implements Describable<WindowsHost> {
         this.disable = disable
     }
 
-    Integer getConnectionTimeout() {
-        return connectionTimeout
-    }
-
-    @DataBoundSetter
-    void setConnectionTimeout(Integer connectionTimeout) {
-        this.connectionTimeout = connectionTimeout
-    }
-
-    Integer getReadTimeout() {
-        return readTimeout
-    }
-
-    @DataBoundSetter
-    void setReadTimeout(Integer readTimeout) {
-        this.readTimeout = readTimeout
-    }
-
-    Integer getAgentConnectionTimeout() {
-        return agentConnectionTimeout
-    }
-
-    @DataBoundSetter
-    void setAgentConnectionTimeout(Integer agentConnectionTimeout) {
-        this.agentConnectionTimeout = agentConnectionTimeout
-    }
-
-    Integer getCommandTimeout() {
-        return commandTimeout
-    }
-
-    @DataBoundSetter
-    void setCommandTimeout(Integer commandTimeout) {
-        this.commandTimeout = commandTimeout
-    }
-
-    Integer getMaxTries() {
-        return maxTries
-    }
-
-    @DataBoundSetter
-    void setMaxTries(Integer maxTries) {
-        this.maxTries = maxTries
-    }
-
     String getLabel() {
         return label
     }
@@ -166,24 +73,6 @@ class WindowsHost implements Describable<WindowsHost> {
     @DataBoundSetter
     void setLabel(String label) {
         this.label = label
-    }
-
-    Boolean isUseHttps() {
-        return useHttps
-    }
-
-    @DataBoundSetter
-    void setUseHttps(Boolean useHttps) {
-        this.useHttps = useHttps
-    }
-
-    Boolean isDisableCertificateCheck() {
-        return disableCertificateCheck
-    }
-
-    @DataBoundSetter
-    void setDisableCertificateCheck(Boolean disableCertificateCheck) {
-        this.disableCertificateCheck = disableCertificateCheck
     }
 
     List<WindowsEnvVar> getEnvVars() {

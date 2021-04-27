@@ -10,6 +10,7 @@ import org.kohsuke.accmod.restrictions.NoExternalUse
 
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
+import fr.edf.jenkins.plugins.windows.connector.WinRmJNLPConnector
 import fr.edf.jenkins.plugins.windows.util.Constants
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMUserConnectionConfiguration
@@ -84,13 +85,13 @@ class WinRMCommand {
      * @throws Exception
      */
     @Restricted(NoExternalUse)
-    static WindowsUser createUser(WindowsHost host, WindowsUser user) throws WinRMCommandException {
+    static WindowsUser createUser(String hostname, WinRmJNLPConnector winRmConnector, WindowsUser user) throws WinRMCommandException {
         WinRMCommandLauncher launcher = null
         try {
-            WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
-            context: Jenkins.get(), host: host.host, port: host.port, authenticationScheme: host.authenticationScheme,
-            useHttps: host.useHttps, disableCertificateCheck: host.disableCertificateCheck, connectionTimeout: host.connectionTimeout, readTimeout: host.readTimeout)
-            launcher = new WinRMCommandLauncher(config, host.commandTimeout)
+            WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: winRmConnector.credentialsId,
+            context: Jenkins.get(), host: hostname, port: winRmConnector.port, authenticationScheme: winRmConnector.authenticationScheme,
+            useHttps: winRmConnector.useHttps, disableCertificateCheck: winRmConnector.disableCertificateCheck, connectionTimeout: winRmConnector.connectionTimeout, readTimeout: winRmConnector.readTimeout)
+            launcher = new WinRMCommandLauncher(config, winRmConnector.commandTimeout)
 
             LOGGER.log(Level.FINE, "$user.username : create user")
             launcher.executeCommand(String.format(Constants.CREATE_USER, user.username, user.password.getPlainText(), user.username), false, true, true)
@@ -107,7 +108,7 @@ class WinRMCommand {
             return user
         } catch(Exception e) {
             if(launcher != null && launcher.shellId != null) launcher.closeShell()
-            final String message = String.format(WinRMCommandException.CREATE_WINDOWS_USER_ERROR, host.host)
+            final String message = String.format(WinRMCommandException.CREATE_WINDOWS_USER_ERROR, hostname)
             throw new WinRMCommandException(message, e)
         }
     }
@@ -119,13 +120,13 @@ class WinRMCommand {
      * @throws WinRMCommandException
      * @throws Exception
      */
-    static void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception{
+    static void deleteUser(String hostname, WinRmJNLPConnector winRmConnector, String username) throws WinRMCommandException, Exception{
         WinRMCommandLauncher launcher = null
         try {
-            WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
-            context: Jenkins.get(), host: host.host, port: host.port, authenticationScheme: host.authenticationScheme,
-            useHttps: host.useHttps, disableCertificateCheck: host.disableCertificateCheck, connectionTimeout: host.connectionTimeout, readTimeout: host.readTimeout)
-            launcher = new WinRMCommandLauncher(config, host.commandTimeout)
+            WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: winRmConnector.credentialsId,
+            context: Jenkins.get(), host: hostname, port: winRmConnector.port, authenticationScheme: winRmConnector.authenticationScheme,
+            useHttps: winRmConnector.useHttps, disableCertificateCheck: winRmConnector.disableCertificateCheck, connectionTimeout: winRmConnector.connectionTimeout, readTimeout: winRmConnector.readTimeout)
+            launcher = new WinRMCommandLauncher(config, winRmConnector.commandTimeout)
 
             LOGGER.log(Level.FINE, "$username : stop all process")
             launcher.executeCommand(String.format(Constants.STOP_USER_PROCESS, username), false, true, true)
@@ -143,7 +144,7 @@ class WinRMCommand {
             }
         }catch(Exception e) {
             if(launcher?.shellId) launcher.closeShell()
-            String message = String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host)
+            String message = String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, hostname)
             throw new WinRMCommandException(message, e)
         }
     }
@@ -154,19 +155,19 @@ class WinRMCommand {
      * @return a list of users
      * @throws WinRMCommandException
      */
-    static List<String> listUsers(WindowsHost host) throws WinRMCommandException{
+    static List<String> listUsers(String hostname, WinRmJNLPConnector winRmConnector) throws WinRMCommandException{
         try {
-            WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: host.credentialsId,
-            context: Jenkins.get(), host: host.host, port: host.port, authenticationScheme: host.authenticationScheme,
-            useHttps: host.useHttps, disableCertificateCheck: host.disableCertificateCheck, connectionTimeout: host.connectionTimeout, readTimeout: host.readTimeout)
-            WinRMCommandLauncher launcher = new WinRMCommandLauncher(config, host.commandTimeout)
+            WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: winRmConnector.credentialsId,
+            context: Jenkins.get(), host: hostname, port: winRmConnector.port, authenticationScheme: winRmConnector.authenticationScheme,
+            useHttps: winRmConnector.useHttps, disableCertificateCheck: winRmConnector.disableCertificateCheck, connectionTimeout: winRmConnector.connectionTimeout, readTimeout: winRmConnector.readTimeout)
+            WinRMCommandLauncher launcher = new WinRMCommandLauncher(config, winRmConnector.commandTimeout)
 
-            LOGGER.log(Level.FINE, "$host.host : list users")
+            LOGGER.log(Level.FINE, "$hostname : list users")
             String result = launcher.executeCommand(Constants.LIST_USERS, false, false, true)
             if(StringUtils.isEmpty(result)) return new ArrayList()
             return result.split(Constants.REGEX_NEW_LINE) as List
         }catch(Exception e) {
-            String message = String.format(WinRMCommandException.LIST_USERS_ERROR_MESSAGE, e.getMessage(), host.host)
+            String message = String.format(WinRMCommandException.LIST_USERS_ERROR_MESSAGE, e.getMessage(), hostname)
             throw new WinRMCommandException(message, e)
         }
     }
@@ -181,7 +182,7 @@ class WinRMCommand {
      * @throws WinRMCommandException
      * @throws Exception
      */
-    static boolean jnlpConnect(WindowsHost host, WindowsUser user, String jenkinsUrl, String agentSecret) throws WinRMCommandException, Exception{
+    static boolean jnlpConnect(String hostname, WinRmJNLPConnector winRmConnector, WindowsUser user, String jenkinsUrl, String agentSecret) throws WinRMCommandException, Exception{
         jenkinsUrl = jenkinsUrl ?: Jenkins.get().getRootUrl()
         if(!jenkinsUrl.endsWith("/")) {
             jenkinsUrl += "/"
@@ -192,9 +193,9 @@ class WinRMCommand {
         WinRMCommandLauncher launcher = null
         try {
             WinRMUserConnectionConfiguration config = new WinRMUserConnectionConfiguration(username: user.username, password: user.password,
-            host: host.host, port: host.port, authenticationScheme: host.authenticationScheme, useHttps: host.useHttps, disableCertificateCheck: host.disableCertificateCheck,
-            connectionTimeout: host.connectionTimeout, readTimeout: host.readTimeout)
-            launcher = new WinRMCommandLauncher(config, host.commandTimeout)
+            host: hostname, port: winRmConnector.port, authenticationScheme: winRmConnector.authenticationScheme, useHttps: winRmConnector.useHttps, disableCertificateCheck: winRmConnector.disableCertificateCheck,
+            connectionTimeout: winRmConnector.connectionTimeout, readTimeout: winRmConnector.readTimeout)
+            launcher = new WinRMCommandLauncher(config, winRmConnector.commandTimeout)
             LOGGER.log(Level.FINE, "$user.username : get remoting.jar")
             launcher.executeCommand(String.format(Constants.GET_REMOTING_JAR, remotingUrl), false, true, true)
             LOGGER.log(Level.FINE, "$user.username : launch jnlp")
@@ -202,7 +203,7 @@ class WinRMCommand {
             return true
         }catch(Exception e) {
             if(launcher?.shellId) launcher.closeShell()
-            final String message = String.format(WinRMCommandException.JNLP_CONNETION_ERROR, host.host, user.username)
+            final String message = String.format(WinRMCommandException.JNLP_CONNETION_ERROR, hostname, user.username)
             throw new WinRMCommandException(message, e)
         }
     }

@@ -6,6 +6,7 @@ import java.util.logging.Logger
 
 import com.google.common.util.concurrent.Futures
 
+import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.agent.WindowsAgent
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
@@ -32,7 +33,7 @@ class StandardPlannedNodeBuilder extends PlannedNodeBuilder{
         Future f
         WindowsUser user = null
         try {
-            user = WinRMCommand.generateUser()
+            user = WindowsHost.generateUser()
             ComputerLauncher launcher = windowsHost.connector.createLauncher(windowsHost, user)
             WindowsAgent agent = new WindowsAgent(cloud.name, windowsHost.label, user, windowsHost, launcher, cloud.idleMinutes, nodeProperties)
             f = Futures.immediateFuture(agent)
@@ -41,7 +42,7 @@ class StandardPlannedNodeBuilder extends PlannedNodeBuilder{
             LOGGER.log(Level.FINEST, "Exception : ", e)
             f = Futures.immediateFailedFuture(e)
             if (user != null ) {
-                WinRMCommand.deleteUser(windowsHost, user.username)
+                windowsHost.connector.deleteUser(windowsHost, user.username)
             }
         }
         return new NodeProvisioner.PlannedNode(windowsHost.host, f, numExecutors)

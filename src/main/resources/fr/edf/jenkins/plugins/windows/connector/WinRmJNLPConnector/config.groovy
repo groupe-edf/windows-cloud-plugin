@@ -24,6 +24,15 @@ f.entry(title:Messages.Host_Credentials(), field:'credentialsId'){
     c.select(context: app, , includeUser: false, expressionAllowed: false)
 }
 
+f.block() {
+    f.validateButton(
+            title: 'Test Connection',
+            progress: 'Testing...',
+            method: 'verifyConnection',
+            with: 'host,port,credentialsId,authenticationScheme,useHttps,disableCertificateCheck,connectionTimeout,readTimeout'
+            )
+}
+
 f.entry(title: Messages.Host_MaxTries(), field: 'maxTries') {
     f.number(clazz: 'required', min: 1, default: 5)
 }
@@ -35,6 +44,7 @@ f.entry(title: Messages.Host_ConnectionTimeout(), field: 'connectionTimeout'){
 f.entry(title: Messages.Host_ReadTimeout(), field: 'readTimeout'){
     f.number(clazz: 'required', default: 60, min: 30)
 }
+
 f.advanced('Advanced settings') {
     f.entry(title: Messages.Host_AgentConnectionTimeout(), field: 'agentConnectionTimeout'){
         f.number(clazz: 'required', default: 60, min: 15)

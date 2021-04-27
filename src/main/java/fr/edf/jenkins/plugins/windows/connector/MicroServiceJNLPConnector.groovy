@@ -54,7 +54,7 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
          */
         @Override
         String getDisplayName() {
-            return "Connect with Microservice and JNLP"
+            return "Microservice and JNLP"
         }
     }
 

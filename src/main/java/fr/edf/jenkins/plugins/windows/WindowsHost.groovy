@@ -1,16 +1,21 @@
 package fr.edf.jenkins.plugins.windows
 
 
+import org.apache.commons.lang.RandomStringUtils
 import org.apache.commons.lang.StringUtils
+import org.kohsuke.accmod.Restricted
+import org.kohsuke.accmod.restrictions.NoExternalUse
 import org.kohsuke.stapler.DataBoundConstructor
 import org.kohsuke.stapler.DataBoundSetter
 
 import fr.edf.jenkins.plugins.windows.connector.WindowsComputerConnector
+import fr.edf.jenkins.plugins.windows.util.Constants
 import hudson.Extension
 import hudson.model.Describable
 import hudson.model.Descriptor
 import hudson.model.Label
 import hudson.model.labels.LabelAtom
+import hudson.util.Secret
 import jenkins.model.Jenkins
 /**
  * WinRm conncetion configuration for a Windows host
@@ -101,6 +106,19 @@ class WindowsHost implements Describable<WindowsHost> {
 
     Set<LabelAtom> getLabelSet() {
         return Label.parse(StringUtils.defaultIfEmpty(this.label, ""))
+    }
+
+    /**
+     * Randomly generate Windows user
+     * @return a new Windows user
+     */
+    @Restricted(NoExternalUse)
+    static WindowsUser generateUser() {
+        String username = String.format(Constants.USERNAME_PATTERN, RandomStringUtils.random(10, true, true).toLowerCase())
+        String password = RandomStringUtils.random(15, true, true)
+        password += "!"
+        String workdir = String.format(Constants.WORKDIR_PATTERN, username)
+        return new WindowsUser(username: username, password: Secret.fromString(password), workdir: workdir)
     }
 
     /**

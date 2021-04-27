@@ -52,7 +52,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
     Integer readTimeout
     Integer agentConnectionTimeout
     Integer commandTimeout
-    private String jenkinsUrl
+    String jenkinsUrl
 
     @DataBoundConstructor
     WinRmJNLPConnector(Boolean useHttps, Boolean disableCertificateCheck, Integer port, String authenticationScheme,
@@ -191,7 +191,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
      */
     @Override
     protected ComputerLauncher createLauncher(WindowsHost host, WindowsUser user) {
-        return new WinRmJNLPLauncher(host, user, jenkinsUrl)
+        return new WinRmJNLPLauncher(host.host, user, jenkinsUrl, this)
     }
 
     @Extension @Symbol("winrm")
@@ -279,16 +279,18 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
     }
 
     private static class WinRmJNLPLauncher extends JNLPLauncher {
-        WindowsHost host
+        String hostname
         WindowsUser user
         String jenkinsUrl
+        WinRmJNLPConnector winrmConnector
         boolean launched
 
-        WinRmJNLPLauncher(WindowsHost host, WindowsUser user, String jenkinsUrl) {
+        WinRmJNLPLauncher(String hostname, WindowsUser user, String jenkinsUrl, WinRmJNLPConnector winrmConnector) {
             super(true)
-            this.host = host
+            this.hostname = hostname
             this.user = user
             this.jenkinsUrl = jenkinsUrl
+            this.winrmConnector = winrmConnector
         }
 
         /**
@@ -307,8 +309,8 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
             launched = true
             WindowsComputer windowsComputer = (WindowsComputer) computer
             try {
-                WinRMCommand.createUser(host, user)
-                WinRMCommand.jnlpConnect(host, user, jenkinsUrl, computer.getJnlpMac())
+                WinRMCommand.createUser(hostname, winrmConnector, user)
+                WinRMCommand.jnlpConnect(hostname, winrmConnector, user, jenkinsUrl, computer.getJnlpMac())
             }catch(Exception e) {
                 launched = false
                 String message = String.format("Error while connecting computer %s due to %s ",
@@ -328,7 +330,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
                 if (windowsComputer.isOnline()) {
                     break
                 }
-                if((Instant.now().toEpochMilli() - currentTimestamp) > host.connector.agentConnectionTimeout.multiply(1000).intValue()) {
+                if((Instant.now().toEpochMilli() - currentTimestamp) > winrmConnector.agentConnectionTimeout.multiply(1000).intValue()) {
                     launched = false
                     String message = toString().format("Connection timeout for the computer %s", computer.name)
                     listener.error(message)

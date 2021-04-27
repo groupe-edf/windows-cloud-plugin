@@ -24,15 +24,6 @@ f.advanced(title:Messages.Host_Details()) {
 
     f.dropdownDescriptorSelector(title:'Connect method', field:'connector')
 
-    f.block() {
-        f.validateButton(
-                title: 'Test Connection',
-                progress: 'Testing...',
-                method: 'verifyConnection',
-                with: 'host,port,credentialsId,authenticationScheme,useHttps,disableCertificateCheck,connectionTimeout,readTimeout'
-                )
-    }
-
     f.entry(title: _(Messages.EnvVar_Title())) {
         f.repeatableHeteroProperty(
                 field:'envVars',

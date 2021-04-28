@@ -42,70 +42,21 @@ import jenkins.model.Jenkins
 
 class WinRmJNLPConnector extends WindowsComputerConnector {
 
-    Boolean useHttps = Boolean.FALSE
-    Boolean disableCertificateCheck = Boolean.FALSE
-    Integer port
     String authenticationScheme
-    String credentialsId
     Integer maxTries
-    Integer connectionTimeout
-    Integer readTimeout
-    Integer agentConnectionTimeout
     Integer commandTimeout
-    String jenkinsUrl
 
     @DataBoundConstructor
     WinRmJNLPConnector(Boolean useHttps, Boolean disableCertificateCheck, Integer port, String authenticationScheme,
     String credentialsId, Integer maxTries, Integer connectionTimeout, Integer readTimeout,
     Integer agentConnectionTimeout, Integer commandTimeout, String jenkinsUrl) {
-        this.jenkinsUrl = jenkinsUrl
-        this.useHttps = useHttps
-        this.disableCertificateCheck = disableCertificateCheck
-        this.port = port
+        super(jenkinsUrl, port, useHttps, disableCertificateCheck, credentialsId, connectionTimeout, readTimeout, agentConnectionTimeout)
         this.authenticationScheme = authenticationScheme
-        this.credentialsId = credentialsId
         this.maxTries = maxTries
-        this.connectionTimeout = connectionTimeout
-        this.readTimeout = readTimeout
-        this.agentConnectionTimeout = agentConnectionTimeout
         this.commandTimeout = commandTimeout
     }
 
-    @DataBoundSetter
-    void setJenkinsUrl(String jenkinsUrl) {
-        this.jenkinsUrl = jenkinsUrl
-    }
 
-    public String getJenkinsUrl() {
-        return jenkinsUrl
-    }
-
-    public Boolean getUseHttps() {
-        return useHttps
-    }
-
-    @DataBoundSetter
-    void setUseHttps(Boolean useHttps) {
-        this.useHttps = useHttps
-    }
-
-    public Boolean getDisableCertificateCheck() {
-        return disableCertificateCheck
-    }
-
-    @DataBoundSetter
-    void setDisableCertificateCheck(Boolean disableCertificateCheck) {
-        this.disableCertificateCheck = disableCertificateCheck
-    }
-
-    public Integer getPort() {
-        return port
-    }
-
-    @DataBoundSetter
-    void setPort(Integer port) {
-        this.port = port
-    }
 
     public String getAuthenticationScheme() {
         return authenticationScheme
@@ -116,15 +67,6 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
         this.authenticationScheme = authenticationScheme
     }
 
-    public String getCredentialsId() {
-        return credentialsId
-    }
-
-    @DataBoundSetter
-    void setCredentialsId(String credentialsId) {
-        this.credentialsId = credentialsId
-    }
-
     public Integer getMaxTries() {
         return maxTries
     }
@@ -132,33 +74,6 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
     @DataBoundSetter
     void setMaxTries(Integer maxTries) {
         this.maxTries = maxTries
-    }
-
-    public Integer getConnectionTimeout() {
-        return connectionTimeout
-    }
-
-    @DataBoundSetter
-    void setConnectionTimeout(Integer connectionTimeout) {
-        this.connectionTimeout = connectionTimeout
-    }
-
-    public Integer getReadTimeout() {
-        return readTimeout
-    }
-
-    @DataBoundSetter
-    void setReadTimeout(Integer readTimeout) {
-        this.readTimeout = readTimeout
-    }
-
-    public Integer getAgentConnectionTimeout() {
-        return agentConnectionTimeout
-    }
-
-    @DataBoundSetter
-    void setAgentConnectionTimeout(Integer agentConnectionTimeout) {
-        this.agentConnectionTimeout = agentConnectionTimeout;
     }
 
     public Integer getCommandTimeout() {

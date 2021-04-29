@@ -11,13 +11,38 @@ import org.apache.http.client.HttpClient
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClientBuilder
 
+import fr.edf.jenkins.plugins.windows.winrm.client.WinRMException
+import hudson.util.Secret
+
 class MicroserviceHttpClient {
 
-    HttpClient client
-    boolean useHttps
-    boolean ignoreCertificate
+    /** http */
+    public static final String PROTOCOL_HTTP = "http"
+    /** https */
+    public static final String PROTOCOL_HTTPS = "https"
 
-    MicroserviceHttpClient(){
+    URL url
+
+    /** token to access to the microservice */
+    Secret token
+    /** "true" to ignore https certificate error. */
+    boolean disableCertificateChecks
+    /** "http" or "https", usage of static constants recommended. */
+    boolean useHttps
+    /** timeout of the connection in second */
+    Integer connectionTimeout = 15
+    /** timeout to receive response in second */
+    Integer readTimeout = 15
+
+    HttpClient client
+
+    MicroserviceHttpClient(String host, Integer port, String contextPath, Secret token, boolean disableCertificateChecks, boolean useHttps, Integer connectionTimeout, Integer readTimeout) {
+        this.url = buildUrl(useHttps?PROTOCOL_HTTPS:PROTOCOL_HTTP, host, port, contextPath)
+        this.token = token
+        this.disableCertificateChecks = disableCertificateChecks
+        this.useHttps = useHttps
+        this.connectionTimeout = connectionTimeout
+        this.readTimeout = readTimeout
     }
 
     /**
@@ -28,7 +53,7 @@ class MicroserviceHttpClient {
     private HttpClient getHttpClient() {
         HttpClientBuilder builder = new HttpClientBuilder()
         if(useHttps) {
-            if(ignoreCertificate) {
+            if(disableCertificateChecks) {
                 builder.setSSLContext(buildIgnoreCertificateErrorContext())
                 builder.setSSLHostnameVerifier(buildIgnoreHostnameVerifier())
             }
@@ -74,5 +99,18 @@ class MicroserviceHttpClient {
             throw new Exception("Cannot init SSLContext due to unexpected exception : $e.localizedMessage", e)
         }
         return sslContext
+    }
+
+    /**
+     * Creates {@link URL} object to connect to the microservice
+     *
+     * @param protocol http or https
+     * @param address remote host name or ip address
+     * @param port port to remote host connection
+     * @return created {@link URL} object
+     * @throws WinRMException if invalid WinRM URL
+     */
+    private URL buildUrl(String protocol, String address, int port, String contextPath) {
+        return new URL(protocol, address, port, contextPath)
     }
 }

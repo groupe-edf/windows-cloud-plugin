@@ -7,10 +7,20 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
+import org.apache.http.Header
+import org.apache.http.HttpEntity
 import org.apache.http.client.HttpClient
+import org.apache.http.client.methods.CloseableHttpResponse
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.message.BasicHeader
+import org.apache.http.protocol.HTTP
+import org.apache.http.util.EntityUtils
 
+import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.winrm.client.WinRMException
 import hudson.util.Secret
 
@@ -20,6 +30,15 @@ class MicroserviceHttpClient {
     public static final String PROTOCOL_HTTP = "http"
     /** https */
     public static final String PROTOCOL_HTTPS = "https"
+
+    /** application/json */
+    private static final String JSON_CONTENT_TYPE = "application/json"
+
+    /** array of success status of an HTTP response */
+    private static final List<Integer> SUCCESS_STATUS = [200, 201, 202, 204]
+
+    /** token */
+    private static final String TOKEN_HEADER = "token"
 
     URL url
 
@@ -112,5 +131,50 @@ class MicroserviceHttpClient {
      */
     private URL buildUrl(String protocol, String address, int port, String contextPath) {
         return new URL(protocol, address, port, contextPath)
+    }
+
+    public void whoami() {
+        HttpGet request = new HttpGet(url.toString().concat("/api/whoami"))
+        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        request.addHeader(contentTypeHeader)
+        request.addHeader(tokenHeader)
+
+        CloseableHttpResponse response = httpClient.execute(request);
+        println EntityUtils.toString(response.getEntity())
+    }
+
+    public void listUser() {
+        HttpGet request = new HttpGet(url.toString().concat("/api/users/list"))
+        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        request.addHeader(contentTypeHeader)
+        request.addHeader(tokenHeader)
+
+        CloseableHttpResponse response = httpClient.execute(request);
+        println EntityUtils.toString(response.getEntity())
+    }
+
+    public void createUser(WindowsUser user) {
+        HttpPost request = new HttpPost(url.toString().concat("/api/user/create"))
+        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        request.addHeader(contentTypeHeader)
+        request.addHeader(tokenHeader)
+        request.setEntity(new StringEntity("{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}"))
+
+        CloseableHttpResponse response = httpClient.execute(request);
+        println EntityUtils.toString(response.getEntity())
+    }
+
+    public void deleteUser(WindowsUser user) {
+        HttpPost request = new HttpPost(url.toString().concat("/api/user/delete?username=$user.username"))
+        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        request.addHeader(contentTypeHeader)
+        request.addHeader(tokenHeader)
+
+        CloseableHttpResponse response = httpClient.execute(request);
+        println EntityUtils.toString(response.getEntity())
     }
 }

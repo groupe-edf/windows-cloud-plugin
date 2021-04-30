@@ -23,6 +23,8 @@ import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.agent.WindowsComputer
 import fr.edf.jenkins.plugins.windows.http.MicroserviceHttpClient
+import fr.edf.jenkins.plugins.windows.http.connection.HttpConnectionConfiguration
+import fr.edf.jenkins.plugins.windows.http.connection.HttpConnectionFactory
 import fr.edf.jenkins.plugins.windows.util.FormUtils
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommandException
 import hudson.Extension
@@ -76,6 +78,13 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
      */
     @Override
     protected void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception {
+    }
+
+    private MicroserviceHttpClient getClient(WindowsHost host) {
+        if(this.client == null) {
+            this.client = HttpConnectionFactory.getHttpConnection(new HttpConnectionConfiguration(host, contextPath, credentialsId, port, connectionTimeout, readTimeout, useHttps, disableCertificateCheck))
+        }
+        return client
     }
 
     @Extension @Symbol("microservice")

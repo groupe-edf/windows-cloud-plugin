@@ -177,4 +177,28 @@ class MicroserviceHttpClient {
         CloseableHttpResponse response = httpClient.execute(request);
         println EntityUtils.toString(response.getEntity())
     }
+
+    public void getRemoting(WindowsUser user, String jenkinsUrl) {
+        HttpPost request = new HttpPost(url.toString().concat("/api/user/remoting?jenkinsUrl=$jenkinsUrl"))
+        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        request.addHeader(contentTypeHeader)
+        request.addHeader(tokenHeader)
+        request.setEntity(new StringEntity("{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}"))
+
+        CloseableHttpResponse response = httpClient.execute(request);
+        println EntityUtils.toString(response.getEntity())
+    }
+
+    public void connectJnlp(WindowsUser user, String jenkinsUrl, String secret) {
+        HttpPost request = new HttpPost(url.toString().concat("/api/user/jnlp"))
+        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        request.addHeader(contentTypeHeader)
+        request.addHeader(tokenHeader)
+        request.setEntity(new StringEntity("{\"jenkinsUrl\":\"$jenkinsUrl\",\"secret\":\"$secret\",user:{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}}"))
+
+        CloseableHttpResponse response = httpClient.execute(request);
+        println EntityUtils.toString(response.getEntity())
+    }
 }

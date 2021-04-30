@@ -17,7 +17,7 @@ import jenkins.model.Jenkins
 class HttpConnectionFactory {
 
     @Restricted(NoExternalUse)
-    private static MicroserviceHttpClient getHttpConnection(HttpConnectionConfiguration config = new WinRMGlobalConnectionConfiguration()) throws WinRMConnectionException {
+    public static MicroserviceHttpClient getHttpConnection(HttpConnectionConfiguration config = new WinRMGlobalConnectionConfiguration()) throws WinRMConnectionException {
         String host = config.host
         Integer port = config.port ?: Integer.valueOf(5985)
         Integer connectionTimeout = config.connectionTimeout ?: Integer.valueOf(15)

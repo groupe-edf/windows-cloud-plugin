@@ -1,15 +1,15 @@
-package fr.edf.jenkins.plugins.windows.http
+package fr.edf.jenkins.plugins.windows.http.connection
 
-class MicroserviceConnectionException {
+class HttpConnectionException {
 
-    MicroserviceConnectionException(String message, Throwable cause) {
+    HttpConnectionException(String message, Throwable cause) {
         super(message, cause)
     }
 
-    MicroserviceConnectionException(String message) {
+    HttpConnectionException(String message) {
         super(message)
     }
 
-    private MicroserviceConnectionException(Throwable cause) {}
-    private MicroserviceConnectionException() {}
+    private HttpConnectionException(Throwable cause) {}
+    private HttpConnectionException() {}
 }

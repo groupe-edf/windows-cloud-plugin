@@ -4,7 +4,7 @@ import org.apache.http.client.config.AuthSchemes
 def f = namespace(lib.FormTagLib)
 def c = namespace(lib.CredentialsTagLib)
 
-f.entry(title: 'Context path', field: 'contextpath') {
+f.entry(title: 'Context path', field: 'contextPath') {
     f.textbox(clazz: 'required', checkMethod: 'post')
 }
 
@@ -29,7 +29,7 @@ f.block() {
             title: 'Test Connection',
             progress: 'Testing...',
             method: 'verifyConnection',
-            with: 'host,port,credentialsId,authenticationScheme,useHttps,disableCertificateCheck,connectionTimeout,readTimeout'
+            with: 'host,port,credentialsId,useHttps,disableCertificateCheck,contextPath,connectionTimeout,readTimeout'
             )
 }
 

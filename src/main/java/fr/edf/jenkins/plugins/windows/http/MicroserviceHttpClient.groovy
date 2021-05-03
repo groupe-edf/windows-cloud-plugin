@@ -9,6 +9,7 @@ import javax.net.ssl.X509TrustManager
 
 import org.apache.http.Header
 import org.apache.http.HttpEntity
+import org.apache.http.HttpException
 import org.apache.http.client.HttpClient
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpGet
@@ -22,7 +23,9 @@ import org.apache.http.util.EntityUtils
 
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.winrm.client.WinRMException
+import groovy.json.JsonSlurper
 import hudson.util.Secret
+import net.sf.json.JSONObject
 
 class MicroserviceHttpClient {
 
@@ -53,7 +56,7 @@ class MicroserviceHttpClient {
     /** timeout to receive response in second */
     Integer readTimeout = 15
 
-    HttpClient client
+    JsonSlurper jsonSlurper = new JsonSlurper()
 
     MicroserviceHttpClient(String host, Integer port, String contextPath, Secret token, boolean disableCertificateChecks, boolean useHttps, Integer connectionTimeout, Integer readTimeout) {
         this.url = buildUrl(useHttps?PROTOCOL_HTTPS:PROTOCOL_HTTP, host, port, contextPath)
@@ -133,72 +136,84 @@ class MicroserviceHttpClient {
         return new URL(protocol, address, port, contextPath)
     }
 
-    public void whoami() {
+    public ExecutionResult whoami() {
         HttpGet request = new HttpGet(url.toString().concat("/api/whoami"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
         request.addHeader(contentTypeHeader)
         request.addHeader(tokenHeader)
 
-        CloseableHttpResponse response = httpClient.execute(request);
-        println EntityUtils.toString(response.getEntity())
+        CloseableHttpResponse response = httpClient.execute(request)
+        checkResponse(response)
+        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
     }
 
-    public void listUser() {
+    public ExecutionResult listUser() {
         HttpGet request = new HttpGet(url.toString().concat("/api/users/list"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
         request.addHeader(contentTypeHeader)
         request.addHeader(tokenHeader)
 
-        CloseableHttpResponse response = httpClient.execute(request);
-        println EntityUtils.toString(response.getEntity())
+        CloseableHttpResponse response = httpClient.execute(request)
+        checkResponse(response)
+        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
     }
 
-    public void createUser(WindowsUser user) {
+    public ExecutionResult createUser(WindowsUser user) {
         HttpPost request = new HttpPost(url.toString().concat("/api/user/create"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
         request.addHeader(contentTypeHeader)
         request.addHeader(tokenHeader)
         request.setEntity(new StringEntity("{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}"))
 
-        CloseableHttpResponse response = httpClient.execute(request);
-        println EntityUtils.toString(response.getEntity())
+        CloseableHttpResponse response = httpClient.execute(request)
+        checkResponse(response)
+        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
     }
 
-    public void deleteUser(WindowsUser user) {
-        HttpPost request = new HttpPost(url.toString().concat("/api/user/delete?username=$user.username"))
+    public ExecutionResult deleteUser(String username) {
+        HttpPost request = new HttpPost(url.toString().concat("/api/user/delete?username=$username"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
         request.addHeader(contentTypeHeader)
         request.addHeader(tokenHeader)
 
-        CloseableHttpResponse response = httpClient.execute(request);
-        println EntityUtils.toString(response.getEntity())
+        CloseableHttpResponse response = httpClient.execute(request)
+        checkResponse(response)
+        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
     }
 
-    public void getRemoting(WindowsUser user, String jenkinsUrl) {
+    public ExecutionResult getRemoting(WindowsUser user, String jenkinsUrl) {
         HttpPost request = new HttpPost(url.toString().concat("/api/user/remoting?jenkinsUrl=$jenkinsUrl"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
         request.addHeader(contentTypeHeader)
         request.addHeader(tokenHeader)
         request.setEntity(new StringEntity("{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}"))
 
-        CloseableHttpResponse response = httpClient.execute(request);
-        println EntityUtils.toString(response.getEntity())
+        CloseableHttpResponse response = httpClient.execute(request)
+        checkResponse(response)
+        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
     }
 
-    public void connectJnlp(WindowsUser user, String jenkinsUrl, String secret) {
+    public ExecutionResult connectJnlp(WindowsUser user, String jenkinsUrl, String secret) {
         HttpPost request = new HttpPost(url.toString().concat("/api/user/jnlp"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.plainText)
+        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
         request.addHeader(contentTypeHeader)
         request.addHeader(tokenHeader)
         request.setEntity(new StringEntity("{\"jenkinsUrl\":\"$jenkinsUrl\",\"secret\":\"$secret\",user:{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}}"))
 
-        CloseableHttpResponse response = httpClient.execute(request);
-        println EntityUtils.toString(response.getEntity())
+        CloseableHttpResponse response = httpClient.execute(request)
+        checkResponse(response)
+        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
+    }
+
+    private void checkResponse(CloseableHttpResponse response) throws HttpException {
+        if(!SUCCESS_STATUS.contains(response.statusLine.statusCode)) {
+            throw new HttpException(response.statusLine.statusCode + " : " + response.statusLine.reasonPhrase)
+        }
     }
 }

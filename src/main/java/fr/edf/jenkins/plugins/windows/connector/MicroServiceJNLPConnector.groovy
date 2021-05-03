@@ -22,9 +22,12 @@ import com.cloudbees.plugins.credentials.common.StandardListBoxModel
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.agent.WindowsComputer
+import fr.edf.jenkins.plugins.windows.http.ExecutionResult
+import fr.edf.jenkins.plugins.windows.http.MicroserviceCommandException
 import fr.edf.jenkins.plugins.windows.http.MicroserviceHttpClient
 import fr.edf.jenkins.plugins.windows.http.connection.HttpConnectionConfiguration
 import fr.edf.jenkins.plugins.windows.http.connection.HttpConnectionFactory
+import fr.edf.jenkins.plugins.windows.util.Constants
 import fr.edf.jenkins.plugins.windows.util.FormUtils
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommandException
 import hudson.Extension
@@ -35,6 +38,7 @@ import hudson.security.ACL
 import hudson.slaves.ComputerLauncher
 import hudson.slaves.JNLPLauncher
 import hudson.slaves.SlaveComputer
+import hudson.util.FormValidation
 import hudson.util.ListBoxModel
 import jenkins.model.Jenkins
 
@@ -46,7 +50,7 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
     @DataBoundConstructor
     MicroServiceJNLPConnector(Boolean useHttps, Boolean disableCertificateCheck, Integer port,
     String credentialsId, Integer connectionTimeout, Integer readTimeout,
-    Integer agentConnectionTimeout, String jenkinsUrl, contextPath) {
+    Integer agentConnectionTimeout, String jenkinsUrl, String contextPath) {
         super(jenkinsUrl, port, useHttps, disableCertificateCheck, credentialsId, connectionTimeout, readTimeout, agentConnectionTimeout)
         this.contextPath = contextPath
     }
@@ -69,8 +73,17 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
      * {@inheritDoc}
      */
     @Override
-    protected List<String> listUsers(WindowsHost host) throws WinRMCommandException {
-        return null;
+    protected List<String> listUsers(WindowsHost host) throws MicroserviceCommandException {
+        try {
+            ExecutionResult executionResult = getClient(host).listUser();
+            if(executionResult.code != 0) {
+                throw new MicroserviceCommandException("Command exit status : " + executionResult.code + "\n Error output : " + executionResult.error)
+            }
+            return executionResult.getOutput().split(Constants.REGEX_NEW_LINE) as List
+        } catch(Exception e) {
+            String message = String.format(WinRMCommandException.LIST_USERS_ERROR_MESSAGE, e.getMessage(), host.host)
+            throw new MicroserviceCommandException(message, e)
+        }
     }
 
     /**
@@ -78,11 +91,30 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
      */
     @Override
     protected void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception {
+        try {
+            ExecutionResult executionResult = getClient(host).deleteUser(username)
+            if(executionResult.code != 0) {
+                throw new MicroserviceCommandException("Command exit status : " + executionResult.code + "\n Error output : " + executionResult.error)
+            }
+        } catch(Exception e) {
+            String message = String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host)
+            throw new MicroserviceCommandException(message, e)
+        }
     }
 
     private MicroserviceHttpClient getClient(WindowsHost host) {
         if(this.client == null) {
-            this.client = HttpConnectionFactory.getHttpConnection(new HttpConnectionConfiguration(host, contextPath, credentialsId, port, connectionTimeout, readTimeout, useHttps, disableCertificateCheck))
+            this.client = HttpConnectionFactory.getHttpConnection(
+                    new HttpConnectionConfiguration(
+                    host,
+                    contextPath,
+                    credentialsId,
+                    port,
+                    connectionTimeout,
+                    readTimeout,
+                    useHttps,
+                    disableCertificateCheck,
+                    Jenkins.get()))
         }
         return client
     }
@@ -116,6 +148,43 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
                     fromUri(FormUtils.getUri(host).toString()).build(),
                     anyOf(instanceOf(StringCredentials)))
                     .includeCurrentValue(credentialsId)
+        }
+
+        /**
+         * Checks connection on Windows machine
+         * @param host
+         * @param port
+         * @param credentialsId
+         * @param useHttps
+         * @param disableCertificateCheck
+         * @param contextPath
+         * @param item
+         * @return connection success otherwise connection failed
+         */
+        @POST
+        FormValidation doVerifyConnection(@QueryParameter String host, @QueryParameter Integer port,
+                @QueryParameter String credentialsId, @QueryParameter Boolean useHttps,
+                @QueryParameter Boolean disableCertificateCheck, @QueryParameter String contextPath,
+                @QueryParameter Integer connectionTimeout, @QueryParameter Integer readTimeout,
+                @AncestorInPath Item item) {
+            try {
+                Jenkins.get().checkPermission(Jenkins.ADMINISTER)
+                ExecutionResult result = HttpConnectionFactory.getHttpConnection(
+                        new HttpConnectionConfiguration(
+                        host,
+                        contextPath,
+                        credentialsId,
+                        port,
+                        connectionTimeout,
+                        readTimeout,
+                        useHttps,
+                        disableCertificateCheck,
+                        item
+                        )).whoami()
+                return FormValidation.ok("Connection success : " + result.output)
+            } catch(Exception e) {
+                return FormValidation.error("Connection failed : " + (e.getMessage()).toString())
+            }
         }
 
         /**
@@ -157,6 +226,8 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
             launched = true
             WindowsComputer windowsComputer = (WindowsComputer) computer
             try {
+                microServiceJNLPConnector.getClient(host).getRemoting(user, jenkinsUrl)
+                microServiceJNLPConnector.getClient(host).connectJnlp(user, jenkinsUrl, computer.getJnlpMac())
             }catch(Exception e) {
                 launched = false
                 String message = String.format("Error while connecting computer %s due to %s ",

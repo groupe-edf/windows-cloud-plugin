@@ -13,7 +13,7 @@ class HttpConnectionConfiguration {
     final ModelObject context
     final String credentialsId
 
-    HttpConnectionConfiguration(String host, String contextPath, String credentialsId, Integer port, Integer connectionTimeout, Integer readTimeout, Boolean useHttps, Boolean disableCertificateCheck) {
+    HttpConnectionConfiguration(String host, String contextPath, String credentialsId, Integer port, Integer connectionTimeout, Integer readTimeout, Boolean useHttps, Boolean disableCertificateCheck, ModelObject context) {
         this.host = host
         this.contextPath = contextPath
         this.credentialsId = credentialsId
@@ -22,5 +22,6 @@ class HttpConnectionConfiguration {
         this.readTimeout = readTimeout
         this.useHttps = useHttps
         this.disableCertificateCheck = disableCertificateCheck
+        this.context = context
     }
 }

@@ -4,7 +4,6 @@ import org.kohsuke.stapler.DataBoundSetter
 
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
-import fr.edf.jenkins.plugins.windows.winrm.WinRMCommandException
 import hudson.model.AbstractDescribableImpl
 import hudson.slaves.ComputerLauncher
 

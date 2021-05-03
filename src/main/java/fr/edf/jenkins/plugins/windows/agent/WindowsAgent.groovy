@@ -12,7 +12,6 @@ import fr.edf.jenkins.plugins.windows.WindowsCloud
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.cause.WindowsOfflineCause
-import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
 import hudson.Extension
 import hudson.model.Computer
 import hudson.model.TaskListener

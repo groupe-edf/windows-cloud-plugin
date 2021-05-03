@@ -7,11 +7,9 @@ import org.antlr.v4.runtime.misc.Nullable
 import org.apache.commons.collections.CollectionUtils
 import org.kohsuke.stapler.DataBoundConstructor
 
-import fr.edf.jenkins.plugins.windows.connector.WindowsComputerConnector
+import fr.edf.jenkins.plugins.windows.connector.WindowsCommandException
 import fr.edf.jenkins.plugins.windows.planned.PlannedNodeBuilderFactory
 import fr.edf.jenkins.plugins.windows.provisioning.InProvisioning
-import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
-import fr.edf.jenkins.plugins.windows.winrm.WinRMCommandException
 import hudson.Extension
 import hudson.model.Descriptor
 import hudson.model.Label
@@ -120,7 +118,7 @@ class WindowsCloud extends Cloud {
                 try {
                     int existingUsers = it.connector.listUsers(it).size()
                     return existingUsers < it.maxUsers
-                } catch(WinRMCommandException e) {
+                } catch(WindowsCommandException e) {
                     nbTries ++
                     if(nbTries < it.maxTries) {
                         continue

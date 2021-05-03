@@ -120,12 +120,12 @@ abstract class WindowsComputerConnector extends AbstractDescribableImpl<WindowsC
      * @param host
      * @return list of usernames
      */
-    protected abstract List<String> listUsers(WindowsHost host) throws WinRMCommandException;
+    protected abstract List<String> listUsers(WindowsHost host) throws WindowsCommandException;
 
     /**
      * Remove the given user on the given WindowsHost
      * @param host
      * @param user
      */
-    protected abstract void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception;
+    protected abstract void deleteUser(WindowsHost host, String username) throws WindowsCommandException, Exception;
 }

@@ -33,6 +33,10 @@ f.block() {
             )
 }
 
+f.entry(title: Messages.Host_MaxTries(), field: 'maxTries') {
+    f.number(clazz: 'required', min: 1, default: 5)
+}
+
 f.entry(title: Messages.Host_ConnectionTimeout(), field: 'connectionTimeout'){
     f.number(clazz: 'required', default: 15, min: 5)
 }

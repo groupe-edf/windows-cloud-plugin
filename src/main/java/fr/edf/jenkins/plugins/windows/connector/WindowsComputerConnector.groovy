@@ -17,10 +17,11 @@ abstract class WindowsComputerConnector extends AbstractDescribableImpl<WindowsC
     Integer connectionTimeout
     Integer readTimeout
     Integer agentConnectionTimeout
+    Integer maxTries
 
 
     public WindowsComputerConnector(String jenkinsUrl, Integer port, Boolean useHttps, Boolean disableCertificateCheck,
-    String credentialsId, Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout) {
+    String credentialsId, Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer maxTries) {
         super()
         this.jenkinsUrl = jenkinsUrl
         this.port = port
@@ -102,6 +103,15 @@ abstract class WindowsComputerConnector extends AbstractDescribableImpl<WindowsC
     @DataBoundSetter
     void setAgentConnectionTimeout(Integer agentConnectionTimeout) {
         this.agentConnectionTimeout = agentConnectionTimeout;
+    }
+
+    public Integer getMaxTries() {
+        return maxTries
+    }
+
+    @DataBoundSetter
+    void setMaxTries(Integer maxTries) {
+        this.maxTries = maxTries
     }
 
     /**

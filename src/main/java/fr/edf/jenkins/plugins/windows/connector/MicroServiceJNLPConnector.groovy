@@ -50,8 +50,8 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
     @DataBoundConstructor
     MicroServiceJNLPConnector(Boolean useHttps, Boolean disableCertificateCheck, Integer port,
     String credentialsId, Integer connectionTimeout, Integer readTimeout,
-    Integer agentConnectionTimeout, String jenkinsUrl, String contextPath) {
-        super(jenkinsUrl, port, useHttps, disableCertificateCheck, credentialsId, connectionTimeout, readTimeout, agentConnectionTimeout)
+    Integer agentConnectionTimeout, String jenkinsUrl, String contextPath, Integer maxTries) {
+        super(jenkinsUrl, port, useHttps, disableCertificateCheck, credentialsId, connectionTimeout, readTimeout, agentConnectionTimeout, maxTries)
         this.contextPath = contextPath
     }
 
@@ -66,7 +66,7 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
 
     @Override
     protected ComputerLauncher createLauncher(WindowsHost host, WindowsUser user) {
-        return new MicroServiceJNLPLauncher(host, user, jenkinsUrl)
+        return new MicroServiceJNLPLauncher(host, user, getClient(host))
     }
 
     /**
@@ -106,15 +106,15 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
         if(this.client == null) {
             this.client = HttpConnectionFactory.getHttpConnection(
                     new HttpConnectionConfiguration(
-                    host,
-                    contextPath,
-                    credentialsId,
-                    port,
-                    connectionTimeout,
-                    readTimeout,
-                    useHttps,
-                    disableCertificateCheck,
-                    Jenkins.get()))
+                    host: host.host,
+                    contextPath: contextPath,
+                    credentialsId: credentialsId,
+                    port: port,
+                    connectionTimeout: connectionTimeout,
+                    readTimeout: readTimeout,
+                    useHttps: useHttps,
+                    disableCertificateCheck: disableCertificateCheck,
+                    context: Jenkins.get()))
         }
         return client
     }
@@ -171,15 +171,15 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
                 Jenkins.get().checkPermission(Jenkins.ADMINISTER)
                 ExecutionResult result = HttpConnectionFactory.getHttpConnection(
                         new HttpConnectionConfiguration(
-                        host,
-                        contextPath,
-                        credentialsId,
-                        port,
-                        connectionTimeout,
-                        readTimeout,
-                        useHttps,
-                        disableCertificateCheck,
-                        item
+                        host: host,
+                        contextPath: contextPath,
+                        credentialsId: credentialsId,
+                        port: port,
+                        connectionTimeout: connectionTimeout,
+                        readTimeout: readTimeout,
+                        useHttps: useHttps,
+                        disableCertificateCheck: disableCertificateCheck,
+                        context: item
                         )).whoami()
                 return FormValidation.ok("Connection success : " + result.output)
             } catch(Exception e) {
@@ -199,15 +199,14 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
     private static class MicroServiceJNLPLauncher extends JNLPLauncher {
         WindowsHost host
         WindowsUser user
-        String jenkinsUrl
-        MicroServiceJNLPConnector microServiceJNLPConnector
+        MicroserviceHttpClient client
         boolean launched
 
-        MicroServiceJNLPLauncher(WindowsHost host, WindowsUser user, String jenkinsUrl) {
+        MicroServiceJNLPLauncher(WindowsHost host, WindowsUser user, MicroserviceHttpClient client) {
             super(true)
             this.host = host
             this.user = user
-            this.jenkinsUrl = jenkinsUrl
+            this.client = client
         }
 
         /**
@@ -226,8 +225,9 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
             launched = true
             WindowsComputer windowsComputer = (WindowsComputer) computer
             try {
-                microServiceJNLPConnector.getClient(host).getRemoting(user, jenkinsUrl)
-                microServiceJNLPConnector.getClient(host).connectJnlp(user, jenkinsUrl, computer.getJnlpMac())
+                client.createUser(user)
+                client.getRemoting(user, host.connector.jenkinsUrl)
+                client.connectJnlp(user, host.connector.jenkinsUrl, computer.getJnlpMac())
             }catch(Exception e) {
                 launched = false
                 String message = String.format("Error while connecting computer %s due to %s ",
@@ -247,7 +247,7 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
                 if (windowsComputer.isOnline()) {
                     break
                 }
-                if((Instant.now().toEpochMilli() - currentTimestamp) > microServiceJNLPConnector.agentConnectionTimeout.multiply(1000).intValue()) {
+                if((Instant.now().toEpochMilli() - currentTimestamp) > host.connector.agentConnectionTimeout.multiply(1000).intValue()) {
                     launched = false
                     String message = toString().format("Connection timeout for the computer %s", computer.name)
                     listener.error(message)

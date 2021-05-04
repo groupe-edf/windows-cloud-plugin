@@ -43,16 +43,14 @@ import jenkins.model.Jenkins
 class WinRmJNLPConnector extends WindowsComputerConnector {
 
     String authenticationScheme
-    Integer maxTries
     Integer commandTimeout
 
     @DataBoundConstructor
     WinRmJNLPConnector(Boolean useHttps, Boolean disableCertificateCheck, Integer port, String authenticationScheme,
     String credentialsId, Integer maxTries, Integer connectionTimeout, Integer readTimeout,
     Integer agentConnectionTimeout, Integer commandTimeout, String jenkinsUrl) {
-        super(jenkinsUrl, port, useHttps, disableCertificateCheck, credentialsId, connectionTimeout, readTimeout, agentConnectionTimeout)
+        super(jenkinsUrl, port, useHttps, disableCertificateCheck, credentialsId, connectionTimeout, readTimeout, agentConnectionTimeout, maxTries)
         this.authenticationScheme = authenticationScheme
-        this.maxTries = maxTries
         this.commandTimeout = commandTimeout
     }
 
@@ -65,15 +63,6 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
     @DataBoundSetter
     void setAuthenticationScheme(String authenticationScheme) {
         this.authenticationScheme = authenticationScheme
-    }
-
-    public Integer getMaxTries() {
-        return maxTries
-    }
-
-    @DataBoundSetter
-    void setMaxTries(Integer maxTries) {
-        this.maxTries = maxTries
     }
 
     public Integer getCommandTimeout() {
@@ -196,15 +185,13 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
     private static class WinRmJNLPLauncher extends JNLPLauncher {
         String hostname
         WindowsUser user
-        String jenkinsUrl
         WinRmJNLPConnector winrmConnector
         boolean launched
 
-        WinRmJNLPLauncher(String hostname, WindowsUser user, String jenkinsUrl, WinRmJNLPConnector winrmConnector) {
+        WinRmJNLPLauncher(String hostname, WindowsUser user, WinRmJNLPConnector winrmConnector) {
             super(true)
             this.hostname = hostname
             this.user = user
-            this.jenkinsUrl = jenkinsUrl
             this.winrmConnector = winrmConnector
         }
 
@@ -225,7 +212,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
             WindowsComputer windowsComputer = (WindowsComputer) computer
             try {
                 WinRMCommand.createUser(hostname, winrmConnector, user)
-                WinRMCommand.jnlpConnect(hostname, winrmConnector, user, jenkinsUrl, computer.getJnlpMac())
+                WinRMCommand.jnlpConnect(hostname, winrmConnector, user, winrmConnector.jenkinsUrl, computer.getJnlpMac())
             }catch(Exception e) {
                 launched = false
                 String message = String.format("Error while connecting computer %s due to %s ",

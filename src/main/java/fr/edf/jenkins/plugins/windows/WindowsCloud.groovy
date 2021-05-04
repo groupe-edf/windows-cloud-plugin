@@ -120,10 +120,10 @@ class WindowsCloud extends Cloud {
                     return existingUsers < it.maxUsers
                 } catch(WindowsCommandException e) {
                     nbTries ++
-                    if(nbTries < it.maxTries) {
+                    if(nbTries < it.connector.maxTries) {
                         continue
                     } else {
-                        LOGGER.log(Level.INFO, "Disabling Windows Host {0}", it.host)
+                        LOGGER.log(Level.INFO, "Disabling Windows Host {0} due to Exception {1}", it.host, e)
                         it.disable = true
                         return false
                     }

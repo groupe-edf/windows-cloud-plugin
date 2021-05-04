@@ -22,9 +22,11 @@ import org.apache.http.protocol.HTTP
 import org.apache.http.util.EntityUtils
 
 import fr.edf.jenkins.plugins.windows.WindowsUser
+import fr.edf.jenkins.plugins.windows.util.Constants
 import fr.edf.jenkins.plugins.windows.winrm.client.WinRMException
 import groovy.json.JsonSlurper
 import hudson.util.Secret
+import jenkins.model.Jenkins
 import net.sf.json.JSONObject
 
 class MicroserviceHttpClient {
@@ -55,8 +57,6 @@ class MicroserviceHttpClient {
     Integer connectionTimeout = 15
     /** timeout to receive response in second */
     Integer readTimeout = 15
-
-    JsonSlurper jsonSlurper = new JsonSlurper()
 
     MicroserviceHttpClient(String host, Integer port, String contextPath, Secret token, boolean disableCertificateChecks, boolean useHttps, Integer connectionTimeout, Integer readTimeout) {
         this.url = buildUrl(useHttps?PROTOCOL_HTTPS:PROTOCOL_HTTP, host, port, contextPath)
@@ -145,7 +145,7 @@ class MicroserviceHttpClient {
 
         CloseableHttpResponse response = httpClient.execute(request)
         checkResponse(response)
-        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
+        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
     }
 
     public ExecutionResult listUser() {
@@ -157,7 +157,7 @@ class MicroserviceHttpClient {
 
         CloseableHttpResponse response = httpClient.execute(request)
         checkResponse(response)
-        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
+        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
     }
 
     public ExecutionResult createUser(WindowsUser user) {
@@ -170,7 +170,7 @@ class MicroserviceHttpClient {
 
         CloseableHttpResponse response = httpClient.execute(request)
         checkResponse(response)
-        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
+        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
     }
 
     public ExecutionResult deleteUser(String username) {
@@ -182,11 +182,16 @@ class MicroserviceHttpClient {
 
         CloseableHttpResponse response = httpClient.execute(request)
         checkResponse(response)
-        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
+        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
     }
 
     public ExecutionResult getRemoting(WindowsUser user, String jenkinsUrl) {
-        HttpPost request = new HttpPost(url.toString().concat("/api/user/remoting?jenkinsUrl=$jenkinsUrl"))
+        jenkinsUrl = jenkinsUrl ?: Jenkins.get().getRootUrl()
+        if(!jenkinsUrl.endsWith("/")) {
+            jenkinsUrl += "/"
+        }
+        String remotingUrl = jenkinsUrl + Constants.REMOTING_JAR_URL
+        HttpPost request = new HttpPost(url.toString().concat("/api/user/remoting?remotingUrl=$remotingUrl"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
         Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
         request.addHeader(contentTypeHeader)
@@ -195,7 +200,7 @@ class MicroserviceHttpClient {
 
         CloseableHttpResponse response = httpClient.execute(request)
         checkResponse(response)
-        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
+        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
     }
 
     public ExecutionResult connectJnlp(WindowsUser user, String jenkinsUrl, String secret) {
@@ -204,11 +209,11 @@ class MicroserviceHttpClient {
         Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
         request.addHeader(contentTypeHeader)
         request.addHeader(tokenHeader)
-        request.setEntity(new StringEntity("{\"jenkinsUrl\":\"$jenkinsUrl\",\"secret\":\"$secret\",user:{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}}"))
+        request.setEntity(new StringEntity("{\"jenkinsUrl\":\"$jenkinsUrl\",\"secret\":\"$secret\",\"user\":{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}}"))
 
         CloseableHttpResponse response = httpClient.execute(request)
         checkResponse(response)
-        return new ExecutionResult(jsonSlurper.parse(response.getEntity().getContent()))
+        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
     }
 
     private void checkResponse(CloseableHttpResponse response) throws HttpException {

@@ -5,6 +5,8 @@ import static com.cloudbees.plugins.credentials.CredentialsMatchers.instanceOf
 import static com.cloudbees.plugins.credentials.domains.URIRequirementBuilder.fromUri
 
 import java.time.Instant
+import java.util.logging.Level
+import java.util.logging.Logger
 
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.jenkinsci.Symbol
@@ -197,6 +199,9 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
     }
 
     private static class MicroServiceJNLPLauncher extends JNLPLauncher {
+
+        private static final Logger LOGGER = Logger.getLogger(MicroServiceJNLPLauncher.class.name)
+
         WindowsHost host
         WindowsUser user
         MicroserviceHttpClient client
@@ -224,10 +229,17 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
         public void launch(SlaveComputer computer, TaskListener listener) {
             launched = true
             WindowsComputer windowsComputer = (WindowsComputer) computer
+            ExecutionResult result = null
             try {
-                client.createUser(user)
-                client.getRemoting(user, host.connector.jenkinsUrl)
-                client.connectJnlp(user, host.connector.jenkinsUrl, computer.getJnlpMac())
+                LOGGER.log(Level.FINE, "Creating user " + user.username)
+                result = client.createUser(user)
+                LOGGER.log(Level.FINE, "Execution Result : \n Code :" + result.code + "\n Output : " + result.output + "\n Error : " + result.error)
+                LOGGER.log(Level.FINE, "Get remotin for the user " + user.username)
+                result = client.getRemoting(user, host.connector.jenkinsUrl)
+                LOGGER.log(Level.FINE, "Execution Result : \n Code :" + result.code + "\n Output : " + result.output + "\n Error : " + result.error)
+                LOGGER.log(Level.FINE, "Launch Jnlp for the user " + user.username)
+                result = client.connectJnlp(user, host.connector.jenkinsUrl, computer.getJnlpMac())
+                LOGGER.log(Level.FINE, "Execution Result : \n Code :" + result.code + "\n Output : " + result.output + "\n Error : " + result.error)
             }catch(Exception e) {
                 launched = false
                 String message = String.format("Error while connecting computer %s due to %s ",

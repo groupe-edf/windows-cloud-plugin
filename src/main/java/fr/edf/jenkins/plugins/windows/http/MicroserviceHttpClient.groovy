@@ -204,6 +204,10 @@ class MicroserviceHttpClient {
     }
 
     public ExecutionResult connectJnlp(WindowsUser user, String jenkinsUrl, String secret) {
+        jenkinsUrl = jenkinsUrl ?: Jenkins.get().getRootUrl()
+        if(!jenkinsUrl.endsWith("/")) {
+            jenkinsUrl += "/"
+        }
         HttpPost request = new HttpPost(url.toString().concat("/api/user/jnlp"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
         Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())

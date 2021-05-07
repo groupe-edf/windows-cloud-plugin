@@ -147,7 +147,7 @@ class MicroserviceHttpClient {
      */
     public ExecutionResult whoami() throws HttpException {
         HttpGet request = new HttpGet(url.toString().concat("/api/whoami"))
-        return executeAndBuildResponse(request)
+        return performRequest(request)
     }
 
     /**
@@ -158,7 +158,7 @@ class MicroserviceHttpClient {
      */
     public ExecutionResult listUser() throws HttpException {
         HttpGet request = new HttpGet(url.toString().concat("/api/users/list"))
-        return executeAndBuildResponse(request)
+        return performRequest(request)
     }
 
     /**
@@ -171,7 +171,7 @@ class MicroserviceHttpClient {
     public ExecutionResult createUser(WindowsUser user) throws HttpException {
         HttpPost request = new HttpPost(url.toString().concat("/api/user/create"))
         request.setEntity(new StringEntity("{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}"))
-        return executeAndBuildResponse(request)
+        return performRequest(request)
     }
 
     /**
@@ -183,7 +183,7 @@ class MicroserviceHttpClient {
      */
     public ExecutionResult deleteUser(String username) throws HttpException {
         HttpPost request = new HttpPost(url.toString().concat("/api/user/delete?username=$username"))
-        return executeAndBuildResponse(request)
+        return performRequest(request)
     }
 
     /**
@@ -199,7 +199,7 @@ class MicroserviceHttpClient {
         String remotingUrl = jenkinsUrl + Constants.REMOTING_JAR_URL
         HttpPost request = new HttpPost(url.toString().concat("/api/user/remoting?remotingUrl=$remotingUrl"))
         request.setEntity(new StringEntity("{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}"))
-        return executeAndBuildResponse(request)
+        return performRequest(request)
     }
 
     /**
@@ -215,18 +215,18 @@ class MicroserviceHttpClient {
         jenkinsUrl = WindowsCloudUtils.checkJenkinsUrl(jenkinsUrl)
         HttpPost request = new HttpPost(url.toString().concat("/api/user/jnlp"))
         request.setEntity(new StringEntity("{\"jenkinsUrl\":\"$jenkinsUrl\",\"secret\":\"$secret\",\"user\":{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}}"))
-        return executeAndBuildResponse(request)
+        return performRequest(request)
     }
 
     /**
-     * Execute the given request and build the response <br>
+     * Perform the given request and build the response <br>
      * Close HttpClient and HttpResponse after performed
      * 
      * @param request
      * @return {@link ExecutionResult}
      * @throws HttpException if a bad status is returned by the request
      */
-    private ExecutionResult executeAndBuildResponse(HttpRequest request) throws HttpException {
+    private ExecutionResult performRequest(HttpRequest request) throws HttpException {
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
         Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
         request.addHeader(contentTypeHeader)

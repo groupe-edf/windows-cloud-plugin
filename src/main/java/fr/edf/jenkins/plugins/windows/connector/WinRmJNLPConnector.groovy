@@ -41,6 +41,11 @@ import hudson.util.FormValidation
 import hudson.util.ListBoxModel
 import jenkins.model.Jenkins
 
+/**
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 class WinRmJNLPConnector extends WindowsComputerConnector {
 
     String authenticationScheme

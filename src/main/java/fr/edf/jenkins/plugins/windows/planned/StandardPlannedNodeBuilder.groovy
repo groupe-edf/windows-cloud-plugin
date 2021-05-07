@@ -9,7 +9,6 @@ import com.google.common.util.concurrent.Futures
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.agent.WindowsAgent
-import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommandException
 import hudson.model.Descriptor
 import hudson.slaves.ComputerLauncher

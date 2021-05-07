@@ -14,6 +14,11 @@ import hudson.model.Queue
 import hudson.model.Queue.Task
 import hudson.slaves.AbstractCloudComputer
 
+/**
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 class WindowsComputer extends AbstractCloudComputer<WindowsAgent>{
 
     private static final Logger LOGGER = Logger.getLogger(WindowsComputer.class.name)

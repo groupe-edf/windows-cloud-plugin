@@ -1,5 +1,10 @@
 package fr.edf.jenkins.plugins.windows.http.connection
 
+/**
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 class HttpConnectionException extends Exception {
 
     HttpConnectionException(String message, Throwable cause) {

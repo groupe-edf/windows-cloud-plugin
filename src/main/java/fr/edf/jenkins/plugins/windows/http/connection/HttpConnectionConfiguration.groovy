@@ -2,6 +2,12 @@ package fr.edf.jenkins.plugins.windows.http.connection
 
 import hudson.model.ModelObject
 
+/**
+ * Connection configuration for powershell-daemon
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 class HttpConnectionConfiguration {
     String host
     String contextPath

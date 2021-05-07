@@ -7,6 +7,11 @@ import hudson.ExtensionList
 import hudson.ExtensionPoint
 import hudson.model.Label
 
+/**
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 abstract class InProvisioning implements ExtensionPoint{
 
     /**

@@ -1,5 +1,10 @@
 package fr.edf.jenkins.plugins.windows.connector
 
+/**
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 class WindowsCommandException extends Exception {
 
     static final String CREATE_WINDOWS_USER_ERROR = "Unable to create WindowsUser on host %s"

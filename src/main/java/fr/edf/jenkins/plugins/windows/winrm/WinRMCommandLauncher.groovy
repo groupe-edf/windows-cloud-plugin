@@ -122,7 +122,7 @@ class WinRMCommandLauncher {
             throw new WinRMCommandException("Unable to execute the command $command", we)
         }
     }
-    
+
     @Restricted(NoExternalUse)
     protected CommandOutput getCommandOutput(String shellId, @NotNull String commandId, @NotNull boolean waitResult) throws WinRMException{
         CommandOutput output = winrmTool.getCommandOutput(shellId, commandId)

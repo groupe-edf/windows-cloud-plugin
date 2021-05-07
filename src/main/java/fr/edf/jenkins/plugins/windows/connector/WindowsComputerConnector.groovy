@@ -7,6 +7,11 @@ import fr.edf.jenkins.plugins.windows.WindowsUser
 import hudson.model.AbstractDescribableImpl
 import hudson.slaves.ComputerLauncher
 
+/**
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 abstract class WindowsComputerConnector extends AbstractDescribableImpl<WindowsComputerConnector>{
 
     String jenkinsUrl

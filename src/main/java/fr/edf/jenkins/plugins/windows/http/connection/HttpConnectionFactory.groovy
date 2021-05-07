@@ -12,6 +12,11 @@ import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionException
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
 import jenkins.model.Jenkins
 
+/**
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 class HttpConnectionFactory {
 
     @Restricted(NoExternalUse)

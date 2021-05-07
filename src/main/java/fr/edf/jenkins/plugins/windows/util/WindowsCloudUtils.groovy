@@ -4,8 +4,9 @@ import org.antlr.v4.runtime.misc.NotNull
 
 import jenkins.model.Jenkins
 /**
- * Jenkins UI form
+ * Utils for windows-cloud plugin
  * @author CHRIS BAHONDA
+ * @author Mathieu Delrocq
  *
  */
 class WindowsCloudUtils {

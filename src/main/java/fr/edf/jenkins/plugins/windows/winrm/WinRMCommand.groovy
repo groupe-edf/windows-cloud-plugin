@@ -14,7 +14,6 @@ import fr.edf.jenkins.plugins.windows.util.WindowsCloudUtils
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMUserConnectionConfiguration
 import hudson.util.Secret
-import jenkins.model.Jenkins
 /**
  * List of all methods to execute winrm commands
  * @author CHRIS BAHONDA

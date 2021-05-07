@@ -8,6 +8,11 @@ import hudson.model.Computer
 import hudson.model.Label
 import hudson.model.Node
 
+/**
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 @Extension
 class WindowsInProvisioning extends InProvisioning{
 

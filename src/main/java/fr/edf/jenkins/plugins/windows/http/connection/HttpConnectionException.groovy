@@ -1,6 +1,6 @@
 package fr.edf.jenkins.plugins.windows.http.connection
 
-class HttpConnectionException {
+class HttpConnectionException extends Exception {
 
     HttpConnectionException(String message, Throwable cause) {
         super(message, cause)

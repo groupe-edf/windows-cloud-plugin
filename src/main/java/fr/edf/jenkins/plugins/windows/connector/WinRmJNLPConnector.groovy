@@ -91,7 +91,12 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
         WinRMCommand.deleteUser(getConnectionConfig(host.host), username, commandTimeout);
     }
 
-    private WinRMGlobalConnectionConfiguration getConnectionConfig(String hostname) {
+    /**
+     * Return the WinRmConnectionConfiguration for the given host
+     * @param hostname
+     * @return
+     */
+    protected WinRMGlobalConnectionConfiguration getConnectionConfig(String hostname) {
         WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: credentialsId,
         context: Jenkins.get(), host: hostname, port: port, authenticationScheme: authenticationScheme,
         useHttps: useHttps, disableCertificateCheck: disableCertificateCheck, connectionTimeout: connectionTimeout, readTimeout: readTimeout)

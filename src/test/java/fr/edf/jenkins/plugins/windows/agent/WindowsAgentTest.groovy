@@ -6,7 +6,6 @@ import org.jvnet.hudson.test.JenkinsRule
 import fr.edf.jenkins.plugins.windows.WindowsCloud
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
-import fr.edf.jenkins.plugins.windows.agent.WindowsAgent
 import fr.edf.jenkins.plugins.windows.connector.WindowsComputerConnector
 import fr.edf.jenkins.plugins.windows.pojos.WindowsPojoBuilder
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
@@ -19,9 +18,9 @@ class WindowsAgentTest extends Specification{
     def"should create agent"(){
 
         given:
-        WindowsComputerConnector connector = WindowsPojoBuilder.buildConnector(rule)
-        List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost()
-        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host, connector)
+        WindowsComputerConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost(connector)
+        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host)
         WindowsUser user = WindowsPojoBuilder.buildUser()
         WindowsAgent agent = WindowsPojoBuilder.buildAgent(cloud.name, user, host.get(0), connector)
 
@@ -36,9 +35,9 @@ class WindowsAgentTest extends Specification{
 
     def"should terminate and remove agent"(){
         given:
-        WindowsComputerConnector connector = WindowsPojoBuilder.buildConnector(rule)
-        List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost()
-        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host, connector)
+        WindowsComputerConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost(connector)
+        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host)
         WindowsUser user = WindowsPojoBuilder.buildUser()
         WindowsAgent agent = WindowsPojoBuilder.buildAgent(cloud.name, user, host.get(0), connector)
 
@@ -59,9 +58,9 @@ class WindowsAgentTest extends Specification{
     def"should return node name on windows cloud"(){
 
         given:
-        WindowsComputerConnector connector = WindowsPojoBuilder.buildConnector(rule)
-        List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost()
-        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host, connector)
+        WindowsComputerConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost(connector)
+        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host)
         WindowsUser user = WindowsPojoBuilder.buildUser()
         WindowsAgent agent = WindowsPojoBuilder.buildAgent(cloud.name, user, host.get(0), connector)
 
@@ -79,9 +78,9 @@ class WindowsAgentTest extends Specification{
     def"should return the windows cloud of the agent"(){
 
         given:
-        WindowsComputerConnector connector = WindowsPojoBuilder.buildConnector(rule)
-        List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost()
-        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host, connector)
+        WindowsComputerConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost(connector)
+        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host)
         WindowsUser user = WindowsPojoBuilder.buildUser()
         WindowsAgent agent = WindowsPojoBuilder.buildAgent(cloud.name, user, host.get(0), connector)
 
@@ -99,9 +98,9 @@ class WindowsAgentTest extends Specification{
     def"node name is user is username"(){
 
         given:
-        WindowsComputerConnector connector = WindowsPojoBuilder.buildConnector(rule)
-        List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost()
-        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host, connector)
+        WindowsComputerConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        List<WindowsHost> host = WindowsPojoBuilder.buildWindowsHost(connector)
+        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(host)
         WindowsUser user = WindowsPojoBuilder.buildUser()
         WindowsAgent agent = WindowsPojoBuilder.buildAgent(cloud.name, user, host.get(0), connector)
 

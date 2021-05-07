@@ -15,22 +15,13 @@ import hudson.util.Secret
 
 class WindowsPojoBuilder {
 
-    static List<WindowsHost> buildWindowsHost(){
-        WindowsHost host = new WindowsHost("localhost",
-                "1",
-                5986,
-                AuthSchemes.NTLM,
-                5,
-                Boolean.FALSE,
-                60,
-                60,
-                60,
-                60,
-                5,
+    static List<WindowsHost> buildWindowsHost(WindowsComputerConnector connector){
+        WindowsHost host = new WindowsHost(
+                "localhost",
+                false,
                 "testLabel",
-                Boolean.FALSE,
-                Boolean.FALSE,
-                buildEnvVars())
+                buildEnvVars(),
+                connector)
         List<WindowsHost> hostList = new ArrayList()
         hostList.add(host)
         return hostList
@@ -40,16 +31,27 @@ class WindowsPojoBuilder {
         return new WindowsUser("admin", Secret.fromString("admin"), "/Users/admin")
     }
 
-    static WindowsCloud buildWindowsCloud(List<WindowsHost> host, WindowsComputerConnector connector) {
-        return new WindowsCloud("testCloud", host, connector, new Integer(1))
+    static WindowsCloud buildWindowsCloud(List<WindowsHost> host) {
+        return new WindowsCloud("testCloud", host, Integer.valueOf(1))
     }
 
-    static WindowsComputerConnector buildConnector(JenkinsRule jenkinsRule) {
-        return new WinRmJNLPConnector(jenkinsRule.getURL().toString())
+    static WinRmJNLPConnector buildWinRmConnector(JenkinsRule jenkinsRule) {
+        return new WinRmJNLPConnector(
+                Boolean.FALSE,
+                Boolean.FALSE,
+                5986,
+                AuthSchemes.NTLM,
+                "1",
+                5,
+                60,
+                60,
+                60,
+                60,
+                jenkinsRule.getURL().toString())
     }
 
     static WindowsAgent buildAgent(String cloudId, WindowsUser user, WindowsHost host, WindowsComputerConnector connector) {
-        return new WindowsAgent(cloudId, "testLabel", user, host, connector.createLauncher(host, user), new Integer(1), Collections.EMPTY_LIST)
+        return new WindowsAgent(cloudId, "testLabel", user, host, connector.createLauncher(host, user), Integer.valueOf(1), Collections.EMPTY_LIST)
     }
 
     static List<WindowsEnvVar> buildEnvVars(){

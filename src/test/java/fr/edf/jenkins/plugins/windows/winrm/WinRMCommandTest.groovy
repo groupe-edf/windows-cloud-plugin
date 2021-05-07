@@ -6,6 +6,7 @@ import org.jvnet.hudson.test.JenkinsRule
 
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
+import fr.edf.jenkins.plugins.windows.connector.WinRmJNLPConnector
 import fr.edf.jenkins.plugins.windows.pojos.WindowsPojoBuilder
 import fr.edf.jenkins.plugins.windows.util.Constants
 import fr.edf.jenkins.plugins.windows.winrm.client.WinRMTool
@@ -13,6 +14,7 @@ import fr.edf.jenkins.plugins.windows.winrm.client.output.CommandOutput
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionConfiguration
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMConnectionFactory
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
+import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMUserConnectionConfiguration
 import spock.lang.Specification
 
 class WinRMCommandTest extends Specification{
@@ -23,9 +25,8 @@ class WinRMCommandTest extends Specification{
     def "checkConnection is working"() {
 
         given:
-        WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
         WinRMConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(
-                host: host,
+                host: "localhost",
                 port: 5986,
                 credentialsId: "test",
                 authenticationScheme: AuthSchemes.NTLM,
@@ -59,14 +60,14 @@ class WinRMCommandTest extends Specification{
     def "createUser throws no exception "(){
 
         given:
-        WindowsHost myHost = WindowsPojoBuilder.buildWindowsHost().get(0)
+        WinRmJNLPConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        WindowsHost host = WindowsPojoBuilder.buildWindowsHost(connector).get(0)
         WindowsUser user = WinRMCommand.generateUser()
 
         String shellId = "shell"
         String createUserId = "createUser"
         String checkUserExist = "checkUserExist"
         String addUserToGroup = "addUserToGroup"
-        String
 
         WinRMTool tool = Stub(WinRMTool) {
             openShell() >> shellId
@@ -83,7 +84,7 @@ class WinRMCommandTest extends Specification{
         }
 
         when:
-        WindowsUser result = WinRMCommand.createUser(myHost, user)
+        WindowsUser result = WinRMCommand.createUser(connector.getConnectionConfig(host.host), user, connector.commandTimeout)
 
         then:
         notThrown Exception
@@ -93,8 +94,10 @@ class WinRMCommandTest extends Specification{
     def "createUser throws an exception when user does not exist"(){
 
         given:
-        WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
+        WinRmJNLPConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        WindowsHost host = WindowsPojoBuilder.buildWindowsHost(connector).get(0)
         WindowsUser user = WinRMCommand.generateUser()
+
 
         String shellId = "shell"
         String createUserId = "createUser"
@@ -118,7 +121,7 @@ class WinRMCommandTest extends Specification{
         }
 
         when:
-        WindowsUser res = WinRMCommand.createUser(host, user)
+        WindowsUser res = WinRMCommand.createUser(connector.getConnectionConfig(host.host), user, connector.commandTimeout)
 
         then:
         WinRMCommandException e = thrown()
@@ -130,7 +133,8 @@ class WinRMCommandTest extends Specification{
     def "deleteUser works"(){
 
         given:
-        WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
+        WinRmJNLPConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        WindowsHost host = WindowsPojoBuilder.buildWindowsHost(connector).get(0)
         String username = "windows_test_user"
         String shellId = "shell"
         String deleteUserId = "deleteUserId"
@@ -159,7 +163,7 @@ class WinRMCommandTest extends Specification{
         }
 
         when:
-        String res = WinRMCommand.deleteUser(host, username)
+        String res = WinRMCommand.deleteUser(connector.getConnectionConfig(host.host), username, connector.commandTimeout)
 
         then:
         notThrown Exception
@@ -170,7 +174,8 @@ class WinRMCommandTest extends Specification{
     def "deleteUser returns an exception because user stills exists"(){
 
         given:
-        WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
+        WinRmJNLPConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        WindowsHost host = WindowsPojoBuilder.buildWindowsHost(connector).get(0)
         String username = "windows_test_user"
         String shellId = "shell"
         String checkUserExist = "checkUserExist"
@@ -199,7 +204,7 @@ class WinRMCommandTest extends Specification{
         }
 
         when:
-        String res = WinRMCommand.deleteUser(host, username)
+        String res = WinRMCommand.deleteUser(connector.getConnectionConfig(host.host), username, connector.commandTimeout)
 
 
         then:
@@ -211,7 +216,8 @@ class WinRMCommandTest extends Specification{
     def "deleteUser returns an exception because workdir stills exists"(){
 
         given:
-        WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
+        WinRmJNLPConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        WindowsHost host = WindowsPojoBuilder.buildWindowsHost(connector).get(0)
         String username = "windows_test_user"
         String shellId = "shell"
         String checkUserExist = "checkUserExist"
@@ -240,7 +246,7 @@ class WinRMCommandTest extends Specification{
         }
 
         when:
-        String res = WinRMCommand.deleteUser(host, username)
+        String res = WinRMCommand.deleteUser(connector.getConnectionConfig(host.host), username, connector.commandTimeout)
 
 
         then:
@@ -254,8 +260,9 @@ class WinRMCommandTest extends Specification{
     def "listUsers returns a list"(){
 
         given:
+        WinRmJNLPConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        WindowsHost host = WindowsPojoBuilder.buildWindowsHost(connector).get(0)
         String shellId = "shell"
-        WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
         String listUserId = "listUserId"
 
         WinRMTool tool = Stub(WinRMTool){
@@ -271,7 +278,7 @@ class WinRMCommandTest extends Specification{
         }
 
         when:
-        List res = WinRMCommand.listUsers(host)
+        List res = WinRMCommand.listUsers(connector.getConnectionConfig(host.host), connector.commandTimeout)
 
         then:
         notThrown Exception
@@ -284,7 +291,8 @@ class WinRMCommandTest extends Specification{
         given:
         String shellId = "shell"
         WindowsUser user = WinRMCommand.generateUser()
-        WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
+        WinRmJNLPConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        WindowsHost host = WindowsPojoBuilder.buildWindowsHost(connector).get(0)
         String jnlpConnect = "jnlpConnect"
         String agentSecret = "secret"
 
@@ -299,8 +307,19 @@ class WinRMCommandTest extends Specification{
             WinRMConnectionFactory.getWinRMConnection(_) >> tool
         }
 
+        WinRMUserConnectionConfiguration userConfig = new WinRMUserConnectionConfiguration(
+                username: user.username,
+                password: user.password,
+                host: host.host,
+                port: connector.port,
+                authenticationScheme: connector.authenticationScheme,
+                useHttps: connector.useHttps,
+                disableCertificateCheck: connector.disableCertificateCheck,
+                connectionTimeout: connector.connectionTimeout,
+                readTimeout: connector.readTimeout)
+
         when:
-        WinRMCommand.jnlpConnect(host, user, null, agentSecret)
+        WinRMCommand.jnlpConnect(userConfig, connector.jenkinsUrl, agentSecret, connector.commandTimeout)
 
         then:
         notThrown Exception
@@ -310,11 +329,23 @@ class WinRMCommandTest extends Specification{
 
         given:
         WindowsUser user = WinRMCommand.generateUser()
-        WindowsHost host = WindowsPojoBuilder.buildWindowsHost().get(0)
+        WinRmJNLPConnector connector = WindowsPojoBuilder.buildWinRmConnector(rule)
+        WindowsHost host = WindowsPojoBuilder.buildWindowsHost(connector).get(0)
         String agentSecret = "secret"
 
+        WinRMUserConnectionConfiguration userConfig = new WinRMUserConnectionConfiguration(
+                username: user.username,
+                password: user.password,
+                host: host.host,
+                port: connector.port,
+                authenticationScheme: connector.authenticationScheme,
+                useHttps: connector.useHttps,
+                disableCertificateCheck: connector.disableCertificateCheck,
+                connectionTimeout: connector.connectionTimeout,
+                readTimeout: connector.readTimeout)
+
         when:
-        WinRMCommand.jnlpConnect(host, user, null, agentSecret)
+        WinRMCommand.jnlpConnect(userConfig, connector.jenkinsUrl, agentSecret, connector.commandTimeout)
 
         then:
         WinRMCommandException e = thrown()

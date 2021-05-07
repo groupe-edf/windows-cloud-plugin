@@ -34,8 +34,8 @@ class FastNodeProvisionerStrategyTest extends Specification{
             getSnapshot() >> snapshot
         }
 
-        WindowsCloud cloud = new WindowsCloud("test", WindowsPojoBuilder.buildWindowsHost(), WindowsPojoBuilder.buildConnector(rule),
-                new Integer(1))
+        WindowsCloud cloud = new WindowsCloud("test", WindowsPojoBuilder.buildWindowsHost(WindowsPojoBuilder.buildWinRmConnector(rule)),
+                Integer.valueOf(1))
         rule.jenkins.clouds.add(cloud)
 
         when:

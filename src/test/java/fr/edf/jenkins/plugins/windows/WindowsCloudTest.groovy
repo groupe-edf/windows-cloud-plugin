@@ -17,7 +17,7 @@ class WindowsCloudTest extends Specification{
     def "create cloud"(){
 
         given:
-        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(WindowsPojoBuilder.buildWindowsHost(), WindowsPojoBuilder.buildConnector(rule))
+        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(WindowsPojoBuilder.buildWindowsHost(WindowsPojoBuilder.buildWinRmConnector(rule)))
 
         when:
         rule.jenkins.clouds.add(cloud)
@@ -31,7 +31,7 @@ class WindowsCloudTest extends Specification{
     def "call provision method"(){
 
         given:
-        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(WindowsPojoBuilder.buildWindowsHost(), WindowsPojoBuilder.buildConnector(rule))
+        WindowsCloud cloud = WindowsPojoBuilder.buildWindowsCloud(WindowsPojoBuilder.buildWindowsHost(WindowsPojoBuilder.buildWinRmConnector(rule)))
         rule.jenkins.getCloud("testCloud")
         FreeStyleProject project = rule.createFreeStyleProject("test")
         project.setAssignedLabel(Label.parse("testLabel").getAt(0))

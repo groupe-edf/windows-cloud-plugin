@@ -2,6 +2,12 @@ package fr.edf.jenkins.plugins.windows.http
 
 import groovy.transform.ToString
 
+/**
+ * Object returned by powershell-daemon apis
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 @ToString
 class ExecutionResult {
 

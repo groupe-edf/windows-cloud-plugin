@@ -44,6 +44,12 @@ import hudson.util.FormValidation
 import hudson.util.ListBoxModel
 import jenkins.model.Jenkins
 
+/**
+ * Connector for powershell-daemon
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 class MicroServiceJNLPConnector extends WindowsComputerConnector {
 
     private static final Logger LOGGER = Logger.getLogger(MicroServiceJNLPConnector.class.name)

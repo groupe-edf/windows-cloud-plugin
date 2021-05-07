@@ -9,11 +9,13 @@ import javax.net.ssl.X509TrustManager
 
 import org.apache.http.Header
 import org.apache.http.HttpException
+import org.apache.http.HttpRequest
 import org.apache.http.client.HttpClient
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
+import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
 import org.apache.http.protocol.HTTP
@@ -24,6 +26,12 @@ import fr.edf.jenkins.plugins.windows.util.WindowsCloudUtils
 import groovy.json.JsonSlurper
 import hudson.util.Secret
 
+/**
+ * Client for powershell-daemon apis
+ * 
+ * @author Mathieu Delrocq
+ *
+ */
 class MicroserviceHttpClient {
 
     /** http */
@@ -131,87 +139,108 @@ class MicroserviceHttpClient {
         return new URL(protocol, address, port, contextPath)
     }
 
+    /**
+     * Call whoami api
+     * 
+     * @return {@link ExecutionResult} with the current user connected as output
+     * @throws HttpException
+     */
     public ExecutionResult whoami() throws HttpException {
         HttpGet request = new HttpGet(url.toString().concat("/api/whoami"))
-        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
-        request.addHeader(contentTypeHeader)
-        request.addHeader(tokenHeader)
-
-        CloseableHttpResponse response = httpClient.execute(request)
-        checkResponse(response)
-        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
+        return executeAndBuildResponse(request)
     }
 
+    /**
+     * Call list users api
+     * 
+     * @return {@link ExecutionResult} with the list of users start with "windows-" as output
+     * @throws HttpException
+     */
     public ExecutionResult listUser() throws HttpException {
         HttpGet request = new HttpGet(url.toString().concat("/api/users/list"))
-        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
-        request.addHeader(contentTypeHeader)
-        request.addHeader(tokenHeader)
-
-        CloseableHttpResponse response = httpClient.execute(request)
-        checkResponse(response)
-        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
+        return executeAndBuildResponse(request)
     }
 
+    /**
+     * Call Create user api
+     * 
+     * @param user to be created
+     * @return {@link ExecutionResult}
+     * @throws HttpException
+     */
     public ExecutionResult createUser(WindowsUser user) throws HttpException {
         HttpPost request = new HttpPost(url.toString().concat("/api/user/create"))
-        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
-        request.addHeader(contentTypeHeader)
-        request.addHeader(tokenHeader)
         request.setEntity(new StringEntity("{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}"))
-
-        CloseableHttpResponse response = httpClient.execute(request)
-        checkResponse(response)
-        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
+        return executeAndBuildResponse(request)
     }
 
+    /**
+     * Call Delete user api
+     * 
+     * @param username to be deleted
+     * @return {@link ExecutionResult}
+     * @throws HttpException
+     */
     public ExecutionResult deleteUser(String username) throws HttpException {
         HttpPost request = new HttpPost(url.toString().concat("/api/user/delete?username=$username"))
-        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
-        request.addHeader(contentTypeHeader)
-        request.addHeader(tokenHeader)
-
-        CloseableHttpResponse response = httpClient.execute(request)
-        checkResponse(response)
-        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
+        return executeAndBuildResponse(request)
     }
 
+    /**
+     * Call get remoting api
+     * 
+     * @param user
+     * @param jenkinsUrl
+     * @return {@link ExecutionResult}
+     * @throws HttpException
+     */
     public ExecutionResult getRemoting(WindowsUser user, String jenkinsUrl) throws HttpException {
         jenkinsUrl = WindowsCloudUtils.checkJenkinsUrl(jenkinsUrl)
         String remotingUrl = jenkinsUrl + Constants.REMOTING_JAR_URL
         HttpPost request = new HttpPost(url.toString().concat("/api/user/remoting?remotingUrl=$remotingUrl"))
-        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
-        request.addHeader(contentTypeHeader)
-        request.addHeader(tokenHeader)
         request.setEntity(new StringEntity("{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}"))
-
-        CloseableHttpResponse response = httpClient.execute(request)
-        checkResponse(response)
-        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
+        return executeAndBuildResponse(request)
     }
 
+    /**
+     * Connect JNLP api
+     * 
+     * @param user
+     * @param jenkinsUrl
+     * @param secret
+     * @return {@link ExecutionResult}
+     * @throws HttpException
+     */
     public ExecutionResult connectJnlp(WindowsUser user, String jenkinsUrl, String secret) throws HttpException {
         jenkinsUrl = WindowsCloudUtils.checkJenkinsUrl(jenkinsUrl)
         HttpPost request = new HttpPost(url.toString().concat("/api/user/jnlp"))
+        request.setEntity(new StringEntity("{\"jenkinsUrl\":\"$jenkinsUrl\",\"secret\":\"$secret\",\"user\":{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}}"))
+        return executeAndBuildResponse(request)
+    }
+
+    /**
+     * Execute the given request and build the response <br>
+     * Close HttpClient and HttpResponse after performed
+     * 
+     * @param request
+     * @return {@link ExecutionResult}
+     * @throws HttpException if a bad status is returned by the request
+     */
+    private ExecutionResult executeAndBuildResponse(HttpRequest request) throws HttpException {
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
         Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
         request.addHeader(contentTypeHeader)
         request.addHeader(tokenHeader)
-        request.setEntity(new StringEntity("{\"jenkinsUrl\":\"$jenkinsUrl\",\"secret\":\"$secret\",\"user\":{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}}"))
-
-        CloseableHttpResponse response = httpClient.execute(request)
-        checkResponse(response)
-        return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
-    }
-
-    private void checkResponse(CloseableHttpResponse response) throws HttpException {
+        CloseableHttpClient client = getHttpClient()
+        CloseableHttpResponse response = client.execute(request)
+        client.close()
         if(!SUCCESS_STATUS.contains(response.statusLine.statusCode)) {
-            throw new HttpException(response.statusLine.statusCode + " : " + response.statusLine.reasonPhrase)
+            String message = "$response.statusLine.statusCode : $response.statusLine.reasonPhrase"
+            response.close()
+            throw new HttpException(message)
         }
+        ExecutionResult result = new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
+        response.close()
+        return result
     }
 }

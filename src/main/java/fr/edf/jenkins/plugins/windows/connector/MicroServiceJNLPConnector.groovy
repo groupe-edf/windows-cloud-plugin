@@ -54,8 +54,9 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
 
     private static final Logger LOGGER = Logger.getLogger(MicroServiceJNLPConnector.class.name)
 
-    private MicroserviceHttpClient client
-    private String contextPath
+    String contextPath
+
+    transient MicroserviceHttpClient microserviceHttpClient
 
     @DataBoundConstructor
     MicroServiceJNLPConnector(Boolean useHttps, Boolean disableCertificateCheck, Integer port,
@@ -117,8 +118,8 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
     }
 
     private MicroserviceHttpClient getClient(WindowsHost host) {
-        if(this.client == null) {
-            this.client = HttpConnectionFactory.getHttpConnection(
+        if(!microserviceHttpClient) {
+            microserviceHttpClient = HttpConnectionFactory.getHttpConnection(
                     new HttpConnectionConfiguration(
                     host: host.host,
                     contextPath: contextPath,
@@ -130,7 +131,7 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
                     disableCertificateCheck: disableCertificateCheck,
                     context: Jenkins.get()))
         }
-        return client
+        return microserviceHttpClient
     }
 
     @Extension @Symbol("microservice")
@@ -252,6 +253,7 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
                 LOGGER.log(Level.FINE, "######## $host.host -> $user.username : Launching Jnlp...")
                 result = client.connectJnlp(user, host.connector.jenkinsUrl, computer.getJnlpMac())
                 LOGGER.log(Level.FINEST, "######## $host.host -> $user.username : Launch Jnlp -> Execution Result : \n Code : $result.code \n Output : $result.output \n Error : $result.error")
+                this.client = null
             }catch(Exception e) {
                 launched = false
                 String message = String.format("Error while connecting computer %s due to %s ",

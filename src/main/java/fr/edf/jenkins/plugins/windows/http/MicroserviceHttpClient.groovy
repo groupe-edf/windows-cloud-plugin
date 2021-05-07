@@ -11,10 +11,14 @@ import org.apache.http.Header
 import org.apache.http.HttpException
 import org.apache.http.HttpRequest
 import org.apache.http.client.HttpClient
+import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.entity.StringEntity
+import org.apache.http.impl.client.AbstractResponseHandler
+import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
@@ -226,21 +230,19 @@ class MicroserviceHttpClient {
      * @return {@link ExecutionResult}
      * @throws HttpException if a bad status is returned by the request
      */
-    private ExecutionResult performRequest(HttpRequest request) throws HttpException {
-        Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
-        Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
-        request.addHeader(contentTypeHeader)
-        request.addHeader(tokenHeader)
+    private ExecutionResult performRequest(HttpUriRequest request) throws HttpException {
         CloseableHttpClient client = getHttpClient()
-        CloseableHttpResponse response = client.execute(request)
-        client.close()
-        if(!SUCCESS_STATUS.contains(response.statusLine.statusCode)) {
-            String message = "$response.statusLine.statusCode : $response.statusLine.reasonPhrase"
-            response.close()
-            throw new HttpException(message)
+        try {
+            Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
+            Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
+            request.addHeader(contentTypeHeader)
+            request.addHeader(tokenHeader)
+            return client.execute(request, new ExecutionResultResponseHandler())
+        } catch(Exception e) {
+            throw new HttpException("An error occured when performing the request $request.URI")
         }
-        ExecutionResult result = new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
-        response.close()
-        return result
+        finally {
+            client.close()
+        }
     }
 }

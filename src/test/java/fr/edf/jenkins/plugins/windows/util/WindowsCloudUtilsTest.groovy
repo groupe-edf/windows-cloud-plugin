@@ -5,7 +5,7 @@ import org.jvnet.hudson.test.JenkinsRule
 
 import spock.lang.Specification
 
-class FormUtilsTest extends Specification{
+class WindowsCloudUtilsTest extends Specification{
 
     @Rule
     JenkinsRule rule = new JenkinsRule()
@@ -15,7 +15,7 @@ class FormUtilsTest extends Specification{
         String url = rule.getURL().toString()
 
         when:
-        URI uri = FormUtils.getUri(url)
+        URI uri = WindowsCloudUtils.getUri(url)
 
         then:
         notThrown Exception
@@ -27,7 +27,7 @@ class FormUtilsTest extends Specification{
         String url = "http://localhost"
 
         when:
-        URI uri = FormUtils.getUri(url)
+        URI uri = WindowsCloudUtils.getUri(url)
 
         then:
         notThrown Exception

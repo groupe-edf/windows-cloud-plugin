@@ -26,7 +26,7 @@ class CredentialsUtils {
      */
     static StandardCredentials findCredentials(final String host, final String credentialsId, ModelObject context) {
         Preconditions.checkNotNull(host, "host not set")
-        URI uri = FormUtils.getUri(host)
+        URI uri = WindowsCloudUtils.getUri(host)
         Preconditions.checkNotNull(credentialsId, "CredentialsId not set")
         Preconditions.checkNotNull(uri, "uri not set")
         Preconditions.checkNotNull(context, "context not set")

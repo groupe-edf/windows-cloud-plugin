@@ -30,7 +30,7 @@ import fr.edf.jenkins.plugins.windows.http.MicroserviceHttpClient
 import fr.edf.jenkins.plugins.windows.http.connection.HttpConnectionConfiguration
 import fr.edf.jenkins.plugins.windows.http.connection.HttpConnectionFactory
 import fr.edf.jenkins.plugins.windows.util.Constants
-import fr.edf.jenkins.plugins.windows.util.FormUtils
+import fr.edf.jenkins.plugins.windows.util.WindowsCloudUtils
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommandException
 import hudson.Extension
 import hudson.model.Descriptor
@@ -45,6 +45,8 @@ import hudson.util.ListBoxModel
 import jenkins.model.Jenkins
 
 class MicroServiceJNLPConnector extends WindowsComputerConnector {
+
+    private static final Logger LOGGER = Logger.getLogger(MicroServiceJNLPConnector.class.name)
 
     private MicroserviceHttpClient client
     private String contextPath
@@ -77,10 +79,12 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
     @Override
     protected List<String> listUsers(WindowsHost host) throws MicroserviceCommandException {
         try {
+            LOGGER.log(Level.FINE, "######## Listing user on the host $host.host...")
             ExecutionResult executionResult = getClient(host).listUser();
             if(executionResult.code != 0) {
                 throw new MicroserviceCommandException("Command exit status : " + executionResult.code + "\n Error output : " + executionResult.error)
             }
+            LOGGER.log(Level.FINEST, "######## $host.host : List user -> Execution Result : \n Code : $executionResult.code \n Output : $executionResult.output \n Error : $executionResult.error")
             return executionResult.getOutput().split(Constants.REGEX_NEW_LINE) as List
         } catch(Exception e) {
             String message = String.format(WinRMCommandException.LIST_USERS_ERROR_MESSAGE, e.getMessage(), host.host)
@@ -94,10 +98,12 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
     @Override
     protected void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception {
         try {
+            LOGGER.log(Level.FINE, "######## $host.host -> $username : Deleting user...")
             ExecutionResult executionResult = getClient(host).deleteUser(username)
             if(executionResult.code != 0) {
                 throw new MicroserviceCommandException("Command exit status : " + executionResult.code + "\n Error output : " + executionResult.error)
             }
+            LOGGER.log(Level.FINEST, "######## $host.host -> $username : Delete user -> Execution Result : \n Code : $executionResult.code \n Output : $executionResult.output \n Error : $executionResult.error")
         } catch(Exception e) {
             String message = String.format(WinRMCommandException.DELETE_WINDOWS_USER_ERROR, username, host.host)
             throw new MicroserviceCommandException(message, e)
@@ -147,7 +153,7 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
                     .includeMatchingAs(ACL.SYSTEM,
                     item ?: Jenkins.get(),
                     StandardCredentials.class,
-                    fromUri(FormUtils.getUri(host).toString()).build(),
+                    fromUri(WindowsCloudUtils.getUri(host).toString()).build(),
                     anyOf(instanceOf(StringCredentials)))
                     .includeCurrentValue(credentialsId)
         }
@@ -231,15 +237,15 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
             WindowsComputer windowsComputer = (WindowsComputer) computer
             ExecutionResult result = null
             try {
-                LOGGER.log(Level.FINE, "Creating user " + user.username)
+                LOGGER.log(Level.FINE, "######## $host.host -> $user.username : Creating user ...")
                 result = client.createUser(user)
-                LOGGER.log(Level.FINE, "Execution Result : \n Code :" + result.code + "\n Output : " + result.output + "\n Error : " + result.error)
-                LOGGER.log(Level.FINE, "Get remotin for the user " + user.username)
+                LOGGER.log(Level.FINEST, "######## $host.host -> $user.username : Create user -> Execution Result : \n Code : $result.code \n Output : $result.output \n Error : $result.error")
+                LOGGER.log(Level.FINE, "######## $host.host -> $user.username : Getting remoting...")
                 result = client.getRemoting(user, host.connector.jenkinsUrl)
-                LOGGER.log(Level.FINE, "Execution Result : \n Code :" + result.code + "\n Output : " + result.output + "\n Error : " + result.error)
-                LOGGER.log(Level.FINE, "Launch Jnlp for the user " + user.username)
+                LOGGER.log(Level.FINEST, "######## $host.host -> $user.username : Get remoting -> Execution Result : \n Code : $result.code \n Output : $result.output \n Error : $result.error")
+                LOGGER.log(Level.FINE, "######## $host.host -> $user.username : Launching Jnlp...")
                 result = client.connectJnlp(user, host.connector.jenkinsUrl, computer.getJnlpMac())
-                LOGGER.log(Level.FINE, "Execution Result : \n Code :" + result.code + "\n Output : " + result.output + "\n Error : " + result.error)
+                LOGGER.log(Level.FINEST, "######## $host.host -> $user.username : Launch Jnlp -> Execution Result : \n Code : $result.code \n Output : $result.output \n Error : $result.error")
             }catch(Exception e) {
                 launched = false
                 String message = String.format("Error while connecting computer %s due to %s ",

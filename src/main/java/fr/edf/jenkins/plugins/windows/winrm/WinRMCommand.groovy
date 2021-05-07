@@ -10,6 +10,7 @@ import org.kohsuke.accmod.restrictions.NoExternalUse
 
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.util.Constants
+import fr.edf.jenkins.plugins.windows.util.WindowsCloudUtils
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMUserConnectionConfiguration
 import hudson.util.Secret
@@ -89,7 +90,7 @@ class WinRMCommand {
         try {
             launcher = new WinRMCommandLauncher(config, commandTimeout)
 
-            LOGGER.log(Level.FINE, "$user.username : create user")
+            LOGGER.log(Level.FINE, "######## $config.host -> $user.username : create user")
             launcher.executeCommand(String.format(Constants.CREATE_USER, user.username, user.password.getPlainText(), user.username), false, true, true)
             if(!doesUserExist(launcher, user.username, true)) {
                 throw new Exception(String.format(WinRMCommandException.USER_DOES_NOT_EXIST, user.username))
@@ -99,7 +100,7 @@ class WinRMCommand {
             //            launcher.executeCommand(String.format(Constants.DISABLE_INHERITED_WORKDIR, user.username, user.username), false, true)
             //            launcher.executeCommand(String.format(Constants.GRANT_ACCESS_WORKDIR, user.username, user.username, user.username), false, true)
 
-            LOGGER.log(Level.FINE, "$user.username : add user to the group Remote Management Users")
+            LOGGER.log(Level.FINE, "######## $config.host -> $user.username : add user to the group Remote Management Users")
             launcher.executeCommand(String.format(Constants.ADD_USER_TO_GROUP, Constants.REMOTE_MANAGEMENT_USERS_GROUP, user.username), false, false, true)
             return user
         } catch(Exception e) {
@@ -123,16 +124,16 @@ class WinRMCommand {
         try {
             launcher = new WinRMCommandLauncher(config, commandTimeout)
 
-            LOGGER.log(Level.FINE, "$username : stop all process")
+            LOGGER.log(Level.FINE, "######## $config.host -> $username : stop all process")
             launcher.executeCommand(String.format(Constants.STOP_USER_PROCESS, username), false, true, true)
             Thread.sleep(5000)
-            LOGGER.log(Level.FINE, "$username : delete user")
+            LOGGER.log(Level.FINE, "######## $config.host -> $username : delete user")
             launcher.executeCommand(String.format(Constants.DELETE_USER, username), false, true, true)
 
             if(doesUserExist(launcher, username, true)) {
                 throw new Exception(String.format(WinRMCommandException.USER_STILL_EXISTS, username))
             }
-            LOGGER.log(Level.FINE, "$username : remove workdir")
+            LOGGER.log(Level.FINE, "######## $config.host -> $username : remove workdir")
             launcher.executeCommand(String.format(Constants.REMOVE_WORKDIR, username), false, true, true)
             if(doesWorkdirExist(launcher, username, false)) {
                 throw new Exception(String.format(WinRMCommandException.WORKDIR_STILL_EXISTS, username))
@@ -156,7 +157,7 @@ class WinRMCommand {
         try {
             WinRMCommandLauncher launcher = new WinRMCommandLauncher(config, commandTimeout)
 
-            LOGGER.log(Level.FINE, "$config.host : list users")
+            LOGGER.log(Level.FINE, "######## $config.host : list users")
             String result = launcher.executeCommand(Constants.LIST_USERS, false, false, true)
             if(StringUtils.isEmpty(result)) return new ArrayList()
             return result.split(Constants.REGEX_NEW_LINE) as List
@@ -178,19 +179,16 @@ class WinRMCommand {
      * @throws Exception
      */
     static boolean jnlpConnect(WinRMUserConnectionConfiguration userConnectionConfig, String jenkinsUrl, String agentSecret, Integer commandTimeout) throws WinRMCommandException, Exception{
-        jenkinsUrl = jenkinsUrl ?: Jenkins.get().getRootUrl()
-        if(!jenkinsUrl.endsWith("/")) {
-            jenkinsUrl += "/"
-        }
+        jenkinsUrl = WindowsCloudUtils.checkJenkinsUrl(jenkinsUrl)
 
         String remotingUrl = jenkinsUrl + Constants.REMOTING_JAR_URL
 
         WinRMCommandLauncher launcher = null
         try {
             launcher = new WinRMCommandLauncher(userConnectionConfig, commandTimeout)
-            LOGGER.log(Level.FINE, "$userConnectionConfig.username : get remoting.jar")
+            LOGGER.log(Level.FINE, "######## $userConnectionConfig.host -> $userConnectionConfig.username : get remoting.jar")
             launcher.executeCommand(String.format(Constants.GET_REMOTING_JAR, remotingUrl), false, true, true)
-            LOGGER.log(Level.FINE, "$userConnectionConfig.username : launch jnlp")
+            LOGGER.log(Level.FINE, "######## $userConnectionConfig.host -> $userConnectionConfig.username : launch jnlp")
             launcher.executeCommand(String.format(Constants.LAUNCH_JNLP, jenkinsUrl, userConnectionConfig.username, agentSecret), true, true, false)
             return true
         }catch(Exception e) {

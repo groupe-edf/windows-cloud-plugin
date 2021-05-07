@@ -24,7 +24,7 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.agent.WindowsComputer
-import fr.edf.jenkins.plugins.windows.util.FormUtils
+import fr.edf.jenkins.plugins.windows.util.WindowsCloudUtils
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommand
 import fr.edf.jenkins.plugins.windows.winrm.WinRMCommandException
 import fr.edf.jenkins.plugins.windows.winrm.connection.WinRMGlobalConnectionConfiguration
@@ -80,7 +80,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
      */
     @Override
     protected List<String> listUsers(WindowsHost host) throws WinRMCommandException {
-        return WinRMCommand.listUsers(getConnectionConfig(host.host));
+        return WinRMCommand.listUsers(getConnectionConfig(host.host), commandTimeout);
     }
 
     /**
@@ -88,7 +88,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
      */
     @Override
     protected void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception {
-        WinRMCommand.deleteUser(getConnectionConfig(host.host), username);
+        WinRMCommand.deleteUser(getConnectionConfig(host.host), username, commandTimeout);
     }
 
     private WinRMGlobalConnectionConfiguration getConnectionConfig(String hostname) {
@@ -102,7 +102,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
      */
     @Override
     protected ComputerLauncher createLauncher(WindowsHost host, WindowsUser user) {
-        return new WinRmJNLPLauncher(getConnectionConfig(host.host), user, jenkinsUrl, commandTimeout)
+        return new WinRmJNLPLauncher(getConnectionConfig(host.host), user, jenkinsUrl, commandTimeout, agentConnectionTimeout)
     }
 
     @Extension @Symbol("winrm")
@@ -153,7 +153,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
                     .includeMatchingAs(ACL.SYSTEM,
                     item ?: Jenkins.get(),
                     StandardCredentials.class,
-                    fromUri(FormUtils.getUri(host).toString()).build(),
+                    fromUri(WindowsCloudUtils.getUri(host).toString()).build(),
                     anyOf(instanceOf(StandardUsernamePasswordCredentials)))
                     .includeCurrentValue(credentialsId)
         }

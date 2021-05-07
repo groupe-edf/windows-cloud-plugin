@@ -1,12 +1,14 @@
 package fr.edf.jenkins.plugins.windows.util
 
 import org.antlr.v4.runtime.misc.NotNull
+
+import jenkins.model.Jenkins
 /**
  * Jenkins UI form
  * @author CHRIS BAHONDA
  *
  */
-class FormUtils {
+class WindowsCloudUtils {
 
     /**
      * Change the host into URI
@@ -27,5 +29,19 @@ class FormUtils {
         } catch(Exception e) {
             return null
         }
+    }
+
+    /**
+     * Check and return a correct Jenkins URL
+     * 
+     * @param jenkinsUrl
+     * @return Jenkins url
+     */
+    static String checkJenkinsUrl(@NotNull String jenkinsUrl) {
+        jenkinsUrl = jenkinsUrl ?: Jenkins.get().getRootUrl()
+        if(!jenkinsUrl.endsWith("/")) {
+            jenkinsUrl += "/"
+        }
+        return jenkinsUrl
     }
 }

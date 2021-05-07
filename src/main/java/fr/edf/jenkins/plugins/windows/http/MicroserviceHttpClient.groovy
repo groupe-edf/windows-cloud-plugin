@@ -8,26 +8,21 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 import org.apache.http.Header
-import org.apache.http.HttpEntity
 import org.apache.http.HttpException
 import org.apache.http.client.HttpClient
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
-import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
 import org.apache.http.protocol.HTTP
-import org.apache.http.util.EntityUtils
 
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.util.Constants
-import fr.edf.jenkins.plugins.windows.winrm.client.WinRMException
+import fr.edf.jenkins.plugins.windows.util.WindowsCloudUtils
 import groovy.json.JsonSlurper
 import hudson.util.Secret
-import jenkins.model.Jenkins
-import net.sf.json.JSONObject
 
 class MicroserviceHttpClient {
 
@@ -136,7 +131,7 @@ class MicroserviceHttpClient {
         return new URL(protocol, address, port, contextPath)
     }
 
-    public ExecutionResult whoami() {
+    public ExecutionResult whoami() throws HttpException {
         HttpGet request = new HttpGet(url.toString().concat("/api/whoami"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
         Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
@@ -148,7 +143,7 @@ class MicroserviceHttpClient {
         return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
     }
 
-    public ExecutionResult listUser() {
+    public ExecutionResult listUser() throws HttpException {
         HttpGet request = new HttpGet(url.toString().concat("/api/users/list"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
         Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
@@ -160,7 +155,7 @@ class MicroserviceHttpClient {
         return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
     }
 
-    public ExecutionResult createUser(WindowsUser user) {
+    public ExecutionResult createUser(WindowsUser user) throws HttpException {
         HttpPost request = new HttpPost(url.toString().concat("/api/user/create"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
         Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
@@ -173,7 +168,7 @@ class MicroserviceHttpClient {
         return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
     }
 
-    public ExecutionResult deleteUser(String username) {
+    public ExecutionResult deleteUser(String username) throws HttpException {
         HttpPost request = new HttpPost(url.toString().concat("/api/user/delete?username=$username"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
         Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())
@@ -185,11 +180,8 @@ class MicroserviceHttpClient {
         return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
     }
 
-    public ExecutionResult getRemoting(WindowsUser user, String jenkinsUrl) {
-        jenkinsUrl = jenkinsUrl ?: Jenkins.get().getRootUrl()
-        if(!jenkinsUrl.endsWith("/")) {
-            jenkinsUrl += "/"
-        }
+    public ExecutionResult getRemoting(WindowsUser user, String jenkinsUrl) throws HttpException {
+        jenkinsUrl = WindowsCloudUtils.checkJenkinsUrl(jenkinsUrl)
         String remotingUrl = jenkinsUrl + Constants.REMOTING_JAR_URL
         HttpPost request = new HttpPost(url.toString().concat("/api/user/remoting?remotingUrl=$remotingUrl"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
@@ -203,11 +195,8 @@ class MicroserviceHttpClient {
         return new ExecutionResult(new JsonSlurper().parse(response.getEntity().getContent()))
     }
 
-    public ExecutionResult connectJnlp(WindowsUser user, String jenkinsUrl, String secret) {
-        jenkinsUrl = jenkinsUrl ?: Jenkins.get().getRootUrl()
-        if(!jenkinsUrl.endsWith("/")) {
-            jenkinsUrl += "/"
-        }
+    public ExecutionResult connectJnlp(WindowsUser user, String jenkinsUrl, String secret) throws HttpException {
+        jenkinsUrl = WindowsCloudUtils.checkJenkinsUrl(jenkinsUrl)
         HttpPost request = new HttpPost(url.toString().concat("/api/user/jnlp"))
         Header contentTypeHeader = new BasicHeader(HTTP.CONTENT_TYPE, JSON_CONTENT_TYPE)
         Header tokenHeader = new BasicHeader(TOKEN_HEADER, token.getPlainText())

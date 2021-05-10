@@ -54,7 +54,7 @@ class HttpConnectionFactory {
                     readTimeout)
             return microserviceHttpClient
         } else {
-            throw new HttpConnectionException("Only Username and Password Credentials are allowed")
+            throw new HttpConnectionException("Only StringCredentials are allowed")
         }
     }
 }

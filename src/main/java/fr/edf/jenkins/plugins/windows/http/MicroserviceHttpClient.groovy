@@ -79,7 +79,7 @@ class MicroserviceHttpClient {
      *
      * @return {@link HttpClient}
      */
-    private HttpClient getHttpClient() {
+    protected HttpClient getHttpClient() {
         HttpClientBuilder builder = new HttpClientBuilder()
         if(useHttps) {
             if(disableCertificateChecks) {
@@ -239,7 +239,7 @@ class MicroserviceHttpClient {
             request.addHeader(tokenHeader)
             return client.execute(request, new ExecutionResultResponseHandler())
         } catch(Exception e) {
-            throw new HttpException("An error occured when performing the request $request.URI")
+            throw new HttpException("An error occured when performing the request $request.URI", e)
         }
         finally {
             client.close()

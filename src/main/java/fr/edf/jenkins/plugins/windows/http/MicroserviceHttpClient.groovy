@@ -40,9 +40,6 @@ class MicroserviceHttpClient {
     /** application/json */
     private static final String JSON_CONTENT_TYPE = "application/json"
 
-    /** array of success status of an HTTP response */
-    private static final List<Integer> SUCCESS_STATUS = [200, 201, 202, 204]
-
     /** token */
     private static final String TOKEN_HEADER = "token"
 

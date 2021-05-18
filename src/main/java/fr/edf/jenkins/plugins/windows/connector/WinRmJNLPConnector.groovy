@@ -102,7 +102,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
      * @return
      */
     protected WinRMGlobalConnectionConfiguration getConnectionConfig(String hostname) {
-        WinRMGlobalConnectionConfiguration config = new WinRMGlobalConnectionConfiguration(credentialsId: credentialsId,
+       return new WinRMGlobalConnectionConfiguration(credentialsId: credentialsId,
         context: Jenkins.get(), host: hostname, port: port, authenticationScheme: authenticationScheme,
         useHttps: useHttps, disableCertificateCheck: disableCertificateCheck, connectionTimeout: connectionTimeout, readTimeout: readTimeout)
     }

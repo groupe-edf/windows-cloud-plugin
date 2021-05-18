@@ -9,16 +9,11 @@ import javax.net.ssl.X509TrustManager
 
 import org.apache.http.Header
 import org.apache.http.HttpException
-import org.apache.http.HttpRequest
 import org.apache.http.client.HttpClient
-import org.apache.http.client.ResponseHandler
-import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.entity.StringEntity
-import org.apache.http.impl.client.AbstractResponseHandler
-import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
@@ -27,7 +22,6 @@ import org.apache.http.protocol.HTTP
 import fr.edf.jenkins.plugins.windows.WindowsUser
 import fr.edf.jenkins.plugins.windows.util.Constants
 import fr.edf.jenkins.plugins.windows.util.WindowsCloudUtils
-import groovy.json.JsonSlurper
 import hudson.util.Secret
 
 /**

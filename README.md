@@ -11,15 +11,6 @@ This plugin builds Windows agents to perform builds.
 
 It has been tested on VMware virtual machines with Windows Server 2012 R2 and Windows Server 2016.
 
-**Team :**
-
-- [feirychris](https://github.com/feirychris)
-
-- [Aelotmani](https://github.com/Aelotmani)
-
-- [mat1e](https://github.com/mat1e)
-
-
 ## Requirements
 JNLP must be enabled on Jenkins.
 
@@ -149,6 +140,22 @@ This project contains code under Apache-2.0 License from :
 
  - [cloudsoft/winrm4j](https://github.com/cloudsoft/winrm4j) for WinRM authentication
  - [sshoogr/groovy-winrm-client](https://github.com/sshoogr/groovy-winrm-client) for WinRM requests
+
+## Team
+
+Product owner :
+
+- [Cloudehard](https://github.com/Cloudehard)
+
+Developers :
+
+- [feirychris](https://github.com/feirychris)
+
+- [mat1e](https://github.com/mat1e)
+
+Microsoft expertise :
+
+- [Aelotmani](https://github.com/Aelotmani)
  
 ## Contact
 

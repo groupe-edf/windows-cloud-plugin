@@ -1,190 +1,216 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.jenkins-ci.plugins</groupId>
-    <artifactId>plugin</artifactId>
-    <version>4.7</version>
-    <relativePath />
-  </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>4.7</version>
+        <relativePath />
+    </parent>
 
-  <groupId>fr.edf.jenkins.plugins</groupId>
-  <artifactId>windows-cloud</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
-  <packaging>hpi</packaging>
-  <url>https://github.com/jenkinsci/windows-cloud-plugin</url>
-
-  <scm>
-    <connection>scm:git:https://github.com/jenkinsci/windows-cloud-plugin.git</connection>
-    <developerConnection>scm:git:https://github.com/jenkinsci/windows-cloud-plugin.git</developerConnection>
+    <groupId>fr.edf.jenkins.plugins</groupId>
+    <artifactId>windows-cloud</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
+    <packaging>hpi</packaging>
     <url>https://github.com/jenkinsci/windows-cloud-plugin</url>
-    <tag>${scmTag}</tag>
-  </scm>
 
-  <properties>
-    <spotbugs.failOnError>false</spotbugs.failOnError>
-    <jenkins.version>2.249.1</jenkins.version>
-    <java.level>8</java.level>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
-  </properties>
+    <scm>
+        <connection>scm:git:https://github.com/jenkinsci/windows-cloud-plugin.git</connection>
+        <developerConnection>scm:git:https://github.com/jenkinsci/windows-cloud-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/windows-cloud-plugin</url>
+        <tag>${scmTag}</tag>
+    </scm>
 
-  <name>Windows cloud plugin</name>
-  <description>This plugin create Windows agents on which builds can be performed</description>
-  <organization>
-    <name>EDF</name>
-  </organization>
+    <properties>
+        <spotbugs.failOnError>false</spotbugs.failOnError>
+        <jenkins.version>2.249.1</jenkins.version>
+        <java.level>8</java.level>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+    </properties>
 
-  <licenses>
-    <license>
-      <name>Apache-2.0 License</name>
-      <url>https://opensource.org/licenses/Apache-2.0</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+    <name>Windows cloud plugin</name>
+    <description>This plugin create Windows agents on which builds can be performed</description>
 
-  <developers>
-    <developer>
-      <id>feirychris</id>
-      <name>Chris Bahonda</name>
-      <email>chrisbahonda@gmail.com</email>
-    </developer>
-    <developer>
-      <id>mat1e</id>
-      <name>Mathieu Delrocq</name>
-      <email>delrocq.mathieu@gmail.com</email>
-    </developer>
-  </developers>
+    <organization>
+        <name>EDF</name>
+        <url>https://github.com/groupe-edf</url>
+    </organization>
 
-  <repositories>
-    <repository>
-      <id>jenkins</id>
-      <url>https://repo.jenkins-ci.org/releases/</url>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>jenkins</id>
-      <url>https://repo.jenkins-ci.org/releases/</url>
-    </pluginRepository>
-  </pluginRepositories>
+    <licenses>
+        <license>
+            <name>Apache-2.0 License</name>
+            <url>https://opensource.org/licenses/Apache-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-  <dependencyManagement>
+    <developers>
+        <developer>
+            <id>feirychris</id>
+            <url>https://github.com/feirychris</url>
+            <name>Chris Bahonda</name>
+        </developer>
+        <developer>
+            <id>mat1e</id>
+            <url>https://github.com/mat1e</url>
+            <name>Mathieu Delrocq</name>
+            <roles>
+                <role>Lead Developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+            <name>Olivier Routier</name>
+            <url>https://github.com/Cloudehard</url>
+            <organization>EDF</organization>
+            <organizationUrl>https://github.com/groupe-edf</organizationUrl>
+            <roles>
+                <role>Product Owner</role>
+            </roles>
+        </contributor>
+        <contributor>
+            <name>Aelotmani</name>
+            <url>https://github.com/Aelotmani</url>
+            <roles>
+                <role>Microsoft Expertise</role>
+            </roles>
+        </contributor>
+    </contributors>
+
+    <repositories>
+        <repository>
+            <id>jenkins</id>
+            <url>https://repo.jenkins-ci.org/releases/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jenkins</id>
+            <url>https://repo.jenkins-ci.org/releases/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.jenkins.tools.bom</groupId>
+                <artifactId>bom-2.235.x</artifactId>
+                <version>11</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>1.7.30</version>
+            </dependency>
+        </dependencies>
+
+    </dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.235.x</artifactId>
-        <version>11</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jcl-over-slf4j</artifactId>
-        <version>1.7.30</version>
-      </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>apache-httpcomponents-client-4-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>credentials</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>plain-credentials</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>durable-task</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.30</version><!--$NO-MVN-MAN-VER$ --> <!-- MANDATORY VERSION -->
+        </dependency>
+        <!-- define dependencies for test execution -->
+
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <version>1.3-groovy-2.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.objenesis</groupId>
+            <artifactId>objenesis</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+            <version>3.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
-  </dependencyManagement>
-  <dependencies>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>apache-httpcomponents-client-4-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>credentials</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>plain-credentials</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>durable-task</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.30</version><!--$NO-MVN-MAN-VER$ --> <!-- MANDATORY VERSION -->
-    </dependency>
-    <!-- define dependencies for test execution -->
-
-    <dependency>
-      <groupId>org.spockframework</groupId>
-      <artifactId>spock-core</artifactId>
-      <version>1.3-groovy-2.5</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.objenesis</groupId>
-      <artifactId>objenesis</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>cglib</groupId>
-      <artifactId>cglib-nodep</artifactId>
-      <version>3.3.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eluder.coveralls</groupId>
-        <artifactId>coveralls-maven-plugin</artifactId>
-        <version>4.3.0</version>
-      </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>prepare-agent</id>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>jacoco-site</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <compilerId>groovy-eclipse-compiler</compilerId>
-          <failOnWarning>false</failOnWarning>
-          <release>11</release>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-eclipse-compiler</artifactId>
-            <version>2.9.2-01</version>
-          </dependency>
-          <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-eclipse-batch</artifactId>
-            <version>2.5.7-01</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-    </plugins>
-  </build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>4.3.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-site</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerId>groovy-eclipse-compiler</compilerId>
+                    <failOnWarning>false</failOnWarning>
+                    <release>11</release>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-compiler</artifactId>
+                        <version>2.9.2-01</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-batch</artifactId>
+                        <version>2.5.7-01</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -1,4 +1,6 @@
-# Windows Plugin
+[<img src="https://i.pinimg.com/originals/bc/00/a8/bc00a8bd0a4be6cd29680d02c70f0539.png" width="100" align="right"/>](https://github.com/groupe-edf)
+
+# Windows Cloud Plugin
 [![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins%2Fwindows-cloud-plugin%2Fmaster)](https://ci.jenkins.io/job/Plugins/job/windows-cloud-plugin/job/master/)
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/windows-cloud.svg?color=blue)](https://plugins.jenkins.io/windows-cloud)
 [![Coverage Status](https://coveralls.io/repos/github/groupe-edf/windows-cloud-plugin/badge.svg?branch=master)](https://coveralls.io/github/groupe-edf/windows-cloud-plugin?branch=master) 
@@ -8,15 +10,6 @@
 This plugin builds Windows agents to perform builds.
 
 It has been tested on VMware virtual machines with Windows Server 2012 R2 and Windows Server 2016.
-
-**Team :**
-
-- [feirychris](https://github.com/feirychris)
-
-- [Aelotmani](https://github.com/Aelotmani)
-
-- [mat1e](https://github.com/mat1e)
-
 
 ## Requirements
 JNLP must be enabled on Jenkins.
@@ -147,6 +140,14 @@ This project contains code under Apache-2.0 License from :
 
  - [cloudsoft/winrm4j](https://github.com/cloudsoft/winrm4j) for WinRM authentication
  - [sshoogr/groovy-winrm-client](https://github.com/sshoogr/groovy-winrm-client) for WinRM requests
+
+## Team
+
+Product Owner : [Cloudehard](https://github.com/Cloudehard)
+
+Developers : [feirychris](https://github.com/feirychris), [mat1e](https://github.com/mat1e)
+
+Microsoft expertise : [Aelotmani](https://github.com/Aelotmani)
  
 ## Contact
 

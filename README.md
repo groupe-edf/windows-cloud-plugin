@@ -143,19 +143,11 @@ This project contains code under Apache-2.0 License from :
 
 ## Team
 
-Product owner :
+Product Owner : [Cloudehard](https://github.com/Cloudehard)
 
-- [Cloudehard](https://github.com/Cloudehard)
+Developers : [feirychris](https://github.com/feirychris), [mat1e](https://github.com/mat1e)
 
-Developers :
-
-- [feirychris](https://github.com/feirychris)
-
-- [mat1e](https://github.com/mat1e)
-
-Microsoft expertise :
-
-- [Aelotmani](https://github.com/Aelotmani)
+Microsoft expertise : [Aelotmani](https://github.com/Aelotmani)
  
 ## Contact
 

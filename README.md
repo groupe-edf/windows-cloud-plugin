@@ -1,6 +1,6 @@
 [<img src="https://i.pinimg.com/originals/bc/00/a8/bc00a8bd0a4be6cd29680d02c70f0539.png" width="100" align="right"/>](https://github.com/groupe-edf)
 
-# Windows Plugin
+# Windows Cloud Plugin
 [![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins%2Fwindows-cloud-plugin%2Fmaster)](https://ci.jenkins.io/job/Plugins/job/windows-cloud-plugin/job/master/)
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/windows-cloud.svg?color=blue)](https://plugins.jenkins.io/windows-cloud)
 [![Coverage Status](https://coveralls.io/repos/github/groupe-edf/windows-cloud-plugin/badge.svg?branch=master)](https://coveralls.io/github/groupe-edf/windows-cloud-plugin?branch=master) 

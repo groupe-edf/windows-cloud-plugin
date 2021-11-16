@@ -56,7 +56,7 @@ class MicroserviceHttpClient {
     /** timeout to receive response in second */
     Integer readTimeout = 15
 
-    MicroserviceHttpClient(String host, Integer port, String contextPath, Secret token, boolean disableCertificateChecks, boolean useHttps, Integer connectionTimeout, Integer readTimeout) {
+    MicroserviceHttpClient(String host, Integer port, String contextPath, Secret token, boolean useHttps, boolean disableCertificateChecks, Integer connectionTimeout, Integer readTimeout) {
         this.url = buildUrl(useHttps?PROTOCOL_HTTPS:PROTOCOL_HTTP, host, port, contextPath)
         this.token = token
         this.disableCertificateChecks = disableCertificateChecks

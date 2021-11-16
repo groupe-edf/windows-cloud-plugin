@@ -12,7 +12,7 @@
 
     <groupId>fr.edf.jenkins.plugins</groupId>
     <artifactId>windows-cloud</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1-EDF</version>
     <packaging>hpi</packaging>
     <url>https://github.com/jenkinsci/windows-cloud-plugin</url>
 

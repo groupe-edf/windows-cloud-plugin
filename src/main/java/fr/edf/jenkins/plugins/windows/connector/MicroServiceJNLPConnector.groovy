@@ -103,7 +103,7 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
      * {@inheritDoc}
      */
     @Override
-    protected void deleteUser(WindowsHost host, String username) throws WinRMCommandException, Exception {
+    protected void deleteUser(WindowsHost host, String username) throws MicroserviceCommandException {
         try {
             LOGGER.log(Level.FINE, "######## $host.host -> $username : Deleting user...")
             ExecutionResult executionResult = getClient(host).deleteUser(username)

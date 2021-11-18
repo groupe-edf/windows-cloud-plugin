@@ -230,7 +230,7 @@ class MicroserviceHttpClient {
             request.addHeader(tokenHeader)
             return client.execute(request, new ExecutionResultResponseHandler())
         } catch(Exception e) {
-            throw new HttpException("An error occured when performing the request $request.URI", e)
+            throw new HttpException("An error occured when performing the request $request.URI : $e.message", e)
         }
         finally {
             client.close()

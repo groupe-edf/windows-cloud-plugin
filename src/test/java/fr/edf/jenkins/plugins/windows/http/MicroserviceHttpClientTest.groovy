@@ -53,7 +53,7 @@ class MicroserviceHttpClientTest extends Specification {
 
         then:
         HttpException he = thrown()
-        assert he.getMessage().equals("An error occured when performing the request http://testUrl:1011/testPath/api/whoami : testUrl")
+        assert he.getMessage().contains("An error occured when performing the request http://testUrl:1011/testPath/api/whoami")
         assert he.getCause() instanceof UnknownHostException
     }
 

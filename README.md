@@ -26,7 +26,7 @@ In a PowerShell terminal,
 Check Winrm configuration :
 
 ```
-PS C:\Users\admsrv> winrm get winrm/config
+PS C:\Users\admin> winrm get winrm/config
 Config
 (...)
     Service
@@ -59,7 +59,7 @@ Config
 Verify PowerShell permissions :
 
 ```
-PS C:\Users\admsrv> (Get-PSSessionConfiguration -Name Microsoft.PowerShell).Permission
+PS C:\Users\admin> (Get-PSSessionConfiguration -Name Microsoft.PowerShell).Permission
 NT AUTHORITY\INTERACTIVE AccessAllowed, BUILTIN\Administrators AccessAllowed, BUILTIN\Remote Management Users AccessAllo
 wed
 ```
@@ -67,7 +67,7 @@ wed
 Then launch 
 
 ```
-PS C:\Users\admsrv> winrm configSDDL default
+PS C:\Users\admin> winrm configSDDL default
 ```
 
 Add permission to "Remote Management User" by following steps :
@@ -95,7 +95,7 @@ Add permission to "Remote Management User" by following steps :
 Restart Winrm with the command :
 
 ```
-PS C:\Users\admsrv> Restart-Service winrm
+PS C:\Users\admin> Restart-Service winrm
 ```
 ## Plugin configuration
 
@@ -111,13 +111,13 @@ In the Agent Properties section, fill the Jenkins URL. Then add a new Windows Ho
 
 Fill the fields like in the given example :
 
-<img src="https://zupimages.net/up/20/50/u1ce.png" width="700"/>
+<img src="https://zupimages.net/up/22/08/qxn9.png" width="700"/>
 
 **The Credential is an username and password type and the account used must be in Administrator group on the server.**
 
 Click on "Test Connection" to test the configuration. If it works, you should see the name of the windows computer and the user used to connect.
 
-<img src="https://zupimages.net/up/20/50/buor.png" width="500"/>
+<img src="https://zupimages.net/up/22/08/e1sw.png" width="500"/>
 
 After configure a job to run on this host, you should see Jenkins agents created
 

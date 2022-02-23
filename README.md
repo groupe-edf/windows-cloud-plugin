@@ -77,8 +77,7 @@ Add permission to "Remote Management User" by following steps :
 - Click on Locations
     
 - Select your computer
-    
-<img src="https://zupimages.net/up/20/49/z5sv.png" width="400"/>
+<img src="https://zupimages.net/up/21/34/wyet.png" width="400"/>
     
 - Click on Advanced
     

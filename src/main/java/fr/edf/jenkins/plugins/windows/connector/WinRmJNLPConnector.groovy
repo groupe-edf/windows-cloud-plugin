@@ -54,8 +54,8 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
     @DataBoundConstructor
     WinRmJNLPConnector(Boolean useHttps, Boolean disableCertificateCheck, Integer port, String authenticationScheme,
     String credentialsId, Integer maxTries, Integer connectionTimeout, Integer readTimeout,
-    Integer agentConnectionTimeout, Integer commandTimeout, String jenkinsUrl) {
-        super(jenkinsUrl, port, useHttps, disableCertificateCheck, credentialsId, connectionTimeout, readTimeout, agentConnectionTimeout, maxTries)
+    Integer agentConnectionTimeout, Integer commandTimeout, String jenkinsUrl, String agentJvmParameters) {
+        super(jenkinsUrl, port, useHttps, disableCertificateCheck, credentialsId, connectionTimeout, readTimeout, agentConnectionTimeout, maxTries, agentJvmParameters)
         this.authenticationScheme = authenticationScheme
         this.commandTimeout = commandTimeout
     }
@@ -102,7 +102,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
      * @return
      */
     protected WinRMGlobalConnectionConfiguration getConnectionConfig(String hostname) {
-       return new WinRMGlobalConnectionConfiguration(credentialsId: credentialsId,
+        return new WinRMGlobalConnectionConfiguration(credentialsId: credentialsId,
         context: Jenkins.get(), host: hostname, port: port, authenticationScheme: authenticationScheme,
         useHttps: useHttps, disableCertificateCheck: disableCertificateCheck, connectionTimeout: connectionTimeout, readTimeout: readTimeout)
     }
@@ -112,7 +112,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
      */
     @Override
     protected ComputerLauncher createLauncher(WindowsHost host, WindowsUser user) {
-        return new WinRmJNLPLauncher(getConnectionConfig(host.host), user, jenkinsUrl, commandTimeout, agentConnectionTimeout)
+        return new WinRmJNLPLauncher(getConnectionConfig(host.host), user, jenkinsUrl, commandTimeout, agentConnectionTimeout, getAgentJvmParameters())
     }
 
     @Extension @Symbol("winrm")
@@ -206,14 +206,16 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
         WinRMGlobalConnectionConfiguration connectionConfig
         boolean launched
         String jenkinsUrl
+        String agentJvmParameters
 
-        WinRmJNLPLauncher(WinRMGlobalConnectionConfiguration connectionConfig, WindowsUser user, String jenkinsUrl, Integer commandTimeout, Integer agentConnectionTimeout) {
+        WinRmJNLPLauncher(WinRMGlobalConnectionConfiguration connectionConfig, WindowsUser user, String jenkinsUrl, Integer commandTimeout, Integer agentConnectionTimeout, String agentJvmParameters) {
             super(true)
             this.user = user
             this.connectionConfig = connectionConfig
             this.commandTimeout = commandTimeout
             this.jenkinsUrl = jenkinsUrl
             this.agentConnectionTimeout = agentConnectionTimeout
+            this.agentJvmParameters = agentJvmParameters
         }
 
         /**
@@ -243,7 +245,7 @@ class WinRmJNLPConnector extends WindowsComputerConnector {
                         disableCertificateCheck: connectionConfig.disableCertificateCheck,
                         connectionTimeout: connectionConfig.connectionTimeout,
                         readTimeout: connectionConfig.readTimeout)
-                WinRMCommand.jnlpConnect(userConfig, jenkinsUrl, computer.getJnlpMac(), commandTimeout)
+                WinRMCommand.jnlpConnect(userConfig, jenkinsUrl, computer.getJnlpMac(), commandTimeout, agentJvmParameters)
             }catch(Exception e) {
                 launched = false
                 String message = String.format("Error while connecting computer %s due to %s ",

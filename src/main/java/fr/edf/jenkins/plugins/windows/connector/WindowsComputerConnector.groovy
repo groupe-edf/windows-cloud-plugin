@@ -4,6 +4,7 @@ import org.kohsuke.stapler.DataBoundSetter
 
 import fr.edf.jenkins.plugins.windows.WindowsHost
 import fr.edf.jenkins.plugins.windows.WindowsUser
+import fr.edf.jenkins.plugins.windows.util.Constants
 import hudson.model.AbstractDescribableImpl
 import hudson.slaves.ComputerLauncher
 
@@ -23,10 +24,11 @@ abstract class WindowsComputerConnector extends AbstractDescribableImpl<WindowsC
     Integer readTimeout
     Integer agentConnectionTimeout
     Integer maxTries
+    String agentJvmParameters
 
 
     public WindowsComputerConnector(String jenkinsUrl, Integer port, Boolean useHttps, Boolean disableCertificateCheck,
-    String credentialsId, Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer maxTries) {
+    String credentialsId, Integer connectionTimeout, Integer readTimeout, Integer agentConnectionTimeout, Integer maxTries, String agentJvmParameters) {
         super()
         this.jenkinsUrl = jenkinsUrl
         this.port = port
@@ -36,6 +38,7 @@ abstract class WindowsComputerConnector extends AbstractDescribableImpl<WindowsC
         this.connectionTimeout = connectionTimeout
         this.readTimeout = readTimeout
         this.agentConnectionTimeout = agentConnectionTimeout
+        this.agentJvmParameters = agentJvmParameters
     }
 
     @DataBoundSetter
@@ -117,6 +120,15 @@ abstract class WindowsComputerConnector extends AbstractDescribableImpl<WindowsC
     @DataBoundSetter
     void setMaxTries(Integer maxTries) {
         this.maxTries = maxTries
+    }
+
+    String getAgentJvmParameters() {
+        return !agentJvmParameters ? Constants.AGENT_JVM_DEFAULT_PARAMETERS : agentJvmParameters
+    }
+
+    @DataBoundSetter
+    void setAgentJvmParameters(String agentJvmParameters) {
+        this.agentJvmParameters = agentJvmParameters
     }
 
     /**

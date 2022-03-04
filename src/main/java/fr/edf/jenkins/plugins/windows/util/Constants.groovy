@@ -10,6 +10,10 @@ class Constants {
 
     static final String EMPTY_LIST_BOX_VALUE = "--------"
 
+    // Advanced properties default values
+    /** -Xms64m -Xmx128m */
+    public static final String AGENT_JVM_DEFAULT_PARAMETERS = "-Xms64m -Xmx128m"
+
     /** windows-%s */
     static final String USERNAME_PATTERN = "windows-%s"
 
@@ -72,8 +76,8 @@ class Constants {
     /** (Get-LocalUser | Where-Object {\$_.Name -eq %s}).name */
     static final String CHECK_USER_EXIST = "(Get-LocalUser | Where-Object {\$_.Name -eq '%s'}).name"
 
-    /** java -jar remoting.jar -jnlpUrl %scomputer/%s/slave-agent.jnlp -secret %s */
-    static final String LAUNCH_JNLP = "java -jar remoting.jar -jnlpUrl %scomputer/%s/slave-agent.jnlp -secret %s"
+    /** java %s -jar remoting.jar -jnlpUrl %scomputer/%s/slave-agent.jnlp -secret %s */
+    static final String LAUNCH_JNLP = "java %s -jar remoting.jar -jnlpUrl %scomputer/%s/slave-agent.jnlp -secret %s"
 
     /** (Get-LocalUser | Where-Object {\$_.Name -match \"windows-*\"}).name */
     static final String LIST_USERS = "(Get-LocalUser | Where-Object {\$_.Name -match \"windows-*\"}).name"

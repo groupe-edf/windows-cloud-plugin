@@ -1,4 +1,6 @@
 import fr.edf.jenkins.plugins.windows.Messages
+import fr.edf.jenkins.plugins.windows.util.Constants
+
 import org.apache.http.client.config.AuthSchemes
 
 def f = namespace(lib.FormTagLib)
@@ -52,6 +54,10 @@ f.advanced('Advanced settings') {
 
     f.entry(title: Messages.Host_CommandTimeout(), field: 'commandTimeout'){
         f.number(clazz: 'required', default: 20, min: 10)
+    }
+
+    f.entry(title: Messages.Host_AgentJVMParameters(), field: 'agentJvmParameters'){
+        f.textbox(default: Constants.AGENT_JVM_DEFAULT_PARAMETERS)
     }
 }
 

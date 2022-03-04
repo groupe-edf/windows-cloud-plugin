@@ -206,10 +206,10 @@ class MicroserviceHttpClient {
      * @return {@link ExecutionResult}
      * @throws HttpException
      */
-    public ExecutionResult connectJnlp(WindowsUser user, String jenkinsUrl, String secret) throws HttpException {
+    public ExecutionResult connectJnlp(WindowsUser user, String jenkinsUrl, String secret, agentJvmParameters) throws HttpException {
         jenkinsUrl = WindowsCloudUtils.checkJenkinsUrl(jenkinsUrl)
         HttpPost request = new HttpPost(url.toString().concat("/api/user/jnlp"))
-        request.setEntity(new StringEntity("{\"jenkinsUrl\":\"$jenkinsUrl\",\"secret\":\"$secret\",\"user\":{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}}"))
+        request.setEntity(new StringEntity("{\"jenkinsUrl\":\"$jenkinsUrl\",\"secret\":\"$secret\",\"agentJvmParameters\":\"$agentJvmParameters\",\"user\":{\"username\":\"$user.username\", \"password\":\"$user.password.plainText\"}}"))
         return performRequest(request)
     }
 

@@ -61,8 +61,8 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
     @DataBoundConstructor
     MicroServiceJNLPConnector(Boolean useHttps, Boolean disableCertificateCheck, Integer port,
     String credentialsId, Integer connectionTimeout, Integer readTimeout,
-    Integer agentConnectionTimeout, String jenkinsUrl, String contextPath, Integer maxTries) {
-        super(jenkinsUrl, port, useHttps, disableCertificateCheck, credentialsId, connectionTimeout, readTimeout, agentConnectionTimeout, maxTries)
+    Integer agentConnectionTimeout, String jenkinsUrl, String contextPath, Integer maxTries, String agentJvmParameters) {
+        super(jenkinsUrl, port, useHttps, disableCertificateCheck, credentialsId, connectionTimeout, readTimeout, agentConnectionTimeout, maxTries, agentJvmParameters)
         this.contextPath = contextPath
     }
 
@@ -77,7 +77,7 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
 
     @Override
     protected ComputerLauncher createLauncher(WindowsHost host, WindowsUser user) {
-        return new MicroServiceJNLPLauncher(host, user, getClient(host))
+        return new MicroServiceJNLPLauncher(host, user, getClient(host), agentJvmParameters)
     }
 
     /**
@@ -218,13 +218,15 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
         WindowsHost host
         WindowsUser user
         MicroserviceHttpClient client
+        String agentJvmParameters
         boolean launched
 
-        MicroServiceJNLPLauncher(WindowsHost host, WindowsUser user, MicroserviceHttpClient client) {
+        MicroServiceJNLPLauncher(WindowsHost host, WindowsUser user, MicroserviceHttpClient client, String agentJvmParameters) {
             super(true)
             this.host = host
             this.user = user
             this.client = client
+            this.agentJvmParameters = agentJvmParameters
         }
 
         /**
@@ -251,7 +253,7 @@ class MicroServiceJNLPConnector extends WindowsComputerConnector {
                 result = client.getRemoting(user, host.connector.jenkinsUrl)
                 LOGGER.log(Level.FINEST, "######## $host.host -> $user.username : Get remoting -> Execution Result : \n Code : $result.code \n Output : $result.output \n Error : $result.error")
                 LOGGER.log(Level.FINE, "######## $host.host -> $user.username : Launching Jnlp...")
-                result = client.connectJnlp(user, host.connector.jenkinsUrl, computer.getJnlpMac())
+                result = client.connectJnlp(user, host.connector.jenkinsUrl, computer.getJnlpMac(), agentJvmParameters)
                 LOGGER.log(Level.FINEST, "######## $host.host -> $user.username : Launch Jnlp -> Execution Result : \n Code : $result.code \n Output : $result.output \n Error : $result.error")
                 this.client = null
             }catch(Exception e) {
